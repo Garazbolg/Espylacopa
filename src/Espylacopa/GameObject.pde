@@ -1,6 +1,6 @@
-public abstract class GameObject{
+public abstract class GameObject extends Updatable{
  PVector position;
  PVector acceleration;
 
- void draw(); 
+ public abstract void draw(); 
 }
