@@ -23,5 +23,7 @@ public abstract class Updatable{
     Updatables.add(this);
   }
   
+  public void start(){}
+  
   public abstract void update();
 }
