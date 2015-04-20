@@ -1,4 +1,4 @@
-public abstract class Area{
+public abstract class Area implements Cloneable{
  public PVector position;
  
  Area(float x,float y){
@@ -11,6 +11,19 @@ public abstract class Area{
  
  public abstract boolean intersect(Area other); 
  
+ public Object clone() {
+    Area o = null;
+    try {
+      o = (Area)super.clone();
+    } catch(CloneNotSupportedException cnse) {
+      cnse.printStackTrace(System.err);
+    }
+    
+    o.position = position.get();
+    // on renvoie le clone
+    return o;
+  }
+ 
 }
 
 public class Rect extends Area{
@@ -22,7 +35,7 @@ public class Rect extends Area{
  }
  
  public boolean inBounds(float x,float y){
-  return (x < position.x+dimension.x && x >= position.x && y < position.y+dimension.y && y >= position.y);
+  return (x < position.x+dimension.x/2 && x >= position.x-dimension.x/2 && y < position.y+dimension.y/2 && y >= position.y-dimension.y/2);
  }
 
  public boolean inBounds(PVector pos){
@@ -32,15 +45,15 @@ public class Rect extends Area{
  public boolean intersect(Area other){
   if(other instanceof Rect){
     Rect o = (Rect)other;
-    return (position.x < o.position.x+o.dimension.x && position.x+dimension.x > o.position.x &&
-            position.y < o.position.y+o.dimension.y && position.y+dimension.y > o.position.y);
+    return (position.x-dimension.x/2 < o.position.x+o.dimension.x/2 && position.x+dimension.x/2 > o.position.x-o.dimension.x/2 &&
+            position.y-dimension.y/2 < o.position.y+o.dimension.y/2 && position.y+dimension.y/2 > o.position.y-o.dimension.y/2);
   }
   if(other instanceof Circle){
     Circle o = (Circle)other;
     
     
-    //Check the four corners of the rectangl, if either one of them is in the circle then they intersect
-    if(o.inBounds(position) || o.inBounds(position.x,position.y+dimension.y) || o.inBounds(position.x+dimension.x,position.y) || o.inBounds(PVector.add(position,dimension)))
+    //Check the four corners of the rectangle, if either one of them is in the circle then they intersect
+    if(o.inBounds(PVector.sub(position,PVector.div(dimension,2))) || o.inBounds(position.x-dimension.x/2,position.y+dimension.y/2) || o.inBounds(position.x+dimension.x/2,position.y-dimension.y/2) || o.inBounds(PVector.add(position,PVector.div(dimension,2))))
       return true;
     
     //else check if the points of the circles (Noth/South/East/West and center) are in the rectangle
@@ -52,6 +65,15 @@ public class Rect extends Area{
   
   return false;
  }
+ 
+ public Object clone() {
+    Rect o = null;
+      o = (Rect)super.clone();
+    
+    o.dimension = dimension.get();
+    // on renvoie le clone
+    return o;
+  }
 }
 
 public class Circle extends Area{
@@ -76,4 +98,13 @@ public class Circle extends Area{
     
   return false;
  }
+ 
+ public Object clone() {
+    Circle o = null;
+      o = (Circle)super.clone();
+    
+    o.ray = ray;
+    // on renvoie le clone
+    return o;
+  }
 }

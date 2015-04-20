@@ -1,4 +1,4 @@
-public static class Rigidbodies{
+/*public static class Rigidbodies{
  private static ArrayList<Rigidbody> items = new ArrayList<Rigidbody>(); 
  
  public static void add(Rigidbody u){
@@ -10,7 +10,7 @@ public static class Rigidbodies{
       
     }
  }
-}
+}*/
 
 public class Rigidbody extends Component{
   public boolean isKinematic = false;
