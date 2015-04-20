@@ -115,3 +115,23 @@ public class Collider extends Component{
  public void onTriggerExit(Collider other){}
  
 }
+
+
+private class ColliderUpdater extends Updatable{
+
+  ColliderUpdater(){
+    super();
+    start(); 
+  }
+  
+  public void start(){
+    Colliders.update();
+  }
+  
+  public void update(){
+    Colliders.update();
+  }
+  
+}
+
+private ColliderUpdater myPrivateColliderUpdater = new ColliderUpdater();
