@@ -1,4 +1,4 @@
-public abstract class Area implements Cloneable{
+public abstract class Area implements Cloneable,Drawable{
  public PVector position;
  
  Area(float x,float y){
@@ -10,6 +10,8 @@ public abstract class Area implements Cloneable{
  public abstract boolean inBounds(float x, float y);
  
  public abstract boolean intersect(Area other); 
+ 
+ public abstract void draw();
  
  public Object clone() {
     Area o = null;
@@ -66,6 +68,10 @@ public class Rect extends Area{
   return false;
  }
  
+ public void draw(){
+    rect(position.x-dimension.x/2,position.y-dimension.y/2,dimension.x,dimension.y); 
+ }
+ 
  public Object clone() {
     Rect o = null;
       o = (Rect)super.clone();
@@ -97,6 +103,10 @@ public class Circle extends Area{
     return other.intersect(this);
     
   return false;
+ }
+ 
+ public void draw(){
+   ellipse(position.x,position.y,ray,ray); 
  }
  
  public Object clone() {
