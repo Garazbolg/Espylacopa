@@ -1,5 +1,6 @@
 GameObject one, two, three, four;
 
+MapManager map;
 
 
 void setup(){
@@ -23,10 +24,13 @@ void setup(){
  ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
  
  
+ map = new MapManager(3);
+ 
  
 }
 
 void draw(){
+  /*
   background(255);
   Updatables.update();
   
@@ -57,6 +61,9 @@ void draw(){
       fill(255,0,0);
       text(Time.getFPS(),0,textAscent());
     }
+    */
+    
+    map.DrawMap();
     
   
   
