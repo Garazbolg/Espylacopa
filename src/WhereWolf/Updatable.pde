@@ -9,6 +9,11 @@ public static class Updatables{
     items.add(u); 
  }
  
+  public static void start(){
+    for(Updatable u : items)
+       u.start(); 
+ }
+ 
  public static void update(){
     for(Updatable u : items)
        u.update(); 
@@ -21,7 +26,6 @@ public abstract class Updatable{
   
   Updatable(){
     Updatables.add(this);
-    start();
   }
   
   public void start(){}

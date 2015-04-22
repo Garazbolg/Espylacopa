@@ -72,8 +72,8 @@ public static class Colliders{
 public class Collider extends Component implements DebugDrawable{
  private Area area;
  
- public ArrayList<Collider> currentCollisions;
- public ArrayList<Collider> currentTriggers;
+ private ArrayList<Collider> currentCollisions;
+ private ArrayList<Collider> currentTriggers;
  
  public boolean isTrigger = false;
  
@@ -105,6 +105,23 @@ public class Collider extends Component implements DebugDrawable{
  }
  
  public void update(){
+ }
+ 
+ 
+ public PVector getExtremePoint(Orientation o){
+   return PVector.add(gameObject.position,area.getExtremePoint(o));
+ }
+ 
+ public boolean inCurrentCollisions(PVector p){
+   return inCurrentCollisions(p.x,p.y);
+ }
+ 
+ public boolean inCurrentCollisions(float x, float y){
+   for(Collider c : currentCollisions)
+     if(c.inBounds(x,y))
+       return true;
+       
+   return false;
  }
 
  public void onCollisionEnter(Collider other){

@@ -1,50 +1,61 @@
 GameObject one, two, three, four;
-boolean DEBUG_MODE = true;
-boolean SHOW_FPS = true;
+
 
 
 void setup(){
  size(1000,800);
  
- one = new GameObject("One",new PVector(200,500));
- one.addComponent(new Collider(new Rect(0,0,100,120)));
+ one = new GameObject("One",new PVector(350,200));
+ one.addComponent(new Collider(new Rect(0,0,100,200)));
  one.addComponent(new Rigidbody());
- two = new GameObject("Two",new PVector(200,200));
- two.addComponent(new Collider(new Rect(0,0,50,60)));
+ two = new GameObject("Two",new PVector(500,400));
+ two.addComponent(new Collider(new Rect(0,0,50,100)));
  three = new GameObject("Three",new PVector(500,200));
  three.addComponent(new Collider(new Circle(0,0,100)));
  four = new GameObject("Four",new PVector(500,600));
  four.addComponent(new Collider(new Rect(0,0,700,150)));
  
- ((Collider)three.getComponent(Collider.class)).isTrigger = true;
-  
- ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(50,-400));
+ //((Collider)three.getComponent(Collider.class)).isTrigger = true;
+ Updatables.start(); 
+ ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
+ 
+ 
+ 
 }
 
 void draw(){
   background(255);
+  Updatables.update();
   
   if(mousePressed)
     Time.setTimeScale(0.5f);
     
-    
-    
+  if(keyPressed){
+     if(key == 'd')
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(100,0));
+     if(key == 'q')
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-100,0));
+     if(key == 'z')
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,-100));
+  }
     one.draw();
     two.draw();
     three.draw();
     four.draw();
     
-    if(DEBUG_MODE){
+    if(Constants.DEBUG_MODE){
        one.debugDraw();
        two.debugDraw();
        three.debugDraw();
        four.debugDraw();
     }
     
-    fill(255,0,0);
-    text(Time.getFPS(),0,textAscent());
+    if(Constants.SHOW_FPS){
+      fill(255,0,0);
+      text(Time.getFPS(),0,textAscent());
+    }
     
-  Updatables.update();
+  
   
   
 }
