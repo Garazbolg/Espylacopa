@@ -10,10 +10,13 @@ void setup(){
  one.addComponent(new Rigidbody());
  two = new GameObject("Two",new PVector(500,400));
  two.addComponent(new Collider(new Rect(0,0,50,100)));
- three = new GameObject("Three",new PVector(500,200));
+ three = new GameObject("Three",new PVector(400,-400));
  three.addComponent(new Collider(new Circle(0,0,100)));
+ three.addComponent(new Rigidbody());
  four = new GameObject("Four",new PVector(500,600));
  four.addComponent(new Collider(new Rect(0,0,700,150)));
+ 
+ one.addChildren(three);
  
  //((Collider)three.getComponent(Collider.class)).isTrigger = true;
  Updatables.start(); 
@@ -40,13 +43,13 @@ void draw(){
   }
     one.draw();
     two.draw();
-    three.draw();
+    //three.draw();
     four.draw();
     
     if(Constants.DEBUG_MODE){
        one.debugDraw();
        two.debugDraw();
-       three.debugDraw();
+       //three.debugDraw();
        four.debugDraw();
     }
     

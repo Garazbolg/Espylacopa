@@ -1,18 +1,35 @@
+/*
+        Made By LE GALL Joseph ( Garazbolg )
+        Created : 17/04/2015 
+        Last Modified : 22/04/2015
+*/
+
+
+/**/
+
 public class GameObject extends Updatable implements Drawable,DebugDrawable{
   
  String name;
- PVector position;
+ public PVector position;
  
- ArrayList<Component> components;
- ArrayList<GameObject> children;
+ private ArrayList<Component> components;
+ private ArrayList<GameObject> children;
+ private GameObject parent;
  
  GameObject(String n, PVector pos){
    position = pos;
    name = n;
   components = new ArrayList<Component>(); 
   children = new ArrayList<GameObject>();
+  parent = null;
  }
  
+ public PVector getPosition(){
+  if(parent != null)
+     return PVector.add(parent.getPosition(),position);
+    
+  return position; 
+ }
  
  //return the first component of type T and null if there isn't
  public Component getComponent(Class cl){
@@ -25,8 +42,12 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  }
  
  public void addChildren(GameObject nGameObject){
-   if(!children.contains(nGameObject))
+   if(!children.contains(nGameObject)){
      children.add(nGameObject);
+     if(nGameObject.parent != null)
+       nGameObject.parent.children.remove(nGameObject);
+     nGameObject.parent = this;
+   }
  }
  
  public boolean addComponent(Component newComponent){
