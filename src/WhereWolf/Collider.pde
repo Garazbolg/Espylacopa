@@ -161,36 +161,42 @@ public class Collider extends Component implements DebugDrawable{
 
  //What happens when this collider enter in collision with an other collider
  public void onCollisionEnter(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Enter Collision with " + other.getGameObject().name);
+   if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Collision with " + other.gameObject.name);
+   gameObject.onCollisionEnter(other);
  }
  
  
  //What happens when this collider start to overlap an other collider
  public void onTriggerEnter(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Enter Trigger with " + other.getGameObject().name);
+   if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Trigger with " + other.gameObject.name);
+   gameObject.onTriggerEnter(other);
  }
  
  
  //What happens when this collider is in collision with an other collider
  public void onCollisionStay(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Stay Collision with " + other.getGameObject().name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Stay Collision with " + other.gameObject.name);
+   gameObject.onCollisionStay(other);
  }
  
  
  //What happens when this collider is overlapping an other collider
  public void onTriggerStay(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Stay Trigger with " + other.getGameObject().name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Stay Trigger with " + other.gameObject.name);
+   gameObject.onTriggerStay(other);
  }
  
  
  //What happens when this collider stop colliding with an other collider
  public void onCollisionExit(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Exit Collision with " + other.getGameObject().name);
+   if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Collision with " + other.gameObject.name);
+   gameObject.onCollisionExit(other);
  }
  
  //What happens when this collider stop overlapping an other collider
  public void onTriggerExit(Collider other){
-   if(Constant.DEBUG_MODE)println(getGameObject().name + " Exit Trigger with " + other.getGameObject().name);
+   if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Trigger with " + other.gameObject.name);
+   gameObject.onTriggerExit(other);
  }
  
  
