@@ -5,17 +5,21 @@
 */
 
 public static class Scene{
- private static GameObject root = new GameObject();
+ private static GameObject root;
+ 
+ public static void startScene(GameObject g){
+  root =  g;
+ }
  
  public static void addChildren(GameObject g){
    root.addChildren(g); 
  }
  
- public static draw(){
+ public static void draw(){
   root.draw(); 
  }
  
- public static debugDraw(){
+ public static void debugDraw(){
   root.debugDraw(); 
  }
 }
@@ -38,6 +42,17 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   components = new ArrayList<Component>(); 
   children = new ArrayList<GameObject>();
   parent = null;
+  Scene.addChildren(this);
+ }
+ 
+ GameObject(String n, PVector pos,GameObject newParent){
+   position = pos;
+   name = n;
+  components = new ArrayList<Component>(); 
+  children = new ArrayList<GameObject>();
+  parent = null;
+  if(newParent != null)
+    newParent.addChildren(this);
  }
  
  public PVector getPosition(){

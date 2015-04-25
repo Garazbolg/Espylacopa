@@ -14,8 +14,8 @@ public class SpriteSheet{
   PImage source;
   int widthSize;
   int heightSize;
-  float oneSpriteWidth;
-  float oneSpriteHeight;
+  int oneSpriteWidth;
+  int oneSpriteHeight;
   
   SpriteSheet(String path, int widthS, int heightS){
     source = ImageManager.getImage(path);
@@ -26,6 +26,6 @@ public class SpriteSheet{
   }
   
   public PImage getImage(int x, int y){
-   return source.get((x%widthSize)*oneSpriteWidth,(y%heightSize)*oneSpriteHeight);
+   return source.get(((int)((x%widthSize)*oneSpriteWidth)),((int)((y%heightSize)*oneSpriteHeight)),oneSpriteWidth,oneSpriteHeight);
   } 
 }
