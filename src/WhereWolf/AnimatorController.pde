@@ -4,6 +4,7 @@
         Last Modified : 22/05/2015
 */
 
+import java.util.Map;
 
 /*
 */
@@ -13,6 +14,7 @@ public class AnimatorController extends Renderer{
   private State currentState;
   
   AnimatorController(State st, Parameters params){
+    super();
     currentState = st;
     parameters = params;
   }
@@ -27,9 +29,10 @@ public class AnimatorController extends Renderer{
 
   public void update(){
    State next = currentState.update(parameters);
-   if(next != null)
+   if(next != null){
      currentState = next;
      next.startState();
+   }
   }
 }
 
@@ -51,14 +54,7 @@ public class Transition{
   private int conditionDataType = 0;
   
   Transition(State f,State t){
-    //Exit Time transition
-    if(f !=null && t != null){
-      from = f;
-      to = t;
-      from.to.add(this);
-    }
-    else
-      println("Error : Transition Init Failed !!!");
+    init(f,t);
   }
   
   Transition(State f,State t,String parameterName, ConditionType ct, boolean value){
@@ -66,6 +62,7 @@ public class Transition{
       conditionParameterValueBool = value;
       condition = ct;
       conditionDataType = 1;
+      init(f,t);
   }
   
   Transition(State f,State t,String parameterName, ConditionType ct, int value){
@@ -73,6 +70,7 @@ public class Transition{
       conditionParameterValueInt = value;
       condition = ct;
       conditionDataType = 2;
+      init(f,t);
   }
   
   Transition(State f,State t,String parameterName, ConditionType ct, float value){
@@ -81,6 +79,17 @@ public class Transition{
       
       condition = ct;
       conditionDataType = 3;
+      init(f,t);
+  }
+  
+  private void init(State f, State t){
+    if(f !=null && t != null){
+      from = f;
+      to = t;
+      from.to.add(this);
+    }
+    else
+      println("Error : Transition Init Failed !!!");
   }
   
   public boolean evaluate(Parameters params){
@@ -162,7 +171,7 @@ public class State{
     to = new ArrayList<Transition>();
   }
   
- private void startState(){
+ public void startState(){
    currentFrame = 0; 
   }
  
@@ -205,28 +214,45 @@ public class Parameters{
     parametersFloat = new HashMap<String,Float>();
   }
   
-  public boolean setBool(String k, boolean value){
-    return parametersBool.put(k,value);
+  public void setBool(String k, boolean value){
+    if(k != null)
+      parametersBool.put(k,value);
   }
   
-  public int setInt(String k, int value){
-    return parametersInt.put(k,value);
+  public void setInt(String k, int value){
+    if(k != null)
+      parametersInt.put(k,value);
   }
   
-  public float setFloat(String k, float value){
-    return parametersFloat.put(k,value);
+  public void setFloat(String k, float value){
+    if(k != null)
+      parametersFloat.put(k,value);
   }
   
   public boolean getBool(String k){
-    return parametersBool.get(k);
+    return parametersBool.get(k).booleanValue();
   }
   
   public int getInt(String k){
-    return parametersInt.get(k);
+    return parametersInt.get(k).intValue();
   }
   
   public float getFloat(String k){
-    return parametersFloat.get(k);
+    return parametersFloat.get(k).floatValue();
+  }
+  
+  public void print(){
+    println("Parameters : ");
+    
+   for(Map.Entry entry : parametersBool.entrySet()){
+     println(entry.getKey() + " : " + entry.getValue());
+   } 
+   for(Map.Entry entry : parametersInt.entrySet()){
+     println(entry.getKey() + " : " + entry.getValue());
+   } 
+   for(Map.Entry entry : parametersFloat.entrySet()){
+     println(entry.getKey() + " : " + entry.getValue());
+   } 
   }
 }
 

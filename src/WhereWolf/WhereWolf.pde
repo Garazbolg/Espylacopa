@@ -1,4 +1,4 @@
-GameObject one;
+GameCharacter one;
 
 float globalScale = 1.0;
 
@@ -7,10 +7,10 @@ float globalScale = 1.0;
 
 void setup(){
  size(displayWidth,displayHeight);
- frameRate(60);
+ frameRate(120);
  noSmooth();                        //To prevent antialiasing
  
- Constants.DEBUG_MODE = true;
+ Constants.DEBUG_MODE = false;
  Constants.SHOW_FPS = true;
  
  globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
@@ -20,7 +20,7 @@ void setup(){
  
  
  GameObject two, three, four,five;
- one = new GameCharacter("One","Villageois",new PVector(350,200));
+one = new GameCharacter("One","Villageois",new PVector(350,200));
  /*one.addComponent(new Rigidbody());
  one.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
  one.addComponent(new Collider(new Rect(0,0,16,32)));*/
@@ -34,7 +34,7 @@ void setup(){
  four = new GameObject("Four",new PVector(500,600));
  four.addComponent(new Collider(new Rect(0,0,700,150)));
  
- //((Collider)three.getComponent(Collider.class)).isTrigger = true;
+ ((Collider)three.getComponent(Collider.class)).isTrigger = true;
  Updatables.start(); 
  //((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
  
@@ -56,14 +56,16 @@ void draw(){
  //Input
  
  //TODO
-  /*if(keyPressed){
+  if(keyPressed){
      if(key == 'd')
        ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(70,0));
      if(key == 'q')
        ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-70,0));
      if(key == 'z')
        ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,-100));
-  }*/
+     if(key == 's')
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,0));
+  }
   
   
   //Draw

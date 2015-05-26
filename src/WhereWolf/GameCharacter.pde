@@ -29,13 +29,13 @@ public class GameCharacter extends GameObject{
     idleRight = new State(new Animation(walkAndIdle,2,true),1);
     idleLeft =  new State(new Animation(walkAndIdle,3,true),1);
     
-    new Transition(idleRight,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
-    new Transition(idleLeft,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
-    new Transition(idleRight,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
-    new Transition(idleLeft,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
-    new Transition(walkRight,idleRight,"SpeedX",ConditionType.LesserThan,0.1f);
-    new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
-    animator = new AnimatorController(idleRight,params);
+    Transition t = new Transition(idleRight,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
+    t = new Transition(idleLeft,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
+    t = new Transition(idleRight,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
+    t = new Transition(idleLeft,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
+    t = new Transition(walkRight,idleRight,"SpeedX",ConditionType.LesserThan,0.1f);
+    t = new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
+    animator = new AnimatorController(idleLeft,params);
     addComponent(animator);
     
     
@@ -43,7 +43,7 @@ public class GameCharacter extends GameObject{
   
   public void update(){
    super.update();
-  
+   
    animator.parameters.setFloat("SpeedX",(float)rigid.getVelocity().x);
   }
  

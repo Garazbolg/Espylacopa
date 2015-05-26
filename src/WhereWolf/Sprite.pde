@@ -32,6 +32,24 @@ public class Sprite extends Renderer{
    scaleY = sy;
  }
  
+ Sprite(PImage sour){
+  source = sour;
+  scaleX = 1.0f; 
+  scaleY = 1.0f;
+ }
+ 
+ Sprite(PImage sour, float scale){
+  source = sour;
+  scaleX = scale;
+  scaleY = scale;
+ }
+ 
+ Sprite(PImage sour,float sx,float sy){
+   source = sour;
+   scaleX = sx;
+   scaleY = sy;
+ }
+ 
  public float getHeight(){
    return source.height*scaleY; 
  }

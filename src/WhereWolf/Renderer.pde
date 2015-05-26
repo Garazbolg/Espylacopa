@@ -14,5 +14,5 @@ public abstract class Renderer extends Component implements Drawable{
  public void update(){}
   
  //draw
- public void draw(){}
+ public abstract void draw();
 }
