@@ -7,6 +7,7 @@ float globalScale = 1.0;
 
 void setup(){
  size(displayWidth,displayHeight);
+ frameRate(60);
  noSmooth();                        //To prevent antialiasing
  
  Constants.DEBUG_MODE = true;
@@ -19,15 +20,15 @@ void setup(){
  
  
  GameObject two, three, four,five;
- one = new GameObject("One",new PVector(350,200));
- one.addComponent(new Rigidbody());
- one.addComponent(new Sprite("totem.png",5));
- one.addComponent(new Collider(new Rect(0,0,((Sprite) one.getComponent(Sprite.class)).getWidth(),((Sprite) one.getComponent(Sprite.class)).getHeight())));
+ one = new GameCharacter("One","Villageois",new PVector(350,200));
+ /*one.addComponent(new Rigidbody());
+ one.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
+ one.addComponent(new Collider(new Rect(0,0,16,32)));*/
  two = new GameObject("Two",new PVector(500,400));
  two.addComponent(new Collider(new Rect(0,0,50,100)));
  five = new GameObject("Two",new PVector(600,400));
  five.addComponent(new Collider(new Rect(0,0,50,100)));
- three = new GameObject("Three",new PVector(400,-400),one);
+ three = new GameObject("Three",new PVector(400,-400)/*,one*/);
  three.addComponent(new Collider(new Circle(0,0,100)));
  three.addComponent(new Rigidbody());
  four = new GameObject("Four",new PVector(500,600));
@@ -35,7 +36,7 @@ void setup(){
  
  //((Collider)three.getComponent(Collider.class)).isTrigger = true;
  Updatables.start(); 
- ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
+ //((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
  
  
  //map = new MapManager(3);
@@ -51,14 +52,18 @@ void draw(){
   if(mousePressed)
     Time.setTimeScale(0.5f);
     
-  if(keyPressed){
+    
+ //Input
+ 
+ //TODO
+  /*if(keyPressed){
      if(key == 'd')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(100,0));
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(70,0));
      if(key == 'q')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-100,0));
+       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-70,0));
      if(key == 'z')
        ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,-100));
-  }
+  }*/
   
   
   //Draw
@@ -81,7 +86,7 @@ void draw(){
       text(Time.getFPS(),0,textAscent());
     }
     
-    
+    //TODO : display a proper minimap
     //map.DrawMap();
     
 }

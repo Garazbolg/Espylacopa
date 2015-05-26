@@ -143,6 +143,10 @@ public class Rigidbody extends Component implements DebugDrawable{
     velocity = vel;
   }
   
+  public PVector getVelocity(){
+    return velocity; 
+  }
+  
   //to apply a force on the gameObject
   public void addForce(PVector vel){}
 }

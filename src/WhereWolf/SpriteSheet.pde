@@ -27,5 +27,17 @@ public class SpriteSheet{
   
   public PImage getImage(int x, int y){
    return source.get(((int)((x%widthSize)*oneSpriteWidth)),((int)((y%heightSize)*oneSpriteHeight)),oneSpriteWidth,oneSpriteHeight);
-  } 
+  }
+  
+  public int getWidth(){
+   return widthSize; 
+  }
+  
+  public int getSpriteWidth(){
+    return oneSpriteWidth;
+  }
+  
+  public int getSpriteHeight(){
+    return oneSpriteHeight;
+  }
 }
