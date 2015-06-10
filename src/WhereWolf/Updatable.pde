@@ -10,11 +10,14 @@
 */
 public static class Updatables{
  private static ArrayList<Updatable> items = new ArrayList<Updatable>(); 
+ private static boolean alreadyStarted = false;
  
  
  //to add a Updatable to items
  public static void add(Updatable u){
     items.add(u); 
+    if(alreadyStarted)
+      u.start();
  }
  
  
@@ -22,6 +25,8 @@ public static class Updatables{
   public static void start(){
     for(Updatable u : items)
        u.start(); 
+       
+    alreadyStarted = true;
  }
  
  //Updatables.update() to put at the start of the draw function of the main
