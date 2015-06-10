@@ -1,5 +1,5 @@
 GameCharacter player;
-
+ 
 float globalScale = 1.0;
 
 MapManager map;
@@ -19,11 +19,12 @@ private PVector playerColliderHalfDimensions;
 private float resolutionStripSize; // taille des bandes noires
 
 void initGame() {
-
+  
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
+ 
 
   Scene.startScene(new GameObject("Scene", new PVector(), null));
-  ImageManager.start(this);
+
 
 
   GameObject two, three, four, five;
@@ -59,24 +60,17 @@ void initGame() {
 void gameDraw() {
 
   Updatables.update();
-
+/*
   if (mousePressed)
-    Time.setTimeScale(0.5f);
+    Time.setTimeScale(0.5f);*/
 
 
   //Input
 
   //TODO
-  if (keyPressed) {
-    if (key == 'd')
-      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(70, 0));
-    if (key == 'q')
-      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(-70, 0));
-    if (key == 'z')
-      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(0, -100));
-    if (key == 's')
-      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(0, 0));
-  }
+  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxis("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
+  if(Input.getButtonDown("Jump"))  
+      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
 
 
   //Draw

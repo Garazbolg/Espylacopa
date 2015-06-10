@@ -1,0 +1,4 @@
+
+
+
+enum SceneState{MainMenu, Game};

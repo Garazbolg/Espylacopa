@@ -52,7 +52,9 @@ public static class Input{
   }
   
   public static void update(){
-    
+    for(Map.Entry entry : buttons.entrySet()){
+     ((Button)entry.getValue()).update();
+   } 
   }
    
   public static boolean addButton(String name, String buttonName){
@@ -146,7 +148,7 @@ public static class Input{
   
 }
 
-public class Button extends Updatable{
+public class Button {
   private boolean justChanged = false;
   private boolean state = false;
   
@@ -158,11 +160,8 @@ public class Button extends Updatable{
     state = false;
   }
   
-  void start(){
-    
-  }
   
-  void update(){
+  public void update(){
     justChanged = false;
     if(state != source.pressed()){
        justChanged = true;
