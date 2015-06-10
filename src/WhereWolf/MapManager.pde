@@ -8,6 +8,12 @@ public class MapManager{
   private int generationOriginX;
   private int generationOriginY;
   
+  private int[] xSpawnPoints;
+  private int[] ySpawnPoints;
+  private int playerSpawnPointIterator;
+  private int spawnpointDelay;
+  private int nextSpawnPoint;
+  
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber){
     if(playerNumber < 4) {
@@ -24,6 +30,12 @@ public class MapManager{
     }
     
     mapBlocks = new byte[mapSize][mapSize];
+    xSpawnPoints = new int[playerNumber];
+    ySpawnPoints = new int[playerNumber];
+    
+    playerSpawnPointIterator = 0;
+    spawnpointDelay = numberOfBlocks / playerNumber;
+    nextSpawnPoint = numberOfBlocks;
     MapGeneration();
   }
   
@@ -38,7 +50,7 @@ public class MapManager{
     
     generationOriginX = mapSize/2;
     generationOriginY = mapSize/2;
-    
+       
     while(numberOfBlocks>0){
        if(mapBlocks[generationOriginX][generationOriginY] != 15){ // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
          createBlock(generationOriginX, generationOriginY);
@@ -58,6 +70,16 @@ public class MapManager{
   }
   
   public void createBlock(int x, int y){
+    
+    // Spawn point creation:
+    if(numberOfBlocks == nextSpawnPoint && playerSpawnPointIterator<xSpawnPoints.length){
+      nextSpawnPoint = nextSpawnPoint - spawnpointDelay;
+      xSpawnPoints[playerSpawnPointIterator] = x;
+      ySpawnPoints[playerSpawnPointIterator] = y;
+      playerSpawnPointIterator++;
+    }
+    
+    // Neighbor creation :
     int neighborNumber = (int)random(1,5); // random number to define how many neighbors the Blocks have
     for(int i=0 ; i<neighborNumber ; i++){
       int neighborSelected = (int)random(0,4); // the type of neighbor is also random, 0 = left, 1 = up, 2 = right, 3 = down;
@@ -104,7 +126,6 @@ public class MapManager{
   }
   
   public void DrawMap(){
-    
    stroke(255);
     for(int i=0 ; i<mapSize ; i++){
       for(int j=0 ; j<mapSize ; j++){
@@ -115,6 +136,7 @@ public class MapManager{
            rect(30+60*i, 20+60*j, 60, 60);
            fill(0);
            text(mapBlocks[i][j], 50+60*i, 55+60*j);
+           //text(i+" "+j, 50+60*i, 55+60*j);
          }
       }
     }

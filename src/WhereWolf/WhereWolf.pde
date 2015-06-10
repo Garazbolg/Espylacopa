@@ -1,98 +1,70 @@
-GameCharacter one;
 
-float globalScale = 1.0;
+SceneState scene;
 
-//MapManager map;
+enum SceneState{MainMenu, Game};
 
+String playString = "Play";
+Rect mouse;
+Rect playButton;
+int textSize = 32;
+
+boolean skipMainMenu = true;
 
 void setup(){
- size(displayWidth,displayHeight);
- frameRate(120);
- noSmooth();                        //To prevent antialiasing
+  
+  size(displayWidth,displayHeight);
+  frameRate(120);
+  noSmooth(); //To prevent antialiasing
+
+  Constants.DEBUG_MODE = false;
+  Constants.SHOW_FPS = true;
+  
+  scene = SceneState.MainMenu;
+  textSize(textSize);   
+  playButton = new Rect(width/2-textWidth(playString), height/2-textSize, textWidth(playString), 32);
+  mouse = new Rect(mouseX, mouseY, 32,32);
  
- Constants.DEBUG_MODE = false;
- Constants.SHOW_FPS = true;
- 
- globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
- 
- Scene.startScene(new GameObject("Scene",new PVector(),null));
- ImageManager.start(this);
- 
- 
- GameObject two, three, four,five;
-one = new GameCharacter("One","Villageois",new PVector(350,200));
- /*one.addComponent(new Rigidbody());
- one.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
- one.addComponent(new Collider(new Rect(0,0,16,32)));*/
- two = new GameObject("Two",new PVector(500,400));
- two.addComponent(new Collider(new Rect(0,0,50,100)));
- five = new GameObject("Two",new PVector(600,400));
- five.addComponent(new Collider(new Rect(0,0,50,100)));
- three = new GameObject("Three",new PVector(400,-400)/*,one*/);
- three.addComponent(new Collider(new Circle(0,0,100)));
- three.addComponent(new Rigidbody());
- four = new GameObject("Four",new PVector(500,600));
- four.addComponent(new Collider(new Rect(0,0,700,150)));
- 
- ((Collider)three.getComponent(Collider.class)).isTrigger = true;
- Updatables.start(); 
- //((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
- 
- 
- //map = new MapManager(3);
- 
- 
+  if(skipMainMenu) {
+    scene = SceneState.Game;
+    initGame();
+  }
 }
 
-void draw(){
-  
+void draw(){  
   background(255);
-  Updatables.update();
+  
+  if(scene==SceneState.MainMenu){
+    
+    
+    mouse.position.x = mouseX - mouse.halfDimension.x;
+    mouse.position.y = mouseY - mouse.halfDimension.y;
    
-  if(mousePressed)
-    Time.setTimeScale(0.5f);
-    
-    
- //Input
- 
- //TODO
-  if(keyPressed){
-     if(key == 'd')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(70,0));
-     if(key == 'q')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-70,0));
-     if(key == 'z')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,-100));
-     if(key == 's')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,0));
+   fill(0);
+   rect(mouse.position.x, mouse.position.y, 2*mouse.halfDimension.x, 2*mouse.halfDimension.y);
+   //rect(mouse.position.x, mouse.position.y, mouse.dimension.x,mouse.dimension.y);
+   
+    text(playString, width/2-textWidth(playString),height/2-textSize);
+    if(mouse.intersect(playButton)){
+      if(mousePressed){
+        scene = SceneState.Game;
+        initGame();
+      }
+
+    }
   }
   
+  else if(scene==SceneState.Game){
+    gameDraw();
+  }
   
-  //Draw
-    scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
-    translate(-200,-400); // translate de (-Camera.position) à faire;
-    Scene.draw();
-    
-  //Debug Draw
-    if(Constants.DEBUG_MODE)
-       Scene.debugDraw();
-    
-  //GUI
-    resetMatrix();
-    
-    //TODO : GUI part
-    
-    
-    if(Constants.SHOW_FPS){
-      fill(255,0,0);
-      text(Time.getFPS(),0,textAscent());
-    }
-    
-    //TODO : display a proper minimap
-    //map.DrawMap();
-    
+  else{
+    println("ERROR ERROR CASE NOT MANAGED");  
+  }  
+  
+  
 }
 
+
 boolean sketchFullScreen() {
-  return true;
+  return false;
 }
