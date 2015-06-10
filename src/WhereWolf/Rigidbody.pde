@@ -9,7 +9,7 @@
   Static class for constants use by rigidbodies
 */
 public static class Rigidbodies{
- public static float gravity = 160; 
+ public static float gravity = 350; 
 }
 
 

@@ -24,8 +24,8 @@ public class GameCharacter extends GameObject{
     Parameters params = new Parameters();
     params.setFloat("SpeedX",0.0f);
     State walkLeft,walkRight,idleRight,idleLeft;
-    walkRight = new State(new Animation(walkAndIdle,0,true),6);
-    walkLeft =  new State(new Animation(walkAndIdle,1,true),6);
+    walkRight = new State(new Animation(walkAndIdle,0,true),9);
+    walkLeft =  new State(new Animation(walkAndIdle,1,true),9);
     idleRight = new State(new Animation(walkAndIdle,2,true),1);
     idleLeft =  new State(new Animation(walkAndIdle,3,true),1);
     

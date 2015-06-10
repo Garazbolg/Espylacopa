@@ -6,17 +6,32 @@ float globalScale = 1.0;
 
 
 void setup(){
+  
+ Constants.DEBUG_MODE = false;
+ Constants.SHOW_FPS = true;
+  
+ //Init Programme
+  
  size(displayWidth,displayHeight);
  frameRate(120);
  noSmooth();                        //To prevent antialiasing
  
- Constants.DEBUG_MODE = false;
- Constants.SHOW_FPS = true;
+ 
  
  globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
  
- Scene.startScene(new GameObject("Scene",new PVector(),null));
+ 
  ImageManager.start(this);
+ Input.start(this);
+ Input.addAxis("Horizontal","joystick Axe X");/*"Q","D"*/
+ Input.addAxis("Vertical","joystick Axe Y");/*"Z","S""*/
+ Input.addButton("Jump","joystick Bouton 0");
+ 
+ 
+ 
+ //Init Scene
+ 
+ Scene.startScene(new GameObject("Scene",new PVector(),null));
  
  
  GameObject two, three, four,five;
@@ -34,7 +49,7 @@ one = new GameCharacter("One","Villageois",new PVector(350,200));
  four = new GameObject("Four",new PVector(500,600));
  four.addComponent(new Collider(new Rect(0,0,700,150)));
  
- ((Collider)three.getComponent(Collider.class)).isTrigger = true;
+ //((Collider)three.getComponent(Collider.class)).isTrigger = true;
  Updatables.start(); 
  //((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
  
@@ -56,17 +71,10 @@ void draw(){
  //Input
  
  //TODO
-  if(keyPressed){
-     if(key == 'd')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(70,0));
-     if(key == 'q')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(-70,0));
-     if(key == 'z')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,-100));
-     if(key == 's')
-       ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(0,0));
-  }
-  
+    
+      ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxis("Horizontal")*70.0f,((Rigidbody) one.getComponent(Rigidbody.class)).getVelocity().y));
+    if(Input.getButtonDown("Jump"))
+      ((Rigidbody) one.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) one.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
   
   //Draw
     scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
@@ -94,5 +102,8 @@ void draw(){
 }
 
 boolean sketchFullScreen() {
+  if(Constants.DEBUG_MODE)
+    return false;
+    
   return true;
 }
