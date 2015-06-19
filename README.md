@@ -1,7 +1,7 @@
 # WhereWolf
 Projet AssimilationSTMN 2015
 
-by 
-Nicolas Regnault : Ghat-Smith
-Charles Arnaudet : Horcos
-Joseph Le Gall   : Garazbolg
+by <br />
+Nicolas Regnault : Ghat-Smith <br />
+Charles Arnaudet : Horcos     <br />
+Joseph Le Gall   : Garazbolg  <br />
