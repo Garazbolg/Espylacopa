@@ -18,6 +18,37 @@ public abstract class Component extends Updatable{
    return gameObject;
  }
  
+ 
+ /*
+   Use to declare a RPC Function to be called remotely
+   Exemple :
+   
+void start(){
+  super.start();
+  
+  //Do your usual start  
+  
+  //And then :
+   addRPC("RPCFunctionName",new Delegate(this){public void call(String [] argv){
+     if(Network.isServer){
+         //  Code your server beheviour here
+     }
+     else{
+         //  Code you client Behaviour here
+     }
+        
+   }});
+}
+
+
+  You can use thisComponent to reference the object on wich the callback is called but remember to cast it to your component class
+
+ */
+ protected void addRPC(String callbackName,Delegate implementation){
+   gameObject.rpcHolder.addRPC(callbackName,implementation);
+ }
+ 
+ 
  //Function to override for collision effect
  
   //What happens when the collider of the gameObject enter in collision with an other collider

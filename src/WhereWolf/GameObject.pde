@@ -35,6 +35,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  private ArrayList<Component> components;
  private ArrayList<GameObject> children;
  private GameObject parent;
+ public RPCHolder rpcHolder;
  
  GameObject(String n, PVector pos){
    position = pos;
@@ -43,6 +44,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   children = new ArrayList<GameObject>();
   parent = null;
   Scene.addChildren(this);
+  rpcHolder = new RPCHolder();
  }
  
  GameObject(String n, PVector pos,GameObject newParent){

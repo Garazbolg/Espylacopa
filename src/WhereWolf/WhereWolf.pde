@@ -9,7 +9,7 @@ boolean skipMainMenu = false;
 
 void setup(){
   
- Constants.DEBUG_MODE = false;
+ Constants.DEBUG_MODE = true;
  Constants.SHOW_FPS = true;
   
  //Init Programme
