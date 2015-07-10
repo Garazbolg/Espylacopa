@@ -39,6 +39,8 @@ public abstract class Area implements Cloneable,Drawable{
   }
   
   public abstract PVector getExtremePoint(Orientation o);
+  
+  public abstract PVector getIntersectSize(Area a);
  
 }
 
@@ -105,6 +107,45 @@ public class Rect extends Area{
       return new PVector();
    } 
   }
+  
+  public PVector getIntersectSize(Area other){
+    PVector res = new PVector();
+    if(other instanceof Rect){
+      Rect a = (Rect) other;
+      if(a.position.y > position.y){
+       res.y = a.position.y - position.y - halfDimension.y - a.halfDimension.y;
+      }
+      else{
+        res.y = a.position.y + halfDimension.y + a.halfDimension.y - position.y ;
+      }
+      
+      if(a.position.x > position.x){
+       res.x = a.position.x - position.x - halfDimension.x - a.halfDimension.x;
+      }
+      else{
+        res.x = a.position.x + halfDimension.x + a.halfDimension.x - position.x ;
+      }
+    }
+    
+    if(other instanceof Circle){
+      Circle a = (Circle) other;
+      if(a.position.y > position.y){
+       res.y = a.position.y - position.y - halfDimension.y - a.halfRay;
+      }
+      else{
+        res.y = a.position.y + halfDimension.y + a.halfRay - position.y ;
+      }
+      
+      if(a.position.x > position.x){
+       res.x = a.position.x - position.x - halfDimension.x - a.halfRay;
+      }
+      else{
+        res.x = a.position.x + halfDimension.x + a.halfRay - position.x ;
+      }
+    }
+    
+    return res;
+  }
 }
 
 public class Circle extends Area{
@@ -152,5 +193,30 @@ public class Circle extends Area{
     default :
       return new PVector();
    } 
+  }
+  
+  public PVector getIntersectSize(Area other){
+    PVector res = new PVector();
+    if(other instanceof Circle){
+      Circle a = (Circle) other;
+      if(a.position.y > position.y){
+       res.y = a.position.y - position.y - halfRay - a.halfRay;
+      }
+      else{
+        res.y = a.position.y + halfRay + a.halfRay - position.y ;
+      }
+      
+      if(a.position.x > position.x){
+       res.x = a.position.x - position.x - halfRay - a.halfRay;
+      }
+      else{
+        res.x = a.position.x + halfRay + a.halfRay - position.x ;
+      }
+    }
+    else{
+     res = PVector.mult(other.getIntersectSize(this),-1); 
+    }
+    
+    return res;    
   }
 }

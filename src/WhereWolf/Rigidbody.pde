@@ -50,6 +50,7 @@ public class Rigidbody extends Component implements DebugDrawable{
       
       //temporary vector for calculation
       PVector vecteur = PVector.mult(velocity,Time.deltaTime());
+      PVector coll = new PVector();
       
       //check for collisions
       //by check if points that are on the border
@@ -57,7 +58,7 @@ public class Rigidbody extends Component implements DebugDrawable{
       //after apllying the vector
       if(collider != null)
       {  
-        
+        /*
         //check for collision on the X axis
         PVector vX = collider.getExtremePoint((vecteur.x < 0)?Orientation.West:Orientation.East);
         float halfDimensionX = (vX.y - collider.getExtremePoint(Orientation.North).y) * 0.9;
@@ -97,11 +98,36 @@ public class Rigidbody extends Component implements DebugDrawable{
           velocity.y = 0;
           vecteur.y = 0;
         }
+        */
+        coll = collider.getOppositeVelocity();
+        if(coll.x >0.01 && velocity.x < 0){
+          velocity.x = 0;
+          vecteur.x = 0;
+        }
+        else if(coll.x <-0.01 && velocity.x > 0){
+          velocity.x = 0;
+          vecteur.x = 0;
+        }
+        else
+          coll.x = 0;
+          
+        if(coll.y >0.01 && velocity.y < 0){
+          velocity.y = 0;
+          vecteur.y = 0;
+        }
+        else if(coll.y <-0.01 && velocity.y > 0){
+          velocity.y = 0;
+          vecteur.y = 0;
+        }
+        else
+          coll.y = 0;
+          
       }
       
       
       //Then apply the processed vector to the gameObject
       gameObject.position.add(vecteur);
+      gameObject.position.add(coll);
     }
   }
   

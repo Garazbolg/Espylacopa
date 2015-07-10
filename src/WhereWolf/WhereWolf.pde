@@ -28,9 +28,9 @@ void setup(){
  
  ImageManager.start(this);
  Input.start(this);
- Input.addAxis("Horizontal","joystick Axe X");/*"Q","D"*/
- Input.addAxis("Vertical","joystick Axe Y");/*"Z","S""*/
- Input.addButton("Jump","joystick Bouton 0");
+ Input.addAxis("Horizontal","Q","D");/*"joystick Axe X"*/
+ Input.addAxis("Vertical","Z","S");/*"joystick Axe Y"*/
+ Input.addButton("Jump","J");/*"joystick Bouton 0"*/
  
  
  

@@ -157,6 +157,14 @@ public class Collider extends Component implements DebugDrawable{
        
    return false;
  }
+ 
+ public PVector getOppositeVelocity(){
+   PVector res = new PVector();
+   for(Collider c : currentCollisions)
+     res.add(area.getIntersectSize(c.area));
+     
+   return res;
+ }
 
 
  //What happens when this collider enter in collision with an other collider

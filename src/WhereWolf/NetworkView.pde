@@ -7,15 +7,15 @@
 
 /*
   Interface for every class that is Drawable at runtime
-*/
+*//*
 public class NetworkView extends Component{
 
     private int NV_ID; 
 /*
    Use to call a RPC function on a remote computer
- */
+ *//*
  protected void RPC(String callbackName,RPCMode target, String [] arg){
    Network
  }
  
-}
+}*/
