@@ -3,8 +3,8 @@ GameCharacter player;
 float globalScale = 1.0;
 
 MapManager map;
-int xTile = 2;
-int yTile = 3;
+int xBlock = 2;
+int yBlock = 3;
 
 //enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
@@ -68,10 +68,21 @@ void gameDraw() {
   //Input
 
   //TODO
+  /*
   ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxis("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   if(Input.getButtonDown("Jump"))  
       ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
-
+  */
+  
+  int leftMoove = 0;
+  if(keyPressed){
+    if(keyCode == LEFT) leftMoove = -1;
+    if(keyCode == RIGHT) leftMoove = 1;
+  }
+  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(leftMoove*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
+  
+  if(keyPressed && key == ' ') ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
+  
 
   //Draw
   scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
@@ -82,12 +93,12 @@ void gameDraw() {
 
  // pushMatrix();
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
-  else translate(-xTile*128,-yTile*128);
+  else translate(-xBlock*128,-yBlock*128);
 
   fill(0, 255, 0);
-  rect(230+resolutionStripSize, 400+64, 64, 10);
+  rect(256+resolutionStripSize, 384, 64, 10);
   fill(255, 0, 0);
-  rect(230+resolutionStripSize+64, 400+64, 64, 10);
+  rect(256+resolutionStripSize+64, 384+64, 64, 10);
 
   Scene.draw();
  // popMatrix();
@@ -98,6 +109,10 @@ void gameDraw() {
   //Debug Draw
   if (Constants.DEBUG_MODE)
     Scene.debugDraw();
+
+
+  // TODO : activate this line to have the draw of the map
+  //map.DrawMap(xBlock, yBlock);
 
   //GUI
   resetMatrix();    
@@ -112,7 +127,8 @@ void gameDraw() {
 
 
   //TODO : display a proper minimap
-  map.DrawMap();
+  map.DrawMiniMap();
+  
 
   // Matrix to manage the
 
@@ -132,25 +148,23 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if (!cameraScroll) {
-
-    if(player.getPosition().x < (128*xTile)+resolutionStripSize){
-      xTile--; 
-    }
-    
-    else if(player.getPosition().x > resolutionStripSize+(128*(xTile+1))){
-      xTile++; 
-    }
-    
-    if(player.getPosition().y < (128*yTile)){
-      yTile--; 
-    }
-    
-    else if(player.getPosition().y > (128*(yTile+1))){
-      yTile++; 
-    }
-
-  } else {
+  if(player.getPosition().x < (128*xBlock)+resolutionStripSize){
+    xBlock--; 
+  }
+  
+  else if(player.getPosition().x > resolutionStripSize+(128*(xBlock+1))){
+    xBlock++; 
+  }
+  
+  if(player.getPosition().y < (128*yBlock)){
+    yBlock--; 
+  }
+  
+  else if(player.getPosition().y > (128*(yBlock+1))){
+    yBlock++; 
+  }
+  
+  if(cameraScroll) {
     if(cameradCentered){
       cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
     }
@@ -179,6 +193,8 @@ public void cameraDrawDebug(){
   noStroke();
   rect(player.getPosition().x+cameraForwardOffset, player.getPosition().y, 1, 100); 
 }
+
+
     
 
 
