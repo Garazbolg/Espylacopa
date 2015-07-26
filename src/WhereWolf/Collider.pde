@@ -161,7 +161,7 @@ public class Collider extends Component implements DebugDrawable{
  public PVector getOppositeVelocity(){
    PVector res = new PVector();
    for(Collider c : currentCollisions)
-     res.add(area.getIntersectSize(c.area));
+     res.add(area.getIntersectSize(c.area,gameObject.getPosition(),c.gameObject.getPosition()));
      
    return res;
  }

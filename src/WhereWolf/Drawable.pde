@@ -14,9 +14,6 @@ public interface Drawable{
 }
 
 
-/*
-  Interface for every class that display something on Debug
-*/
 public interface DebugDrawable{
  public void debugDraw(); 
 }

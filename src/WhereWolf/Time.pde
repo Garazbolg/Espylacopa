@@ -31,6 +31,10 @@ public static class Time{
     return deltaWScale;
   }
   
+  public static float unscaledDeltaTime(){
+    return delta;
+  }
+  
   //get the current Frame per second
   public static int getFPS(){
     return int( 1/delta); 

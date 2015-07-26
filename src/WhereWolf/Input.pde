@@ -21,9 +21,9 @@ public static class Input{
   private static ControllDevice mouse;
   private static ControllDevice keyboard;
   
-  private static HashMap<String,Button> buttons = new HashMap<String,Button>();
+  private static HashMap<String,ArrayList<Button>> buttons = new HashMap<String,ArrayList<Button>>();
   
-  private static HashMap<String,Axis> axis  = new HashMap<String,Axis>();
+  private static HashMap<String,ArrayList<Axis>> axis  = new HashMap<String,ArrayList<Axis>>();
   
   
   public static void start(WhereWolf e){
@@ -53,22 +53,27 @@ public static class Input{
   
   public static void update(){
     for(Map.Entry entry : buttons.entrySet()){
-     ((Button)entry.getValue()).update();
+     ArrayList<Button> al = ((ArrayList<Button>)entry.getValue());
+     for(Button b : al)
+       b.update();
    } 
   }
    
   public static boolean addButton(String name, String buttonName){
     String[] s = buttonName.split(" ",2);
-    ControllButton b;
-    if(s[0].compareTo("joystick") == 0)
+    ControllButton b = null;
+    if(s[0].compareTo("joystick") == 0 && controller != null)
      b = controller.getButton(s[1]);
-    else if(s[0].compareTo("mouse") == 0)
+    else if(s[0].compareTo("mouse") == 0 && mouse != null)
      b = mouse.getButton(s[1]);
-    else
+    else if(keyboard != null)
      b = keyboard.getButton(buttonName);
     
     if(b != null){
-      buttons.put(name,env.new Button(b)); 
+      if(!buttons.containsKey(name))
+        buttons.put(name,new ArrayList<Button>());
+      ArrayList al = buttons.get(name);
+      al.add(env.new Button(b));
       return true;
      }
     else
@@ -79,16 +84,19 @@ public static class Input{
   
   public static boolean addAxis(String name, String sliderName){
     String[] s = sliderName.split(" ",2);
-    ControllSlider b;
-    if(s[0].compareTo("joystick") == 0)
+    ControllSlider b = null;
+    if(s[0].compareTo("joystick") == 0 && controller != null)
      b = controller.getSlider(s[1]);
-    else if(s[0].compareTo("mouse") == 0)
+    else if(s[0].compareTo("mouse") == 0 && mouse != null)
      b = mouse.getSlider(s[1]);
-    else
+    else if(keyboard != null)
      b = keyboard.getSlider(sliderName);
     
     if(b != null){
-      axis.put(name,env.new Axis(b)); 
+      if(!axis.containsKey(name))
+        axis.put(name,new ArrayList<Axis>());
+      ArrayList al = axis.get(name);
+      al.add(env.new Axis(b));
       return true;
      }
     else{
@@ -100,24 +108,27 @@ public static class Input{
   
   public static boolean addAxis(String name, String buttonNegative,String buttonPositive){
     String[] s = buttonNegative.split(" ",2);
-    ControllButton b,d;
-    if(s[0].compareTo("joystick") == 0)
+    ControllButton b = null,d = null;
+    if(s[0].compareTo("joystick") == 0 && controller != null)
      b = controller.getButton(s[1]);
-    else if(s[0].compareTo("mouse") == 0)
+    else if(s[0].compareTo("mouse") == 0 && mouse != null)
      b = mouse.getButton(s[1]);
-    else
+    else if(keyboard != null)
      b = keyboard.getButton(buttonNegative);
      
     s = buttonPositive.split(" ",2);
-    if(s[0].compareTo("joystick") == 0)
+    if(s[0].compareTo("joystick") == 0 && controller != null)
      d = controller.getButton(s[1]);
-    else if(s[0].compareTo("mouse") == 0)
+    else if(s[0].compareTo("mouse") == 0 && mouse != null)
      d = mouse.getButton(s[1]);
-    else
+    else if(keyboard != null)
      d = keyboard.getButton(buttonPositive);
     
     if(b != null && d != null){
-      axis.put(name,env.new Axis(b,d)); 
+      if(!axis.containsKey(name))
+        axis.put(name,new ArrayList<Axis>());
+      ArrayList al = axis.get(name);
+      al.add(env.new Axis(b,d)); 
       return true;
      }
     else
@@ -127,23 +138,48 @@ public static class Input{
   }
   
   public static boolean getButtonDown(String name){
-    return buttons.get(name).getButtonDown();
+    ArrayList<Button> collection = buttons.get(name);
+    for(Button b : collection){
+     if(b.getButtonDown()) 
+       return true;
+    }
+    return false;
   }
   
   public static boolean getButtonUp(String name){
-    return buttons.get(name).getButtonUp();
+    ArrayList<Button> collection = buttons.get(name);
+    for(Button b : collection){
+     if(b.getButtonUp()) 
+       return true;
+    }
+    return false;
   }
   
   public static boolean getButton(String name){
-    return buttons.get(name).getButton();
+    ArrayList<Button> collection = buttons.get(name);
+    for(Button b : collection){
+     if(b.getButton()) 
+       return true;
+    }
+    return false;
   }
   
   public static float getAxis(String name){
-    return axis.get(name).getAxis();
+    ArrayList<Axis> collection = axis.get(name);
+    float out = 0;
+    for(Axis a : collection){
+       out += a.getAxis();
+    }
+    return out;
   }
   
   public static float getAxisRaw(String name){
-    return axis.get(name).getAxisRaw();
+    ArrayList<Axis> collection = axis.get(name);
+    float out = 0;
+    for(Axis a : collection){
+       out += a.getAxisRaw();
+    }
+    return out;
   }
   
 }

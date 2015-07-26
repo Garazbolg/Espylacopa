@@ -6,16 +6,24 @@
 
 
 /*
-  Interface for every class that is Drawable at runtime
+  Component for Objects that should be synchronize over the network
 *//*
 public class NetworkView extends Component{
 
-    private int NV_ID; 
-/*
+    private int id; 
+    
+    public boolean isClientAuthority = false;
+    
+    public int ownerId;
+ /*
    Use to call a RPC function on a remote computer
  *//*
  protected void RPC(String callbackName,RPCMode target, String [] arg){
-   Network
- }
+   Network.write
+ }*/
  
-}*/
+//}
+
+/*
+  
+*/

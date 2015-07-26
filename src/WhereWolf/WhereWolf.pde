@@ -9,8 +9,10 @@ boolean skipMainMenu = false;
 
 void setup(){
   
- Constants.DEBUG_MODE = true;
+ Constants.DEBUG_MODE = false;
  Constants.SHOW_FPS = true;
+ 
+ //Time.setTimeScale(0.5f);
   
  //Init Programme
   
@@ -18,21 +20,19 @@ void setup(){
  frameRate(120);
  noSmooth();                        //To prevent antialiasing
  
- 
- 
+ ImageManager.start(this);
+ Input.start(this);
  
  scene = SceneState.MainMenu;
   textSize(textSize);   
   playButton = new Rect(width/2-textWidth(playString), height/2-textSize, textWidth(playString), 32);
   mouse = new Rect(mouseX, mouseY, 32,32);
- 
- ImageManager.start(this);
- Input.start(this);
- Input.addAxis("Horizontal","Q","D");/*"joystick Axe X"*/
- Input.addAxis("Vertical","Z","S");/*"joystick Axe Y"*/
- Input.addButton("Jump","J");/*"joystick Bouton 0"*/
- 
- 
+ Input.addAxis("Horizontal","Q","D");
+ Input.addAxis("Horizontal","joystick Axe X");
+ Input.addAxis("Vertical","Z","S");
+ Input.addAxis("Vertical","joystick Axe Y");
+ Input.addButton("Jump","ESPACE");
+ Input.addButton("Jump","joystick Bouton 0");
  
  if(skipMainMenu) {
     scene = SceneState.Game;
@@ -45,7 +45,9 @@ void setup(){
 void draw(){
   
   background(255);
+  //Updatables.update();
   Input.update();
+  
   
   if(scene==SceneState.MainMenu){
   mouse.position.x = mouseX - mouse.halfDimension.x;

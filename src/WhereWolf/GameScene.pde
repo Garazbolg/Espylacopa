@@ -25,10 +25,10 @@ void initGame() {
 
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
-
+ 
 
   GameObject two, three, four, five;
-  player = new GameCharacter("One", "Villageois", new PVector(350, 100));
+  player = new GameCharacter("One", "Villageois", new PVector(350, 350));
   //player = new GameCharacter("One","Villageois",new PVector(0,0));
   player.SetLife(5);
   player.SetArmorLife(3);
@@ -60,30 +60,15 @@ void initGame() {
 void gameDraw() {
 
   Updatables.update();
-/*
-  if (mousePressed)
-    Time.setTimeScale(0.5f);*/
 
-
-  //Input
-
-  //TODO
-  /*
-  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxis("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
-  if(Input.getButtonDown("Jump"))  
-      ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
-  */
+//Move  
+  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   
-  int leftMoove = 0;
-  if(keyPressed){
-    if(keyCode == LEFT) leftMoove = -1;
-    if(keyCode == RIGHT) leftMoove = 1;
-  }
-  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(leftMoove*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
-  
-  if(keyPressed && key == ' ') ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
+// TODO : prevent to jump while in the air
+  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
   
 
+  if(! Constants.DEBUG_MODE)
   //Draw
   scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
 
@@ -92,23 +77,27 @@ void gameDraw() {
 
 
  // pushMatrix();
+ if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
   else translate(-xBlock*128,-yBlock*128);
+ }
 
   fill(0, 255, 0);
-  rect(256+resolutionStripSize, 384, 64, 10);
+  rect(256+resolutionStripSize, 460, 64, 10);
   fill(255, 0, 0);
-  rect(256+resolutionStripSize+64, 384+64, 64, 10);
+  rect(256+resolutionStripSize+64, 460+64, 64, 10);
 
   Scene.draw();
  // popMatrix();
 
 
-  cameraDrawDebug();
+  
 
   //Debug Draw
-  if (Constants.DEBUG_MODE)
+  if (Constants.DEBUG_MODE){
+    cameraDrawDebug();
     Scene.debugDraw();
+  }
 
 
   // TODO : activate this line to have the draw of the map
@@ -117,10 +106,11 @@ void gameDraw() {
   //GUI
   resetMatrix();    
   //TODO : GUI part
-  
-  fill(0);
-  rect(0, 0, globalScale*resolutionStripSize, height); // bande noire gauche
-  rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
+  if(! Constants.DEBUG_MODE){
+    fill(0);
+    rect(0, 0, globalScale*resolutionStripSize, height); // bande noire gauche
+    rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
+  }
   
   player.drawLife();
 

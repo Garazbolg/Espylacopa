@@ -49,5 +49,5 @@ public abstract class Updatable{
   public void start(){}
   
   //update
-  public abstract void update();
+  public void update(){}
 }

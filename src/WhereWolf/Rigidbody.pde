@@ -33,10 +33,15 @@ public class Rigidbody extends Component implements DebugDrawable{
   //current velocity of the gameObject
   private PVector velocity;
   
+  //current opposing Vector
+  private PVector coll = new PVector();
+  
   //start
   public void start(){
     velocity = new PVector();
-    collider = (Collider)getGameObject().getComponent(Collider.class);
+    Component c = getGameObject().getComponent(Collider.class);
+    if(c != null)
+      collider = (Collider)c;
   }
   
   //update
@@ -50,84 +55,70 @@ public class Rigidbody extends Component implements DebugDrawable{
       
       //temporary vector for calculation
       PVector vecteur = PVector.mult(velocity,Time.deltaTime());
-      PVector coll = new PVector();
       
       //check for collisions
       //by check if points that are on the border
       //would still be in the colliders that the collider is already in collision with
       //after apllying the vector
       if(collider != null)
-      {  
-        /*
-        //check for collision on the X axis
-        PVector vX = collider.getExtremePoint((vecteur.x < 0)?Orientation.West:Orientation.East);
-        float halfDimensionX = (vX.y - collider.getExtremePoint(Orientation.North).y) * 0.9;
-        vX.x += vecteur.x;
-        vX.y -= halfDimensionX;
-        halfDimensionX *= 2.0f/collisionPrecision;
-        boolean canX = true,canY = true;
-        for(int i=0;i<=collisionPrecision;i++){
-          
-          if(collider.inCurrentCollisions(vX.x,vX.y+halfDimensionX*i)){
-            canX = false;
-            break;
-          }
-        }
-        //if it is still in collision then nullify this direction
-        if(!canX){
-          velocity.x = 0;
-          vecteur.x = 0;
-        }
-        
-        
-        //check for collision on the Y axis
-        PVector vY = collider.getExtremePoint((vecteur.y < 0)?Orientation.North:Orientation.South);
-        float halfDimensionY = (vY.x - collider.getExtremePoint(Orientation.West).x)*0.9;
-        vY.y+=vecteur.y;
-        vY.x -= halfDimensionY;
-        halfDimensionY *= 2.0f/collisionPrecision;
-        for(int i=0;i<=collisionPrecision;i++){
-          
-          if(collider.inCurrentCollisions(vY.x+halfDimensionY*i,vY.y)){
-            canY = false;
-            break;
-          }
-        }
-        //if it is still in collision then nullify this direction
-        if(!canY){
-          velocity.y = 0;
-          vecteur.y = 0;
-        }
-        */
+      {
         coll = collider.getOppositeVelocity();
+        
+        PVector coll2 = coll.get();
+        
+        if(coll.y >0.01 && velocity.y < 0){
+          if(abs(coll2.x) > 5f ){
+            velocity.y = 0;
+            vecteur.y = 0;
+           }
+          else
+            coll.y = 0;
+        }
+        else if(coll.y <-0.01 && velocity.y > 0){
+          if(abs(coll2.x) > 5f ){
+            velocity.y = 0;
+            vecteur.y = 0;
+          }
+          else
+            coll.y = 0;
+        }
+        else
+          coll.y = 0;
+        
+        
         if(coll.x >0.01 && velocity.x < 0){
-          velocity.x = 0;
-          vecteur.x = 0;
+          if(abs(coll2.y) > 5f ){
+            velocity.x = 0;
+            vecteur.x = 0;
+          }
+          else
+            coll.x = 0;
         }
         else if(coll.x <-0.01 && velocity.x > 0){
-          velocity.x = 0;
-          vecteur.x = 0;
+          if(abs(coll2.y) > 5f ){
+            velocity.x = 0;
+            vecteur.x = 0;
+          }
+          else
+            coll.x = 0;
         }
         else
           coll.x = 0;
           
-        if(coll.y >0.01 && velocity.y < 0){
-          velocity.y = 0;
-          vecteur.y = 0;
-        }
-        else if(coll.y <-0.01 && velocity.y > 0){
-          velocity.y = 0;
-          vecteur.y = 0;
-        }
-        else
-          coll.y = 0;
+        
           
+      }
+      
+      //Debug
+      if(Constants.DEBUG_MODE){
+        stroke(0,0,255);
+        line(0,0,coll.x,coll.y); 
       }
       
       
       //Then apply the processed vector to the gameObject
       gameObject.position.add(vecteur);
-      gameObject.position.add(coll);
+      gameObject.position.add(PVector.mult(coll,0.99));
     }
   }
   
@@ -138,26 +129,7 @@ public class Rigidbody extends Component implements DebugDrawable{
       stroke(255,0,0);
       line(0,0,velocity.x,velocity.y);
       fill(0,0);
-      ellipse(velocity.x,velocity.y,3,3); 
-
-
-      stroke(0,0,255);
-        strokeWeight(5);
-          
-      PVector vX = PVector.sub(collider.getExtremePoint((velocity.x < 0)?Orientation.West:Orientation.East),gameObject.getPosition());
-      float halfDimensionX = (collider.getExtremePoint(Orientation.North).y-gameObject.getPosition().y) * 0.9;
-      vX.y -= halfDimensionX;
-      halfDimensionX *= 2.0f/collisionPrecision;
-          
-       PVector vY = PVector.sub(collider.getExtremePoint((velocity.y < 0)?Orientation.North:Orientation.South),gameObject.getPosition());
-      float halfDimensionY = (collider.getExtremePoint(Orientation.West).x-gameObject.getPosition().x)*0.9;
-      vY.x -= halfDimensionY;
-      halfDimensionY *= 2.0f/collisionPrecision;
-      
-      for(int i=0;i<=collisionPrecision;i++){
-        point(vX.x,vX.y+halfDimensionX*i);
-        point(vY.x+halfDimensionY*i,vY.y);
-      }
+      ellipse(velocity.x,velocity.y,3,3);
       
       strokeWeight(1);
     }

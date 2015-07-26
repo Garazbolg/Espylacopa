@@ -40,7 +40,7 @@ public abstract class Area implements Cloneable,Drawable{
   
   public abstract PVector getExtremePoint(Orientation o);
   
-  public abstract PVector getIntersectSize(Area a);
+  public abstract PVector getIntersectSize(Area a,PVector first, PVector second);
  
 }
 
@@ -108,39 +108,39 @@ public class Rect extends Area{
    } 
   }
   
-  public PVector getIntersectSize(Area other){
+  public PVector getIntersectSize(Area other, PVector firstGameObject, PVector secondGameObject){
     PVector res = new PVector();
     if(other instanceof Rect){
       Rect a = (Rect) other;
-      if(a.position.y > position.y){
-       res.y = a.position.y - position.y - halfDimension.y - a.halfDimension.y;
+      if(a.position.y + secondGameObject.y > position.y + firstGameObject.y){
+        res.y = a.position.y + secondGameObject.y - position.y - firstGameObject.y - halfDimension.y - a.halfDimension.y;
       }
       else{
-        res.y = a.position.y + halfDimension.y + a.halfDimension.y - position.y ;
+        res.y = a.position.y + secondGameObject.y + halfDimension.y + a.halfDimension.y - position.y - firstGameObject.y;
       }
       
-      if(a.position.x > position.x){
-       res.x = a.position.x - position.x - halfDimension.x - a.halfDimension.x;
+      if(a.position.x + secondGameObject.x > position.x + firstGameObject.x){
+       res.x = a.position.x + secondGameObject.x - position.x - firstGameObject.x - halfDimension.x - a.halfDimension.x;
       }
       else{
-        res.x = a.position.x + halfDimension.x + a.halfDimension.x - position.x ;
+        res.x = a.position.x + secondGameObject.x + halfDimension.x + a.halfDimension.x - position.x - firstGameObject.x;
       }
     }
     
     if(other instanceof Circle){
       Circle a = (Circle) other;
-      if(a.position.y > position.y){
-       res.y = a.position.y - position.y - halfDimension.y - a.halfRay;
+      if(a.position.y + secondGameObject.y > position.y + firstGameObject.y){
+        res.y = a.position.y + secondGameObject.y - position.y - firstGameObject.y - halfDimension.y - a.halfRay;
       }
       else{
-        res.y = a.position.y + halfDimension.y + a.halfRay - position.y ;
+        res.y = a.position.y + secondGameObject.y + halfDimension.y + a.halfRay - position.y - firstGameObject.y ;
       }
       
-      if(a.position.x > position.x){
-       res.x = a.position.x - position.x - halfDimension.x - a.halfRay;
+      if(a.position.x + secondGameObject.x > position.x + firstGameObject.x){
+       res.x = a.position.x + secondGameObject.x - position.x - firstGameObject.x - halfDimension.x - a.halfRay;
       }
       else{
-        res.x = a.position.x + halfDimension.x + a.halfRay - position.x ;
+        res.x = a.position.x + secondGameObject.x + halfDimension.x + a.halfRay - position.x - firstGameObject.x ;
       }
     }
     
@@ -195,26 +195,26 @@ public class Circle extends Area{
    } 
   }
   
-  public PVector getIntersectSize(Area other){
+  public PVector getIntersectSize(Area other, PVector first, PVector second){
     PVector res = new PVector();
     if(other instanceof Circle){
       Circle a = (Circle) other;
-      if(a.position.y > position.y){
-       res.y = a.position.y - position.y - halfRay - a.halfRay;
+      if(a.position.y + second.y > position.y + first.y){
+       res.y = a.position.y + second.y - position.y - first.y - halfRay - a.halfRay;
       }
       else{
-        res.y = a.position.y + halfRay + a.halfRay - position.y ;
+        res.y = a.position.y + second.y + halfRay + a.halfRay - position.y - first.y ;
       }
       
-      if(a.position.x > position.x){
-       res.x = a.position.x - position.x - halfRay - a.halfRay;
+      if(a.position.x + second.x > position.x + first.x){
+       res.x = a.position.x + second.x - position.x - first.x - halfRay - a.halfRay;
       }
       else{
-        res.x = a.position.x + halfRay + a.halfRay - position.x ;
+        res.x = a.position.x + second.x + halfRay + a.halfRay - position.x - first.x ;
       }
     }
     else{
-     res = PVector.mult(other.getIntersectSize(this),-1); 
+     res = PVector.mult(other.getIntersectSize(this,second,first),-1); 
     }
     
     return res;    
