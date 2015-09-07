@@ -5,6 +5,8 @@ float globalScale = 1.0;
 MapManager map;
 int xBlock = 2;
 int yBlock = 3;
+int previousYblock = 2;
+int previousXblock = 3;
 
 //enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
@@ -26,9 +28,11 @@ void initGame() {
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
  
+  map = new MapManager(3);
 
   GameObject two, three, four, five;
-  player = new GameCharacter("One", "Villageois", new PVector(350, 350));
+  //player = new GameCharacter("One", "Villageois", new PVector(470, 350));
+  player = new GameCharacter("One", "Villageois", GetSpawnPosition());
   //player = new GameCharacter("One","Villageois",new PVector(0,0));
   player.SetLife(5);
   player.SetArmorLife(3);
@@ -40,21 +44,27 @@ void initGame() {
   /*player.addComponent(new Rigidbody());
    player.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
    player.addComponent(new Collider(new Rect(0,0,16,32)));*/
+   
+  /*
   two = new GameObject("Two", new PVector(500, 400));
   two.addComponent(new Collider(new Rect(0, 0, 50, 100)));
-  five = new GameObject("Two", new PVector(600, 400));
+  */
+  
+  /*five = new GameObject("Two", new PVector(600, 400));
   five.addComponent(new Collider(new Rect(0, 0, 50, 100)));
-  three = new GameObject("Three", new PVector(400, -400)/*,one*/);
+  three = new GameObject("Three", new PVector(400, -400)/*,one*///);
+  /*
   three.addComponent(new Collider(new Circle(0, 0, 100)));
   three.addComponent(new Rigidbody());
   four = new GameObject("Four", new PVector(500, 600));
   four.addComponent(new Collider(new Rect(0, 0, 700, 150)));
 
   ((Collider)three.getComponent(Collider.class)).isTrigger = true;
+  */
+  
   Updatables.start();
   //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
 
-  map = new MapManager(3);
 }
 
 void gameDraw() {
@@ -139,19 +149,39 @@ void gameDraw() {
 
 private void CameraManagement() {
   if(player.getPosition().x < (128*xBlock)+resolutionStripSize){
-    xBlock--; 
+    previousXblock = xBlock;
+    previousYblock = yBlock;
+    xBlock--;
+    
+    println("Gone to left " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
+    map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
   else if(player.getPosition().x > resolutionStripSize+(128*(xBlock+1))){
+    previousXblock = xBlock;
+    previousYblock = yBlock;
     xBlock++; 
+    
+    println("Gone to right " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
+    map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
   if(player.getPosition().y < (128*yBlock)){
+    previousXblock = xBlock;
+    previousYblock = yBlock;
     yBlock--; 
+    
+    println("Gone to up " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
+    map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
   else if(player.getPosition().y > (128*(yBlock+1))){
+    previousXblock = xBlock;
+    previousYblock = yBlock;
     yBlock++; 
+    
+    println("Gone to down " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
+    map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
   if(cameraScroll) {
@@ -182,6 +212,15 @@ public void cameraDrawDebug(){
   fill(0,0,255);
   noStroke();
   rect(player.getPosition().x+cameraForwardOffset, player.getPosition().y, 1, 100); 
+}
+
+public PVector GetSpawnPosition(){
+  xBlock = map.GetSpawnIndexX();
+  yBlock = map.GetSpawnIndexY();
+  
+  map.UpdateMap(xBlock, yBlock, xBlock, yBlock);
+  
+  return map.GetSpawnPosition();
 }
 
 

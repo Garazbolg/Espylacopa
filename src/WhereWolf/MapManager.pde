@@ -4,6 +4,7 @@ import java.io.FilenameFilter;
 public class MapManager{
   
   private byte[][] mapBlocks; // each Block is stocked as a byte, the four least significant bits defines the connections with neighboring Blocks, the 4 most significant bits are for used to get the specific type of brick to use
+  private GameObject[][] mapBlocksGameObjects;
   private TileType[][][] mapTiles; // [xBlock][yBlock][tileNumber] = tileType
   
   private int mapSize; // the max bounds of the map
@@ -42,6 +43,7 @@ public class MapManager{
     }
     
     mapBlocks = new byte[mapSize][mapSize];
+    mapBlocksGameObjects = new GameObject[mapSize][mapSize];
     mapTiles = new TileType[mapSize][mapSize][blockTileSize*blockTileSize];
     xSpawnPoints = new int[playerNumber];
     ySpawnPoints = new int[playerNumber];
@@ -53,6 +55,7 @@ public class MapManager{
     
     CreateMap();
     //CreateTile(0,0,TileType.Closed);
+
   }
   
   public void MapGeneration(){
@@ -140,6 +143,22 @@ public class MapManager{
 
     }
     
+  }
+  
+
+  public int GetSpawnIndexX(){
+    return xSpawnPoints[0];
+  }
+  
+  public int GetSpawnIndexY(){
+    return ySpawnPoints[0];
+  }
+  
+  public PVector GetSpawnPosition(){
+    
+    // TODO : manage returned spawn position index
+    println("Spawn : " + xSpawnPoints[0] + " " + ySpawnPoints[0]);
+    return(new PVector(xSpawnPoints[0]*blockPixelSize+ blockPixelSize, ySpawnPoints[0]*blockPixelSize + blockPixelSize/2));
   }
   
   public void DrawMiniMap(){
@@ -241,6 +260,7 @@ public class MapManager{
   }
   
   public boolean HaveNeighborInDirection(int abscissa, int ordinate, Direction dir){
+    
     switch(dir){
       case Left :
         return((mapBlocks[abscissa][ordinate] & (1<<3))==8);
@@ -253,6 +273,34 @@ public class MapManager{
     }
     
     return false;
+  }
+  
+  public void UpdateMap(int xCurrentBlock, int yCurrentBlock, int xPreviousBlock, int yPreviousBlock){
+      if(xCurrentBlock < 0 || xCurrentBlock >= mapSize || yCurrentBlock < 0 || yCurrentBlock >= mapSize){
+        println("ERROR ERROR - Character out of map bounds !");
+        return; 
+      }
+      
+      if(mapBlocks[xCurrentBlock][yCurrentBlock]==0){
+        println("ERROR ERROR - Character in null/empty block !");
+        return; 
+      }
+      
+      println("Player is in " + xCurrentBlock + " " + yCurrentBlock);
+      println("previous pos : " + xPreviousBlock + " " + yPreviousBlock);
+      // TODO : optimization please
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left))  mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock].setActive(false);
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock][yPreviousBlock-1].setActive(false);
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Right)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock].setActive(false);
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Down)) mapBlocksGameObjects[xPreviousBlock][yPreviousBlock+1].setActive(false);
+      
+      mapBlocksGameObjects[xCurrentBlock][yCurrentBlock].setActive(true);
+      
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Left))  mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock].setActive(true);
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Up)) mapBlocksGameObjects[xCurrentBlock][yCurrentBlock-1].setActive(true);
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Right)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock].setActive(true);
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Down)) mapBlocksGameObjects[xCurrentBlock][yCurrentBlock+1].setActive(true);
+      
   }
   
 
@@ -317,17 +365,24 @@ public class MapManager{
   
   // Block = 8x8 tiles
   public void CreateBlock(int xBlock, int yBlock){
+    
+    //mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(xBlock*blockPixelSize,yBlock*blockPixelSize));
+    mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(0,0));
+    
     for(int i=0 ; i<blockTileSize ; i++){
       for(int j=0 ; j<blockTileSize ; j++){
-        CreateTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i]);
+        CreateTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i], mapBlocksGameObjects[xBlock][yBlock]);
       } 
     }
+    
+    mapBlocksGameObjects[xBlock][yBlock].setActive(false);
+    
   }
   
   // Tile = 16x16 pixels 
-  public void CreateTile(int posX, int posY, TileType type){
+  public void CreateTile(int posX, int posY, TileType type, GameObject blockGameObject){
     
-    GameObject tile = new GameObject(str(posX)+str(posY), new PVector(posX, posY));
+    GameObject tile = new GameObject(str(posX)+str(posY), new PVector(posX, posY), blockGameObject);
     
     switch(type){
       case Closed :     
@@ -335,9 +390,11 @@ public class MapManager{
       break;
         
       case Opened :  
-         println("open");
+      
       break;
     } 
+    
+    //tile.setActive(false);
     
   }
   
