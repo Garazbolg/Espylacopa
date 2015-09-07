@@ -31,11 +31,13 @@ void start(){
   //And then :
    addRPC("RPCFunctionName",new Delegate(this){public void call(String [] argv){
      if(Network.isServer){
-         //  Code your server beheviour here
+         //  Code your server behaviour here
      }
      else{
          //  Code you client Behaviour here
      }
+     
+     this.Myfunction(String[] argv);
         
    }});
 }

@@ -29,7 +29,7 @@ public static class Scene{
 
 public class GameObject extends Updatable implements Drawable,DebugDrawable{
   
- String name;
+ public String name;
  public PVector position;
  
  private ArrayList<Component> components;
@@ -45,7 +45,6 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   parent = null;
   Scene.addChildren(this);
   rpcHolder = new RPCHolder();
-  activeInHierarchy = true;
  }
  
  GameObject(String n, PVector pos,GameObject newParent){
@@ -54,7 +53,6 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   components = new ArrayList<Component>(); 
   children = new ArrayList<GameObject>();
   parent = null;
-  activeInHierarchy = true;
   if(newParent != null)
     newParent.addChildren(this);
  }
@@ -111,9 +109,14 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
      }
      return false;
  }
+ 
+ public boolean removeComponent(Component c){
+   c.OnDestroy();
+   return components.remove(c);
+ }
 
  public void draw(){
-     if(!active) return;
+     if(!isActive()) return;
      pushMatrix();
      translate(position.x,position.y);
      
@@ -136,6 +139,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  }
  
  public void debugDraw(){
+   if(!isActive()) return;
    pushMatrix();
    translate(position.x,position.y);
    for(GameObject g : children){
@@ -151,7 +155,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
      
    fill(0);
    stroke(0);
-   text(name,-textWidth(name)/2,0);
+   //text(name,-textWidth(name)/2,0);
    popMatrix();
  }
  

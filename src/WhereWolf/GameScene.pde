@@ -41,9 +41,9 @@ void initGame() {
    player.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
    player.addComponent(new Collider(new Rect(0,0,16,32)));*/
   two = new GameObject("Two", new PVector(500, 400));
-  two.addComponent(new Collider(new Rect(0, 0, 50, 100)));
+  two.addComponent(new Collider(new Rect(0, 0, 100, 100)));
   five = new GameObject("Two", new PVector(600, 400));
-  five.addComponent(new Collider(new Rect(0, 0, 50, 100)));
+  five.addComponent(new Collider(new Rect(0, 0, 100, 100)));
   three = new GameObject("Three", new PVector(400, -400)/*,one*/);
   three.addComponent(new Collider(new Circle(0, 0, 100)));
   three.addComponent(new Rigidbody());

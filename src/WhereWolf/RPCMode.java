@@ -13,6 +13,6 @@ public enum RPCMode{
 
 Server,	//Sends to the server only.
 Others,	//Sends to everyone except the sender.
-OtherClients, //Sends to every clients except the sender.
-All	//Sends to everyone.
+OtherClients,//Sends to every clients except the sender.
+All	        //Sends to everyone.
 }

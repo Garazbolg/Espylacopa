@@ -32,8 +32,12 @@ public static class Updatables{
  //Updatables.update() to put at the start of the draw function of the main
  public static void update(){
     for(Updatable u : items)
-       if(u.activeSelf && u.activeInHierarchy)
+       if(u.isActive())
          u.update(); 
+ }
+ 
+ public static boolean destroy(Updatable u){
+  return items.remove(u); 
  }
 }
 
@@ -41,37 +45,41 @@ public static class Updatables{
 //Parent class for class that have code to run every frame
 public abstract class Updatable{
   
-  protected boolean activeSelf;
-  protected boolean activeInHierarchy;
+  private boolean activeSelf;
+  private boolean activeInHierarchy;
   
   //ctor
   Updatable(){
-    active = true;
+    activeSelf = true;
     activeInHierarchy = true;
     Updatables.add(this);
   }
   
   
  public void setActive(boolean state){
-   boolean last = activeSelf && activeInHierarchy;
+   boolean last = isActive();
    activeSelf = state;
-   if(last && !(activeSelf && activeInHierarchy)){
+   if(last && !isActive()){
       OnDisable(); 
    }
-   else if(!last && (activeSelf && activeInHierarchy)){
+   else if(!last && isActive()){
       OnEnable();     
    }
  }
  
  public void setActiveInHierarchy(boolean state){
-   boolean last = activeSelf && activeInHierarchy;
+   boolean last = isActive();
    activeInHierarchy = state; 
-   if(last && !(activeSelf && activeInHierarchy)){
+   if(last && !isActive()){
       OnDisable(); 
    }
-   else if(!last && (activeSelf && activeInHierarchy)){
+   else if(!last && isActive()){
       OnEnable();     
    }
+ }
+ 
+ public boolean isActive(){
+   return  activeSelf && activeInHierarchy;
  }
   
   //start
@@ -85,4 +93,8 @@ public abstract class Updatable{
   
   //OnDisable
   public void OnDisable(){}
+  
+  public void OnDestroy(){
+    Updatables.destroy(this);
+  }
 }

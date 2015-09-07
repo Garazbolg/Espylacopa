@@ -9,11 +9,6 @@ boolean skipMainMenu = false;
 
 void setup(){
   
- Constants.DEBUG_MODE = false;
- Constants.SHOW_FPS = true;
- 
- //Time.setTimeScale(0.5f);
-  
  //Init Programme
   
  size(displayWidth,displayHeight);

@@ -18,6 +18,7 @@ public static class Network{
   public static Server server;
   public static Client client;
   
+  
   public static int sendRate = 15;
   
  
