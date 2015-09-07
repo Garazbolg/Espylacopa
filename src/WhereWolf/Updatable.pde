@@ -32,7 +32,8 @@ public static class Updatables{
  //Updatables.update() to put at the start of the draw function of the main
  public static void update(){
     for(Updatable u : items)
-       u.update(); 
+       if(u.activeSelf && u.activeInHierarchy)
+         u.update(); 
  }
 }
 
@@ -40,14 +41,48 @@ public static class Updatables{
 //Parent class for class that have code to run every frame
 public abstract class Updatable{
   
+  protected boolean activeSelf;
+  protected boolean activeInHierarchy;
+  
   //ctor
   Updatable(){
+    active = true;
+    activeInHierarchy = true;
     Updatables.add(this);
   }
+  
+  
+ public void setActive(boolean state){
+   boolean last = activeSelf && activeInHierarchy;
+   activeSelf = state;
+   if(last && !(activeSelf && activeInHierarchy)){
+      OnDisable(); 
+   }
+   else if(!last && (activeSelf && activeInHierarchy)){
+      OnEnable();     
+   }
+ }
+ 
+ public void setActiveInHierarchy(boolean state){
+   boolean last = activeSelf && activeInHierarchy;
+   activeInHierarchy = state; 
+   if(last && !(activeSelf && activeInHierarchy)){
+      OnDisable(); 
+   }
+   else if(!last && (activeSelf && activeInHierarchy)){
+      OnEnable();     
+   }
+ }
   
   //start
   public void start(){}
   
   //update
   public void update(){}
+  
+  //OnEnable
+  public void OnEnable(){}
+  
+  //OnDisable
+  public void OnDisable(){}
 }

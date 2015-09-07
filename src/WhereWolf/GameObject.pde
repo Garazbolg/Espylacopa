@@ -45,6 +45,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   parent = null;
   Scene.addChildren(this);
   rpcHolder = new RPCHolder();
+  activeInHierarchy = true;
  }
  
  GameObject(String n, PVector pos,GameObject newParent){
@@ -53,9 +54,28 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   components = new ArrayList<Component>(); 
   children = new ArrayList<GameObject>();
   parent = null;
+  activeInHierarchy = true;
   if(newParent != null)
     newParent.addChildren(this);
  }
+ 
+ 
+ public void setActive(boolean state){
+   super.setActive(state);
+   for(Component c : components)
+     c.setActiveInHierarchy(state);
+   for(GameObject go : children)
+     go.setActiveInHierarchy(state);
+ }
+ 
+ public void setActiveInHierarchy(boolean state){
+   super.setActiveInHierarchy(state);
+   for(Component c : components)
+     c.setActiveInHierarchy(state);
+   for(GameObject go : children)
+     go.setActiveInHierarchy(state);
+ }
+ 
  
  public PVector getPosition(){
   if(parent != null)
@@ -93,6 +113,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  }
 
  public void draw(){
+     if(!active) return;
      pushMatrix();
      translate(position.x,position.y);
      

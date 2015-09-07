@@ -32,6 +32,12 @@ public class Sprite extends Renderer{
    scaleY = sy;
  }
  
+ Sprite(SpriteSheet ssh, int x, int y){
+  source = ssh.getImage(x,y);
+  scaleX = 1.0f;
+  scaleY = 1.0f;
+ }
+ 
  Sprite(PImage sour){
   source = sour;
   scaleX = 1.0f; 
