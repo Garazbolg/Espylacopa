@@ -23,6 +23,9 @@ public class MapManager{
   private int blockTileSize = 8; // Block = 8 x 8 tiles
   private int blockPixelSize = blockTileSize*tilePixelSize;
   
+  // TODO : use spriteSheet when all 
+  private Sprite closedSprite;
+  
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber){
     if(playerNumber < 4) {
@@ -47,6 +50,9 @@ public class MapManager{
     spawnpointDelay = numberOfBlocks / playerNumber;
     nextSpawnPoint = numberOfBlocks;
     MapGeneration();
+    
+    CreateMap();
+    //CreateTile(0,0,TileType.Closed);
   }
   
   public void MapGeneration(){
@@ -185,7 +191,6 @@ public class MapManager{
   
   // Tile = 16x16 pixels 
   public void DrawTile(int posX, int posY, TileType type){
-    TileType test = TileType.Closed;
     switch(type){
       case Closed :     
         fill(0,0,255);
@@ -228,21 +233,31 @@ public class MapManager{
     
     // Such the player is in (xCurrentBlock, yCurrentBlock) block, we have to draw the neighbors blocks to manage camera scrool
     // Doors inside current block are used to know which neighbors we have to draw
-    
-    // Bottom Block
-    if((mapBlocks[xCurrentBlock][yCurrentBlock] & 1)==1) DrawBlock(xCurrentBlock,yCurrentBlock+1);
-    
-    // Right Block
-    if((mapBlocks[xCurrentBlock][yCurrentBlock] & (1<<1))==2) DrawBlock(xCurrentBlock+1,yCurrentBlock);
-    
-    // Above Block
-    if((mapBlocks[xCurrentBlock][yCurrentBlock] & (1<<2))==4) DrawBlock(xCurrentBlock,yCurrentBlock-1);
-    
-    // Left Block
-    if((mapBlocks[xCurrentBlock][yCurrentBlock] & (1<<3))==8) DrawBlock(xCurrentBlock-1,yCurrentBlock);
+            
+    if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Left)) DrawBlock(xCurrentBlock-1,yCurrentBlock);
+    if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Up)) DrawBlock(xCurrentBlock,yCurrentBlock-1);
+    if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Right)) DrawBlock(xCurrentBlock+1,yCurrentBlock);
+    if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Down)) DrawBlock(xCurrentBlock,yCurrentBlock+1);
   }
   
+  public boolean HaveNeighborInDirection(int abscissa, int ordinate, Direction dir){
+    switch(dir){
+      case Left :
+        return((mapBlocks[abscissa][ordinate] & (1<<3))==8);
+      case Up :
+        return((mapBlocks[abscissa][ordinate] & (1<<2))==4);
+      case Right :
+        return((mapBlocks[abscissa][ordinate] & (1<<1))==2);
+      case Down :
+        return((mapBlocks[abscissa][ordinate] & 1)==1);
+    }
+    
+    return false;
+  }
+  
+
   public void DefineTilesForAllBlock(){
+    
     int debug = 0;
     for(int i=0 ; i<mapSize ; i++){
       for(int j=0 ; j<mapSize ; j++){
@@ -263,8 +278,9 @@ public class MapManager{
             else folderPath += '0';
             
             folderPath = "Blocks/" + folderPath;
-            
+
             String path = sketchPath + "/data" + "/" + folderPath; 
+            println(path);
             File dataFolder = new File(path); 
             
             int numberOfBlocksPossibilities = dataFolder.list().length;
@@ -284,6 +300,48 @@ public class MapManager{
       }
     }
   }
+  
+
+
+  public void CreateMap(){
+    
+    for(int i=0 ; i<mapSize ; i++){
+      for(int j=0 ; j<mapSize ; j++){
+        if(mapBlocks[i][j]!=0){
+            CreateBlock(i,j);
+        }
+      } 
+    }
+
+  }
+  
+  // Block = 8x8 tiles
+  public void CreateBlock(int xBlock, int yBlock){
+    for(int i=0 ; i<blockTileSize ; i++){
+      for(int j=0 ; j<blockTileSize ; j++){
+        CreateTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i]);
+      } 
+    }
+  }
+  
+  // Tile = 16x16 pixels 
+  public void CreateTile(int posX, int posY, TileType type){
+    
+    GameObject tile = new GameObject(str(posX)+str(posY), new PVector(posX, posY));
+    
+    switch(type){
+      case Closed :     
+        tile.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+      break;
+        
+      case Opened :  
+         println("open");
+      break;
+    } 
+    
+  }
+  
+
   
   // Debug function
   public void PrintTilesFile(String textPath){
