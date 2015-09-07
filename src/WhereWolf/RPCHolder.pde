@@ -18,8 +18,10 @@ public class RPCHolder{
   }
   
   private void init(){
-   delegates = new HashMap<String,Delegate>(); 
-   isInit = true;
+    if(!isInit){
+       delegates = new HashMap<String,Delegate>(); 
+       isInit = true;
+    }
   }
   
   public void addRPC(String s,Delegate r){

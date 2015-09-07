@@ -18,12 +18,19 @@ public static class Colliders{
    everyColliders.add(c);
  }
  
+ public static boolean remove(Collider c){
+  return everyColliders.remove(c); 
+ }
+ 
  //Update
  public static void update(){   
    //Test for every colliders with every other colliders
   for(int i = 0; i< everyColliders.size();i++){
+    if(!everyColliders.get(i).isActive())
+      continue;
    for(int j = i+1;j< everyColliders.size();j++){
-     
+     if(!everyColliders.get(j).isActive())
+      continue;
          //if they touch
         if(everyColliders.get(i).intersect(everyColliders.get(j))){
                //if either one of them is a trigger
@@ -205,6 +212,11 @@ public class Collider extends Component implements DebugDrawable{
  public void onTriggerExit(Collider other){
    if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Trigger with " + other.gameObject.name);
    gameObject.onTriggerExit(other);
+ }
+ 
+ public void OnDestroy(){
+   super.OnDestroy();
+  Colliders.remove(this); 
  }
  
  
