@@ -32,4 +32,6 @@ On a donc deux chiffres par tiles, ce qui donne un nombre allant de 0 à 99 pour 
 Dans Processing, ce nombre est relié à l'énumération se trouvant dans l'onglet TileType.java.
 
 
+Pour éviter une double épaisseur des murs, on établit que : les salles disposant d'une ouverture vers le bas et vers la droite mettent en place le mur.
+Les salles disposant d'une ouverture vers le haut ou vers la gauche s'appuient sur le mur du voisin.
 

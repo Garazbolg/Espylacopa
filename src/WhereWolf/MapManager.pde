@@ -24,11 +24,10 @@ public class MapManager{
   private int blockTileSize = 8; // Block = 8 x 8 tiles
   private int blockPixelSize = blockTileSize*tilePixelSize;
   
-  // TODO : use spriteSheet when all 
-  private Sprite closedSprite;
   
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber){
+    
     if(playerNumber < 4) {
       mapSize = 6;
       numberOfBlocks = 7;
@@ -55,6 +54,7 @@ public class MapManager{
     
     CreateMap();
     //CreateTile(0,0,TileType.Closed);
+    
 
   }
   
@@ -387,15 +387,15 @@ public class MapManager{
     switch(type){
       case Closed :     
         tile.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        tile.addComponent(new Sprite(tilesSpriteSheet, 1,0));
       break;
         
       case Opened :  
-      
+        tile.addComponent(new Sprite(tilesSpriteSheet, 17,15));
+        //tile.addComponent(new Sprite(torchSpriteSheet, 0,0));
       break;
     } 
-    
-    //tile.setActive(false);
-    
+        
   }
   
 

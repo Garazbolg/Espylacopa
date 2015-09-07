@@ -7,6 +7,9 @@ int textSize = 32;
 
 boolean skipMainMenu = false;
 
+private SpriteSheet tilesSpriteSheet;
+private SpriteSheet torchSpriteSheet;
+  
 void setup(){
   
  //Init Programme
@@ -33,6 +36,9 @@ void setup(){
     scene = SceneState.Game;
     initGame();
   }
+  
+  tilesSpriteSheet = new SpriteSheet("Resources/Sprites/tilesSpriteSheet.png", 24, 20);
+  torchSpriteSheet = new SpriteSheet("Resources/Sprites/torchSpriteSheet.png", 4, 6);
 }
  
 
