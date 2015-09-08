@@ -259,6 +259,7 @@ public class MapManager{
   
   public boolean HaveNeighborInDirection(int abscissa, int ordinate, Direction dir){
     
+    if(abscissa < 0 || abscissa >= mapSize || ordinate < 0 || ordinate >= mapSize) return false;
     switch(dir){
       case Left :
         return((mapBlocks[abscissa][ordinate] & (1<<3))==8);
@@ -286,17 +287,53 @@ public class MapManager{
       
 
       // TODO : optimization please
-      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left))  mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock].setActive(false);
-      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock][yPreviousBlock-1].setActive(false);
-      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Right)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock].setActive(false);
-      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Down)) mapBlocksGameObjects[xPreviousBlock][yPreviousBlock+1].setActive(false);
+      
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left))  {
+        mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock-1, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock-1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock-1, yPreviousBlock, Direction.Down)) mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock+1].setActive(false);
+      }
+      
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Up)){
+        mapBlocksGameObjects[xPreviousBlock][yPreviousBlock-1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock-1, Direction.Left)) mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock-1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock-1, Direction.Right)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock-1].setActive(false);
+      }
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Right)) {
+        mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock+1, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock-1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock+1, yPreviousBlock, Direction.Down)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock+1].setActive(false);
+      }
+      if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Down)) {
+        mapBlocksGameObjects[xPreviousBlock][yPreviousBlock+1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock+1, Direction.Left)) mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock+1].setActive(false);
+        if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock+1, Direction.Right)) mapBlocksGameObjects[xPreviousBlock+1][yPreviousBlock+1].setActive(false);
+      }
       
       mapBlocksGameObjects[xCurrentBlock][yCurrentBlock].setActive(true);
       
-      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Left))  mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock].setActive(true);
-      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Up)) mapBlocksGameObjects[xCurrentBlock][yCurrentBlock-1].setActive(true);
-      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Right)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock].setActive(true);
-      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Down)) mapBlocksGameObjects[xCurrentBlock][yCurrentBlock+1].setActive(true);
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Left)) {
+        mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock-1, yCurrentBlock, Direction.Up)) mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock-1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock-1, yCurrentBlock, Direction.Down)) mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock+1].setActive(true);
+      }
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Up)) {
+        mapBlocksGameObjects[xCurrentBlock][yCurrentBlock-1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock-1, Direction.Left)) mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock-1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock-1, Direction.Right)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock-1].setActive(true);
+      }
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Right)) {
+        mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock+1, yCurrentBlock, Direction.Up)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock-1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock+1, yCurrentBlock, Direction.Down)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock+1].setActive(true);
+      }
+      if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock, Direction.Down)) {
+        mapBlocksGameObjects[xCurrentBlock][yCurrentBlock+1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock+1, Direction.Left)) mapBlocksGameObjects[xCurrentBlock-1][yCurrentBlock+1].setActive(true);
+        if(HaveNeighborInDirection(xCurrentBlock, yCurrentBlock+1, Direction.Right)) mapBlocksGameObjects[xCurrentBlock+1][yCurrentBlock+1].setActive(true);
+      }
+      
+      
       
   }
   
