@@ -21,7 +21,7 @@ public class MapManager{
   private int nextSpawnPoint;
   
   private int tilePixelSize = 16;
-  private int blockTileSize = 8; // Block = 8 x 8 tiles
+  private int blockTileSize = 10; // Block = 8 x 8 tiles
   private int blockPixelSize = blockTileSize*tilePixelSize;
   
   
@@ -160,14 +160,14 @@ public class MapManager{
     return(new PVector(xSpawnPoints[0]*blockPixelSize+ blockPixelSize, ySpawnPoints[0]*blockPixelSize + blockPixelSize/2));
   }
   
-  public void DrawMiniMap(){
+  public void DrawMiniMap(int playerPositionX, int playerPositionY){
    stroke(255);
     for(int i=0 ; i<mapSize ; i++){
       for(int j=0 ; j<mapSize ; j++){
          if(mapBlocks[i][j]>0) {
            fill(255);
            
-           if(i==mapSize/2 && j==mapSize/2) fill(255,0,0); // just to indicate which Block was using as origin
+           if(i==playerPositionX && j==playerPositionY) fill(255,0,0); // just to indicate where the player is
            rect(30+60*i, 20+60*j, 60, 60);
            fill(0);
            text(mapBlocks[i][j], 50+60*i, 55+60*j);
@@ -327,7 +327,7 @@ public class MapManager{
             String path = sketchPath + "/data" + "/" + folderPath; 
             
             File dataFolder = new File(path); 
-            
+            println(path);
             int numberOfBlocksPossibilities = dataFolder.list().length;
             int choosenBlock = (int)random(0,numberOfBlocksPossibilities);
             folderPath += "/"; // WARNING : this line must be done before the loadStrings
@@ -410,6 +410,10 @@ public class MapManager{
       }
       print("\n");
     }
+  }
+  
+  public float GetBlockPixelSize(){
+    return blockPixelSize;
   }
   
 }

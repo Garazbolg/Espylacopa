@@ -31,9 +31,9 @@ public static class Updatables{
  
  //Updatables.update() to put at the start of the draw function of the main
  public static void update(){
-    for(Updatable u : items)
-       if(u.isActive())
-         u.update(); 
+   for(int i = 0; i<items.size(); i++)
+       if(items.get(i).isActive())
+         items.get(i).update(); 
  }
  
  public static boolean destroy(Updatable u){

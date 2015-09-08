@@ -34,6 +34,10 @@ public class AnimatorController extends Renderer{
      next.startState();
    }
   }
+  
+  public State getCurrentState(){
+    return currentState; 
+  }
 }
 
 

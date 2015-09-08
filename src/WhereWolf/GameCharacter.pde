@@ -22,11 +22,12 @@ public class GameCharacter extends GameObject{
   
   private PVector colliderHalfDimensions;
   
-  private boolean facingRight = false;
+  protected boolean facingRight = false;
   
   protected SpriteSheet walkAndIdle;
   protected Parameters params;
   protected State walkLeft,walkRight,idleRight,idleLeft;
+  
  
   GameCharacter(String name, PVector position){
     super(name,position);
@@ -38,6 +39,9 @@ public class GameCharacter extends GameObject{
  
  public void update(){
     super.update();
+    
+
+    
     float xVelocity = (float)rigid.getVelocity().x;
     animator.parameters.setFloat("SpeedX",xVelocity);
     if(xVelocity > 0) facingRight = true;

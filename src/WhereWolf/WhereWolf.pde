@@ -9,6 +9,7 @@ boolean skipMainMenu = false;
 
 String characterSpriteSheetPath = "Resources/Characters/";
 String mapTilesSpriteSheetPath = "Resources/Sprites/";
+String spritesPath = "Resources/Sprites/";
 
 private SpriteSheet tilesSpriteSheet;
 private SpriteSheet torchSpriteSheet;

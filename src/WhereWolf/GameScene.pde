@@ -24,18 +24,16 @@ void initGame() {
   
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
  
-
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
- 
   map = new MapManager(3);
 
   GameObject two, three, four, five;
   
   //player = new GameCharacter("One", "Villageois", GetSpawnPosition());
-  player = new Villager("One", GetSpawnPosition());
-  
-  
+  //player = new Villager("One", GetSpawnPosition());
+  player = new Werewolf("One", GetSpawnPosition());
+    
   player.SetLife(5);
   player.SetArmorLife(3);
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
@@ -73,11 +71,12 @@ void gameDraw() {
 
   Updatables.update();
 
-//Move  
-  ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
+//Move
+// Done in Villager class
+  //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   
 // TODO : prevent to jump while in the air
-  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-70.0f));
+  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-100.0f));
   
 
   if(! Constants.DEBUG_MODE)
@@ -91,7 +90,7 @@ void gameDraw() {
  // pushMatrix();
  if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
-  else translate(-xBlock*128,-yBlock*128);
+  else translate(-xBlock*map.GetBlockPixelSize(),-yBlock*map.GetBlockPixelSize());
  }
 
   fill(0, 255, 0);
@@ -127,9 +126,8 @@ void gameDraw() {
   player.drawLife();
 
 
-
   //TODO : display a proper minimap
-  map.DrawMiniMap();
+  map.DrawMiniMap(xBlock, yBlock);
   
 
   // Matrix to manage the
@@ -150,7 +148,7 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if(player.getPosition().x < (128*xBlock)+resolutionStripSize){
+  if(player.getPosition().x < (map.GetBlockPixelSize()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -158,7 +156,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x > resolutionStripSize+(128*(xBlock+1))){
+  else if(player.getPosition().x > resolutionStripSize+(map.GetBlockPixelSize()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock++; 
@@ -166,7 +164,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  if(player.getPosition().y < (128*yBlock)){
+  if(player.getPosition().y < (map.GetBlockPixelSize()*yBlock)){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock--; 
@@ -174,7 +172,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().y > (128*(yBlock+1))){
+  else if(player.getPosition().y > (map.GetBlockPixelSize()*(yBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock++; 
@@ -184,7 +182,7 @@ private void CameraManagement() {
   
   if(cameraScroll) {
     if(cameradCentered){
-      cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+      cameraPosition = new PVector(player.getPosition().x-map.GetBlockPixelSize()+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
     }
     
     else{

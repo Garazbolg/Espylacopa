@@ -64,6 +64,10 @@ public class Sprite extends Renderer{
    return source.width*scaleX; 
  }
  
+ public void flip(){
+   scaleX = -scaleX;
+ }
+ 
  public void draw(){
    pushMatrix();
    scale(scaleX,scaleY);
