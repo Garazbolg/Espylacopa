@@ -7,6 +7,9 @@ int textSize = 32;
 
 boolean skipMainMenu = false;
 
+String characterSpriteSheetPath = "Resources/Characters/";
+String mapTilesSpriteSheetPath = "Resources/Sprites/";
+
 private SpriteSheet tilesSpriteSheet;
 private SpriteSheet torchSpriteSheet;
   
@@ -31,14 +34,16 @@ void setup(){
  Input.addAxis("Vertical","joystick Axe Y");
  Input.addButton("Jump","ESPACE");
  Input.addButton("Jump","joystick Bouton 0");
+ Input.addButton("Fire","A");
+ Input.addButton("Fire","joystick Bouton 1");
  
  if(skipMainMenu) {
     scene = SceneState.Game;
     initGame();
   }
   
-  tilesSpriteSheet = new SpriteSheet("Resources/Sprites/tilesSpriteSheet.png", 24, 20);
-  torchSpriteSheet = new SpriteSheet("Resources/Sprites/torchSpriteSheet.png", 4, 6);
+  tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
+  torchSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "torchSpriteSheet.png", 4, 6);
 }
  
 

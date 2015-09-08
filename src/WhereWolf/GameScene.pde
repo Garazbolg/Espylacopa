@@ -31,9 +31,11 @@ void initGame() {
   map = new MapManager(3);
 
   GameObject two, three, four, five;
-  //player = new GameCharacter("One", "Villageois", new PVector(470, 350));
-  player = new GameCharacter("One", "Villageois", GetSpawnPosition());
-  //player = new GameCharacter("One","Villageois",new PVector(0,0));
+  
+  //player = new GameCharacter("One", "Villageois", GetSpawnPosition());
+  player = new Villager("One", GetSpawnPosition());
+  
+  
   player.SetLife(5);
   player.SetArmorLife(3);
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
@@ -153,7 +155,6 @@ private void CameraManagement() {
     previousYblock = yBlock;
     xBlock--;
     
-    println("Gone to left " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
@@ -162,7 +163,6 @@ private void CameraManagement() {
     previousYblock = yBlock;
     xBlock++; 
     
-    println("Gone to right " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
@@ -171,7 +171,6 @@ private void CameraManagement() {
     previousYblock = yBlock;
     yBlock--; 
     
-    println("Gone to up " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
@@ -180,7 +179,6 @@ private void CameraManagement() {
     previousYblock = yBlock;
     yBlock++; 
     
-    println("Gone to down " + " previous X : " + previousXblock + " previous Y = " + previousYblock + " xBlock : " + xBlock + " yBlock : " + yBlock);
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   

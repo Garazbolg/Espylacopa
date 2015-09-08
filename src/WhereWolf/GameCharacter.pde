@@ -16,39 +16,23 @@ public class GameCharacter extends GameObject{
   private int armorLife;
   private boolean isAlive = true;
   
+  // TODO : use image manager
   private PImage lifeSprite = loadImage("Resources/Sprites/heart.png");
   private PImage armorLifeSprite = loadImage("Resources/Sprites/armorHeart.png");
   
   private PVector colliderHalfDimensions;
   
   private boolean facingRight = false;
+  
+  protected SpriteSheet walkAndIdle;
+  protected Parameters params;
+  protected State walkLeft,walkRight,idleRight,idleLeft;
  
-  GameCharacter(String name,String type,PVector position){
+  GameCharacter(String name, PVector position){
     super(name,position);
     
     rigid = new Rigidbody();
     addComponent(rigid);
-    
-    SpriteSheet walkAndIdle = new SpriteSheet(type + "SpriteSheet.png",8,4);
-    addComponent(new Collider(new Rect(0,0,walkAndIdle.getSpriteWidth(),walkAndIdle.getSpriteHeight())));
-    
-    Parameters params = new Parameters();
-    params.setFloat("SpeedX",0.0f);
-    State walkLeft,walkRight,idleRight,idleLeft;
-    walkRight = new State(new Animation(walkAndIdle,0,true),9);
-    walkLeft =  new State(new Animation(walkAndIdle,1,true),9);
-    idleRight = new State(new Animation(walkAndIdle,2,true),1);
-    idleLeft =  new State(new Animation(walkAndIdle,3,true),1);
-    
-    Transition t = new Transition(idleRight,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
-    t = new Transition(idleLeft,walkRight,"SpeedX",ConditionType.GreaterThan,0.1f);
-    t = new Transition(idleRight,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
-    t = new Transition(idleLeft,walkLeft,"SpeedX",ConditionType.LesserThan,-0.1f);
-    t = new Transition(walkRight,idleRight,"SpeedX",ConditionType.LesserThan,0.1f);
-    t = new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
-    animator = new AnimatorController(idleLeft,params);
-    addComponent(animator);
-
   }
   
  
