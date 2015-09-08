@@ -24,8 +24,6 @@ public class Rigidbody extends Component implements DebugDrawable{
   public boolean useGravity = true;
   //mass of the gameObject
   public float mass = 1.0;
-  //Precision of the collision detection the higher the better but ressource consuming ( the bigger the higher it needs to be)
-  public int collisionPrecision = 5;
   
   //reference of the collider of the gameObject
   private Collider collider;
@@ -53,69 +51,76 @@ public class Rigidbody extends Component implements DebugDrawable{
       if(useGravity)
         velocity.y += Rigidbodies.gravity * mass * Time.deltaTime();
       
-      //temporary vector for calculation
-      PVector vecteur = PVector.mult(velocity,Time.deltaTime());
-      
+            
       //check for collisions
-      //by check if points that are on the border
-      //would still be in the colliders that the collider is already in collision with
-      //after apllying the vector
       if(collider != null)
       {
         coll = collider.getOppositeVelocity();
         
         PVector coll2 = coll.get();
+        print("coll2 : (" +coll2.x +","+coll2.y +")\n");
         
-        if(coll.y >0.01 && velocity.y < 0){
-          if(abs(coll2.x) > 5f ){
-            velocity.y = 0;
-            vecteur.y = 0;
-           }
-          else
-            coll.y = 0;
+        if(collider.xMoreMagnitude){
+          velocity.x = 0;
         }
-        else if(coll.y <-0.01 && velocity.y > 0){
-          if(abs(coll2.x) > 5f ){
+        if(collider.yMoreMagnitude){
+          velocity.y = 0;
+        }
+        
+        if((coll.y >0.001 && velocity.y < 0) || (coll.y <-0.001 && velocity.y > 0)){
+          if(abs(collider.absOppositeVecteur.x) > 1f)
             velocity.y = 0;
-            vecteur.y = 0;
-          }
-          else
+          else 
+            coll.y = 0;
+            
+          if(abs(coll2.y) < 1f )
             coll.y = 0;
         }
         else
           coll.y = 0;
         
-        
-        if(coll.x >0.01 && velocity.x < 0){
-          if(abs(coll2.y) > 5f ){
+        if((coll.x >0.001 && velocity.x < 0) || (coll.x <-0.001 && velocity.x > 0)){
+          if(abs(collider.absOppositeVecteur.y) > 1f)
             velocity.x = 0;
-            vecteur.x = 0;
-          }
           else
             coll.x = 0;
-        }
-        else if(coll.x <-0.01 && velocity.x > 0){
-          if(abs(coll2.y) > 5f ){
-            velocity.x = 0;
-            vecteur.x = 0;
-          }
-          else
+            
+          if(abs(coll2.x) < 1f )
             coll.x = 0;
         }
         else
           coll.x = 0;
           
         
-          
+        /*
+        if(abs(coll2.x) < 1f )
+            coll.x = 0;
+        if(abs(coll2.y) < 1f )
+            coll.y = 0;
+            
+        if(collider.xMoreMagnitude){
+          velocity.x = 0;
+        }
+        if(collider.yMoreMagnitude){
+          velocity.y = 0;
+        }*/
+        
       }
       
       //Debug
       if(Constants.DEBUG_MODE){
+        strokeWeight(5);
         stroke(0,0,255);
         line(0,0,coll.x,coll.y); 
+        strokeWeight(1);
       }
       
+      //temporary vector for calculation
+      PVector vecteur = PVector.mult(velocity,Time.deltaTime());
       
+      println("absOpposite : (" + collider.absOppositeVecteur.x +","+collider.absOppositeVecteur.y+")");
+      println("velocity : (" + velocity.x +"," + velocity.y +")");
+      println("coll : (" + coll.x +"," + coll.y +")\n");
       //Then apply the processed vector to the gameObject
       gameObject.position.add(vecteur);
       gameObject.position.add(PVector.mult(coll,0.99));

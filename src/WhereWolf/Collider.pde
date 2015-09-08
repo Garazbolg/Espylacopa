@@ -107,6 +107,9 @@ public class Collider extends Component implements DebugDrawable{
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
  
+ public PVector absOppositeVecteur = new PVector();
+ public boolean xMoreMagnitude = false, yMoreMagnitude = false;
+ 
  //ctor
  Collider(Area zone){
   area = zone; 
@@ -167,8 +170,18 @@ public class Collider extends Component implements DebugDrawable{
  
  public PVector getOppositeVelocity(){
    PVector res = new PVector();
-   for(Collider c : currentCollisions)
-     res.add(area.getIntersectSize(c.area,gameObject.getPosition(),c.gameObject.getPosition()));
+   PVector intersectSize;
+   PVector previousAbs = absOppositeVecteur;
+   absOppositeVecteur = new PVector();
+   for(Collider c : currentCollisions){
+     intersectSize = area.getIntersectSize(c.area,gameObject.getPosition(),c.gameObject.getPosition());
+     res.add(intersectSize);
+     absOppositeVecteur.x += abs(intersectSize.x);
+     absOppositeVecteur.y += abs(intersectSize.y);
+   }
+   
+   xMoreMagnitude = previousAbs.x < absOppositeVecteur.x;
+   yMoreMagnitude = previousAbs.y < absOppositeVecteur.y;
      
    return res;
  }
@@ -176,14 +189,14 @@ public class Collider extends Component implements DebugDrawable{
 
  //What happens when this collider enter in collision with an other collider
  public void onCollisionEnter(Collider other){
-   if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Collision with " + other.gameObject.name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Collision with " + other.gameObject.name);
    gameObject.onCollisionEnter(other);
  }
  
  
  //What happens when this collider start to overlap an other collider
  public void onTriggerEnter(Collider other){
-   if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Trigger with " + other.gameObject.name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Trigger with " + other.gameObject.name);
    gameObject.onTriggerEnter(other);
  }
  
@@ -204,13 +217,13 @@ public class Collider extends Component implements DebugDrawable{
  
  //What happens when this collider stop colliding with an other collider
  public void onCollisionExit(Collider other){
-   if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Collision with " + other.gameObject.name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Collision with " + other.gameObject.name);
    gameObject.onCollisionExit(other);
  }
  
  //What happens when this collider stop overlapping an other collider
  public void onTriggerExit(Collider other){
-   if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Trigger with " + other.gameObject.name);
+   //if(Constants.DEBUG_MODE)println(gameObject.name + " Exit Trigger with " + other.gameObject.name);
    gameObject.onTriggerExit(other);
  }
  
@@ -227,7 +240,9 @@ public class Collider extends Component implements DebugDrawable{
    area.draw();
  }
  
- 
+ public void setArea(Area newArea){
+  area = newArea; 
+ }
  
  
 }

@@ -114,16 +114,24 @@ public class Rect extends Area{
       Rect a = (Rect) other;
       if(a.position.y + secondGameObject.y > position.y + firstGameObject.y){
         res.y = a.position.y + secondGameObject.y - position.y - firstGameObject.y - halfDimension.y - a.halfDimension.y;
+        if(res.y > 0)
+          res.y = 0;
       }
       else{
         res.y = a.position.y + secondGameObject.y + halfDimension.y + a.halfDimension.y - position.y - firstGameObject.y;
+        if(res.y < 0)
+          res.y = 0;
       }
       
       if(a.position.x + secondGameObject.x > position.x + firstGameObject.x){
        res.x = a.position.x + secondGameObject.x - position.x - firstGameObject.x - halfDimension.x - a.halfDimension.x;
+       if(res.x > 0)
+          res.x = 0;
       }
       else{
         res.x = a.position.x + secondGameObject.x + halfDimension.x + a.halfDimension.x - position.x - firstGameObject.x;
+        if(res.x < 0)
+          res.x = 0;
       }
     }
     
