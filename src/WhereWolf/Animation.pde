@@ -9,7 +9,7 @@
 */
 public class Animation{
  private int index;
- private SpriteSheet source;
+ protected SpriteSheet source;
  private boolean loop = false; // Animation has to be 2^n frames long (max 16 frames) for it to be smooth
  
  Animation(SpriteSheet spriteSheet, int line, boolean doesLoop){

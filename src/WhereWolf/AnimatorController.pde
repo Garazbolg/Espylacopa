@@ -158,7 +158,7 @@ public class Transition{
 /*
 */
 public class State{
-  private Animation animation;
+  protected Animation animation;
   private float framePerSecond;
   private float currentFrame;
   

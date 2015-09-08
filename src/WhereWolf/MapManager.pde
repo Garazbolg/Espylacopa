@@ -157,7 +157,6 @@ public class MapManager{
   public PVector GetSpawnPosition(){
     
     // TODO : manage returned spawn position index
-    println("Spawn : " + xSpawnPoints[0] + " " + ySpawnPoints[0]);
     return(new PVector(xSpawnPoints[0]*blockPixelSize+ blockPixelSize, ySpawnPoints[0]*blockPixelSize + blockPixelSize/2));
   }
   
@@ -226,7 +225,6 @@ public class MapManager{
   
   // Block = 8x8 tiles
   public void DrawBlock(int xBlock, int yBlock){
-    println("Draw block : " + xBlock + " " + yBlock);
     for(int i=0 ; i<blockTileSize ; i++){
       for(int j=0 ; j<blockTileSize ; j++){
         DrawTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i]);
@@ -286,8 +284,7 @@ public class MapManager{
         return; 
       }
       
-      println("Player is in " + xCurrentBlock + " " + yCurrentBlock);
-      println("previous pos : " + xPreviousBlock + " " + yPreviousBlock);
+
       // TODO : optimization please
       if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left))  mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock].setActive(false);
       if(HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock][yPreviousBlock-1].setActive(false);
@@ -328,7 +325,7 @@ public class MapManager{
             folderPath = "Blocks/" + folderPath;
 
             String path = sketchPath + "/data" + "/" + folderPath; 
-            println(path);
+            
             File dataFolder = new File(path); 
             
             int numberOfBlocksPossibilities = dataFolder.list().length;
