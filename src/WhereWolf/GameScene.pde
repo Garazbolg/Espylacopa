@@ -1,4 +1,5 @@
 GameCharacter player;
+Rigidbody rig;
  
 float globalScale = 1.0;
 
@@ -63,7 +64,7 @@ void initGame() {
   */
   
   Updatables.start();
-  //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
+  rig = ((Rigidbody) player.getComponent(Rigidbody.class));
 
 }
 
@@ -76,7 +77,7 @@ void gameDraw() {
   //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   
 // TODO : prevent to jump while in the air
-  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-100.0f));
+  if(Input.getButtonDown("Jump") && rig.grounded) rig.setVelocity(new PVector(rig.getVelocity().x,-100.0f));
   
 
   if(! Constants.DEBUG_MODE)

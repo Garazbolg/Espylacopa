@@ -107,9 +107,6 @@ public class Collider extends Component implements DebugDrawable{
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
  
- public PVector absOppositeVecteur = new PVector();
- public boolean xMoreMagnitude = false, yMoreMagnitude = false;
- 
  //ctor
  Collider(Area zone){
   area = zone; 
@@ -171,18 +168,22 @@ public class Collider extends Component implements DebugDrawable{
  public PVector getOppositeVelocity(){
    PVector res = new PVector();
    PVector intersectSize;
-   PVector previousAbs = absOppositeVecteur;
-   absOppositeVecteur = new PVector();
    for(Collider c : currentCollisions){
      intersectSize = area.getIntersectSize(c.area,gameObject.getPosition(),c.gameObject.getPosition());
-     res.add(intersectSize);
-     absOppositeVecteur.x += abs(intersectSize.x);
-     absOppositeVecteur.y += abs(intersectSize.y);
+     if(abs(intersectSize.x) < abs(intersectSize.y))
+       intersectSize.y = 0;
+     else 
+       intersectSize.x = 0;
+       
+     res.x = (abs(intersectSize.x)>abs(res.x))?intersectSize.x:res.x;
+     res.y = (abs(intersectSize.y)>abs(res.y))?intersectSize.y:res.y;
    }
-   
-   xMoreMagnitude = previousAbs.x < absOppositeVecteur.x;
-   yMoreMagnitude = previousAbs.y < absOppositeVecteur.y;
      
+     if(abs(res.x) < abs(res.y))
+       res.x = 0;
+     else
+       res.y = 0;
+       
    return res;
  }
 
