@@ -24,6 +24,8 @@ public class Rigidbody extends Component implements DebugDrawable{
   public boolean useGravity = true;
   //mass of the gameObject
   public float mass = 1.0;
+  //Is the rigidbody on an other collider (to know if he can or cannot jump)
+  public boolean grounded = false;
   
   //reference of the collider of the gameObject
   private Collider collider;
@@ -55,75 +57,44 @@ public class Rigidbody extends Component implements DebugDrawable{
       //check for collisions
       if(collider != null)
       {
+        grounded = false;
         coll = collider.getOppositeVelocity();
         
-        PVector coll2 = coll.get();
-        print("coll2 : (" +coll2.x +","+coll2.y +")\n");
-        
-        if(collider.xMoreMagnitude){
-          velocity.x = 0;
-        }
-        if(collider.yMoreMagnitude){
-          velocity.y = 0;
-        }
-        
-        if((coll.y >0.001 && velocity.y < 0) || (coll.y <-0.001 && velocity.y > 0)){
-          if(abs(collider.absOppositeVecteur.x) > 1f)
+        println("coll : (" + coll.x +"," + coll.y +")\n");
+                       
+        if((coll.y >0.05 && velocity.y < 0) || (coll.y <-0.05 && velocity.y > 0)){
             velocity.y = 0;
-          else 
-            coll.y = 0;
-            
-          if(abs(coll2.y) < 1f )
-            coll.y = 0;
+            if(coll.y<0)
+              grounded = true;
         }
         else
           coll.y = 0;
         
-        if((coll.x >0.001 && velocity.x < 0) || (coll.x <-0.001 && velocity.x > 0)){
-          if(abs(collider.absOppositeVecteur.y) > 1f)
+        if((coll.x >0.05 && velocity.x < 0) || (coll.x <-0.05 && velocity.x > 0))
             velocity.x = 0;
-          else
-            coll.x = 0;
-            
-          if(abs(coll2.x) < 1f )
-            coll.x = 0;
-        }
         else
           coll.x = 0;
           
-        
-        /*
-        if(abs(coll2.x) < 1f )
+          
+         if(abs(coll.x) < 0.1f )
             coll.x = 0;
-        if(abs(coll2.y) < 1f )
+         if(abs(coll.y) < 0.1f )
             coll.y = 0;
-            
-        if(collider.xMoreMagnitude){
-          velocity.x = 0;
-        }
-        if(collider.yMoreMagnitude){
-          velocity.y = 0;
-        }*/
         
       }
       
-      //Debug
-      if(Constants.DEBUG_MODE){
-        strokeWeight(5);
-        stroke(0,0,255);
-        line(0,0,coll.x,coll.y); 
-        strokeWeight(1);
-      }
       
       //temporary vector for calculation
       PVector vecteur = PVector.mult(velocity,Time.deltaTime());
       
-      println("absOpposite : (" + collider.absOppositeVecteur.x +","+collider.absOppositeVecteur.y+")");
+      //println("absOpposite : (" + collider.absOppositeVecteur.x +","+collider.absOppositeVecteur.y+")");
       println("velocity : (" + velocity.x +"," + velocity.y +")");
+      println("vecteur : (" + vecteur.x +"," + vecteur.y +")");
       println("coll : (" + coll.x +"," + coll.y +")\n");
+      
       //Then apply the processed vector to the gameObject
       gameObject.position.add(vecteur);
-      gameObject.position.add(PVector.mult(coll,0.99));
+      gameObject.position.add(PVector.mult(coll,0.99f));
     }
   }
   
