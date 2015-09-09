@@ -103,13 +103,13 @@ public class Werewolf extends GameCharacter {
 
     rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f, rigid.getVelocity().y));
     
-    
+    if (Input.getButtonDown("Fire")) {
+      attack();
+    }
 
     if (isTransformed) {
 
-      if (Input.getButtonDown("Fire")) {
-        attack();
-      }
+
 
       if (millis() - powerBarChrono > powerBarDecreaseDelay) {
         powerBar -= powerBarDecreaseSpeed;
@@ -167,11 +167,26 @@ public class Werewolf extends GameCharacter {
   }
 
   public void attack() {
-    //TODO
-    if(facingRight){
+    
+    if(isTransformed){
       
-    } else{
-      
+    }
+    
+    else{
+      if(facingRight){
+        ArrayList<Collider> allColliders = rightHumanAttackCollider.getCurrentTriggers();
+        
+        for(int i=0 ; i<allColliders.size() ; i++){
+          if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
+            if(allColliders.get(i).gameObject != this){
+              ((GameCharacter)(allColliders.get(i).gameObject)).DecreaseLife(1);
+            }
+          }; // TODO : not working not taking super class in count
+        }
+        
+      } else{
+        
+      }
     }
   }
 
