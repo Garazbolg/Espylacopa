@@ -24,7 +24,7 @@ public class AnimatorController extends Renderer{
   }
   
   public void draw(){
-    currentState.draw();
+    if(parameters.getBool("Visible")) currentState.draw();
   }
 
   public void update(){
@@ -38,6 +38,7 @@ public class AnimatorController extends Renderer{
   public State getCurrentState(){
     return currentState; 
   }
+
 }
 
 
@@ -184,7 +185,6 @@ public class State{
  }
  
  public void draw(){
-   
      PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
      image(source,-source.width/2,-source.height/2); 
      currentFrame += Time.deltaTime();

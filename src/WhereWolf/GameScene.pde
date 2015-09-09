@@ -27,43 +27,19 @@ void initGame() {
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
   map = new MapManager(3);
-
-  GameObject two, three, four, five;
   
-  //player = new GameCharacter("One", "Villageois", GetSpawnPosition());
   //player = new Villager("One", GetSpawnPosition());
   player = new Werewolf("One", GetSpawnPosition());
     
-  player.SetLife(5);
-  player.SetArmorLife(3);
+
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
 
   resolutionStripSize = (width - (globalScale*128))/14;
   cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
 
-  /*player.addComponent(new Rigidbody());
-   player.addComponent(new StaticAnimation(new Animation(new SpriteSheet("VillageoisSpriteSheet.png",8,4),0,true),6));
-   player.addComponent(new Collider(new Rect(0,0,16,32)));*/
-   
-  /*
-  two = new GameObject("Two", new PVector(500, 400));
-  two.addComponent(new Collider(new Rect(0, 0, 50, 100)));
-  */
   
-  /*five = new GameObject("Two", new PVector(600, 400));
-  five.addComponent(new Collider(new Rect(0, 0, 50, 100)));
-  three = new GameObject("Three", new PVector(400, -400)/*,one*///);
-  /*
-  three.addComponent(new Collider(new Circle(0, 0, 100)));
-  three.addComponent(new Rigidbody());
-  four = new GameObject("Four", new PVector(500, 600));
-  four.addComponent(new Collider(new Rect(0, 0, 700, 150)));
-
-  ((Collider)three.getComponent(Collider.class)).isTrigger = true;
-  */
   
   Updatables.start();
-  //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(10,0));
 
 }
 
@@ -76,8 +52,10 @@ void gameDraw() {
   //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   
 // TODO : prevent to jump while in the air
-  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-100.0f));
+  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-150.0f));
   
+  // DEBUG
+  if(Input.getButtonDown("DebugGetDamage")) player.DecreaseLife(1);
 
   if(! Constants.DEBUG_MODE)
   //Draw
@@ -93,6 +71,8 @@ void gameDraw() {
   else translate(-xBlock*map.GetBlockPixelSize(),-yBlock*map.GetBlockPixelSize());
  }
 
+
+
   fill(0, 255, 0);
   rect(256+resolutionStripSize, 460, 64, 10);
   fill(255, 0, 0);
@@ -105,7 +85,7 @@ void gameDraw() {
   
 
   //Debug Draw
-  if (Constants.DEBUG_MODE){
+  if (!Constants.DEBUG_MODE){
     cameraDrawDebug();
     Scene.debugDraw();
   }

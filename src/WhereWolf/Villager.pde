@@ -36,7 +36,11 @@ public class Villager extends GameCharacter {
     t = new Transition(walkRight,idleRight,"SpeedX",ConditionType.LesserThan,0.1f);
     t = new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
     animator = new AnimatorController(idleLeft,params);
+    animator.parameters.setBool("Visible", true);
     addComponent(animator);
+    
+    
+    characterCollider = (Collider)this.getComponent(Collider.class);
     
   }
   
@@ -89,7 +93,6 @@ public class Villager extends GameCharacter {
     animator.getCurrentState().startState(); // To have a fixed height for the weapon
     barrelGun.setActive(true);
     fireShotChrono = millis();
-    println("Fire");
   }
   
   public void ShowWeapon(){
@@ -102,7 +105,6 @@ public class Villager extends GameCharacter {
     idleLeft.animation.source = walkAndIdle;
     
     fireShotSprite = new Sprite(spritesPath + "fireShot.png");
-    println("check check check");
     //fireShotSprite = new Sprite(characterSpriteSheetPath + "VillageoisSpriteSheet.png");
      
     //GameObject thisGameObject = (GameObject) this;
@@ -110,6 +112,6 @@ public class Villager extends GameCharacter {
     barrelGun.addComponent(fireShotSprite);
     
     barrelGun.setActive(false);
-;  }
+  }
   
 }

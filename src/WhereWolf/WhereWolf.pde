@@ -37,6 +37,10 @@ void setup(){
  Input.addButton("Jump","joystick Bouton 0");
  Input.addButton("Fire","A");
  Input.addButton("Fire","joystick Bouton 1");
+ Input.addButton("DebugGetDamage","P");
+ 
+ Input.addButton("Special","joystick Bouton 2");
+ Input.addButton("Special","E");
  
  if(skipMainMenu) {
     scene = SceneState.Game;

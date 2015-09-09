@@ -11,5 +11,5 @@
 
 public static class Constants{
   public static boolean DEBUG_MODE = false;
-  public static boolean SHOW_FPS = false;
+  public static boolean SHOW_FPS = true;
 }

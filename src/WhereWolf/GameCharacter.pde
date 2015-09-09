@@ -7,10 +7,11 @@
 
 /*
 */
-public class GameCharacter extends GameObject{
+public abstract class GameCharacter extends GameObject{
   
   AnimatorController animator;
   Rigidbody rigid;
+  Collider characterCollider;
  
   private int life;  
   private int armorLife;
@@ -28,6 +29,18 @@ public class GameCharacter extends GameObject{
   protected Parameters params;
   protected State walkLeft,walkRight,idleRight,idleLeft;
   
+  private boolean invulnerable = false;
+  private float blinkDelay = 100;
+  private float blinkChrono;
+  private float blinkNumber = 0;
+  private float maxBlinkNumber = 13;
+  private boolean visible = true;
+  
+ 
+  protected boolean isRunning = false;
+  protected Rect staticColliderRect;
+  protected Rect runningColliderRect;
+ 
  
   GameCharacter(String name, PVector position){
     super(name,position);
@@ -40,12 +53,44 @@ public class GameCharacter extends GameObject{
  public void update(){
     super.update();
     
-
-    
     float xVelocity = (float)rigid.getVelocity().x;
     animator.parameters.setFloat("SpeedX",xVelocity);
-    if(xVelocity > 0) facingRight = true;
-    else if(xVelocity < 0) facingRight = false;
+    if(xVelocity > 0) {
+      if(!isRunning){
+        isRunning = true;
+        characterCollider.setArea(runningColliderRect); 
+      }
+      facingRight = true;
+    }
+    else if(xVelocity < 0) {
+      if(!isRunning){
+        isRunning = true;
+        characterCollider.setArea(runningColliderRect); 
+      }
+      facingRight = false;
+    }
+    
+    else{
+      if(isRunning){
+        isRunning = false;
+        characterCollider.setArea(staticColliderRect); 
+      } 
+    }
+    
+    if(invulnerable){
+      if(millis() - blinkChrono > blinkDelay){
+        blinkNumber++;
+        visible = !visible;
+        animator.parameters.setBool("Visible", visible);
+        
+        if(blinkNumber == maxBlinkNumber){
+          invulnerable = false; 
+        }
+        
+        blinkChrono = millis();
+        
+      }
+    }
   }
   
   public int GetLife(){
@@ -57,10 +102,23 @@ public class GameCharacter extends GameObject{
   }
   
   public void DecreaseLife(int n){
-    life -= n;
-    if(life <0){
-      life = 0;
-      isAlive = false;
+    if(invulnerable) return;
+    
+    if(armorLife > 0){
+      DecreaseArmorLife(n); 
+    }
+    
+    else{
+      life -= n;
+      
+      if(life <=0){
+        life = 0;
+        Die();
+      }
+      
+      else{
+        activateBlinkOfInvulnerability(); 
+      }
     }
   }
       
@@ -73,10 +131,15 @@ public class GameCharacter extends GameObject{
   }
   
   public void DecreaseArmorLife(int n){
+    if(invulnerable) return;
     armorLife -= n;
     if(armorLife <0){
       DecreaseLife(n+armorLife);
       armorLife = 0;
+    }
+    
+    else{
+      activateBlinkOfInvulnerability(); 
     }
   }
   
@@ -109,6 +172,30 @@ public class GameCharacter extends GameObject{
   
   public boolean isFacingRight(){
     return facingRight; 
+  }
+  
+  public void activateBlinkOfInvulnerability(){
+    invulnerable = true;
+    blinkChrono = millis();
+    blinkNumber = 0;
+    
+    visible = false;
+    animator.parameters.setBool("Visible", visible);
+  }
+  
+  public void Die(){
+    isAlive = false;
+    // TODO : feedback death + stop character control
+  }
+  
+  public void UpdateCollider(){
+    if(rigid.getVelocity().x != 0){
+      characterCollider.setArea(runningColliderRect); 
+    }
+    
+    else{
+      characterCollider.setArea(staticColliderRect); 
+    }
   }
   
 }
