@@ -245,6 +245,10 @@ public class Collider extends Component implements DebugDrawable{
   area = newArea; 
  }
  
+ public ArrayList<Collider> getCurrentTriggers(){
+   return currentTriggers; 
+ }
+ 
  
 }
 

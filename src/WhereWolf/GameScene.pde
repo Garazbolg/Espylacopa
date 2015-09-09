@@ -30,6 +30,8 @@ void initGame() {
   
   //player = new Villager("One", GetSpawnPosition());
   player = new Werewolf("One", GetSpawnPosition());
+  
+  Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
     
 
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
