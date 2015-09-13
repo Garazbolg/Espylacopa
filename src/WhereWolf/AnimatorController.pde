@@ -38,6 +38,10 @@ public class AnimatorController extends Renderer{
   public State getCurrentState(){
     return currentState; 
   }
+  
+  public void setCurrentState(State newState){
+    currentState = newState; 
+  }
 
 }
 
@@ -234,7 +238,7 @@ public class Parameters{
   }
   
   public boolean getBool(String k){
-    return parametersBool.get(k).booleanValue();
+    return (parametersBool.get(k) == null || parametersBool.get(k).booleanValue());
   }
   
   public int getInt(String k){

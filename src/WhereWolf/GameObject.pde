@@ -31,10 +31,12 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   
  public String name;
  public PVector position;
+ public boolean isTile = false;
+ public boolean isChildTile = false;
  
  private ArrayList<Component> components;
  private ArrayList<GameObject> children;
- private GameObject parent;
+ protected GameObject parent;
  public RPCHolder rpcHolder;
  
  GameObject(String n, PVector pos){
@@ -117,6 +119,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
 
  public void draw(){
      if(!isActive()) return;
+     
      pushMatrix();
      translate(position.x,position.y);
      

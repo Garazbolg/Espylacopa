@@ -1,0 +1,7 @@
+00 - Tile Vide
+01 - Fond coloté
+02 - Mur
+03 - Pot vide
+04 - Pot avec flamme
+05 - Pot de fleur
+06 - Bibliothèque

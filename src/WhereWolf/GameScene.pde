@@ -13,7 +13,7 @@ private boolean cameraScroll = true;
 private boolean cameradCentered = false;
 private float maxCameraForwardOffset = 20;
 private float cameraForwardOffset;
-private PVector cameraPosition;
+
 private float cameraLerpSpeed;
 
 private PVector playerColliderHalfDimensions;
@@ -28,6 +28,8 @@ void initGame() {
 
   map = new MapManager(3);
   
+  delay(2000); // Wait the end of the map generation to avoid low frame rate at start
+  
   //player = new Villager("One", GetSpawnPosition());
   player = new Werewolf("One", GetSpawnPosition());
   
@@ -39,9 +41,12 @@ void initGame() {
   resolutionStripSize = (width - (globalScale*128))/14;
   cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
 
-  
+  cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
+  cameraHeight = displayHeight / globalScale;
   
   Updatables.start();
+
+  scene = SceneState.Game;
 
 }
 
@@ -53,11 +58,9 @@ void gameDraw() {
 // Done in Villager class
   //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
   
-// TODO : prevent to jump while in the air
-  if(Input.getButtonDown("Jump")) ((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().x,-150.0f));
   
   // DEBUG
-  if(Input.getButtonDown("DebugGetDamage")) player.DecreaseLife(1);
+  if(Input.getButtonDown("DebugGetDamage")) player.DecreaseLife(1, player.position);
 
   if(! Constants.DEBUG_MODE)
   //Draw
@@ -72,13 +75,7 @@ void gameDraw() {
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
   else translate(-xBlock*map.GetBlockPixelSize(),-yBlock*map.GetBlockPixelSize());
  }
-
-
-
-  fill(0, 255, 0);
-  rect(256+resolutionStripSize, 460, 64, 10);
-  fill(255, 0, 0);
-  rect(256+resolutionStripSize+64, 460+64, 64, 10);
+ 
 
   Scene.draw();
  // popMatrix();
@@ -89,7 +86,7 @@ void gameDraw() {
   //Debug Draw
   if (!Constants.DEBUG_MODE){
     cameraDrawDebug();
-    Scene.debugDraw();
+    //Scene.debugDraw();
   }
 
 
@@ -130,7 +127,7 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if(player.getPosition().x < (map.GetBlockPixelSize()*xBlock)+resolutionStripSize){
+  if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSize()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -138,7 +135,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x > resolutionStripSize+(map.GetBlockPixelSize()*(xBlock+1))){
+  else if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSize()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock++; 
@@ -146,7 +143,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  if(player.getPosition().y < (map.GetBlockPixelSize()*yBlock)){
+  if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y < (map.GetBlockPixelSize()*yBlock)){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock--; 
@@ -154,7 +151,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().y > (map.GetBlockPixelSize()*(yBlock+1))){
+  else if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y > (map.GetBlockPixelSize()*(yBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock++; 

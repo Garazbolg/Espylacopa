@@ -107,6 +107,8 @@ public class Collider extends Component implements DebugDrawable{
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
  
+ public boolean forceDebugDraw = false;
+ 
  //ctor
  Collider(Area zone){
   area = zone; 
@@ -142,6 +144,7 @@ public class Collider extends Component implements DebugDrawable{
  
  //update
  public void update(){
+   if(forceDebugDraw) debugDraw();
  }
  
  //return the extreme point of an area for a given orientation (North,South,East,West)
@@ -236,9 +239,11 @@ public class Collider extends Component implements DebugDrawable{
  
  //debug Draw
  public void debugDraw(){
+   if(forceDebugDraw){
    fill(0,0);
    stroke(0,255,0);
    area.draw();
+   }
  }
  
  public void setArea(Area newArea){

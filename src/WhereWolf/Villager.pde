@@ -56,12 +56,8 @@ public class Villager extends GameCharacter {
        else barrelGun.position = new PVector(-10,2);
     }
     
-    if(!isFiring){
-      rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
-    }
-    
-    else{
-      rigid.setVelocity(new PVector(0,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
+    if(isFiring){
+      rigid.setVelocity(new PVector(0,rigid.getVelocity().y));
     }
         
     if(Input.getButtonDown("Fire")){

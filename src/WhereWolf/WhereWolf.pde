@@ -11,17 +11,24 @@ String characterSpriteSheetPath = "Resources/Characters/";
 String mapTilesSpriteSheetPath = "Resources/Sprites/";
 String spritesPath = "Resources/Sprites/";
 
+PVector cameraPosition;
+float cameraWidth;
+float cameraHeight;
+
+
 private SpriteSheet tilesSpriteSheet;
 private SpriteSheet torchSpriteSheet;
+
+private Sprite emptyPotSprite;
   
 void setup(){
   
  //Init Programme
   
- size(displayWidth,displayHeight);
+ size(displayWidth,displayHeight, P2D);
  frameRate(120);
  noSmooth();                        //To prevent antialiasing
- 
+ ((PGraphicsOpenGL)g).textureSampling(3);
  ImageManager.start(this);
  Input.start(this);
  
@@ -41,27 +48,28 @@ void setup(){
  
  Input.addButton("Special","joystick Bouton 2");
  Input.addButton("Special","E");
- 
  if(skipMainMenu) {
     scene = SceneState.Game;
-    initGame();
+    
   }
   
   tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
-  torchSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "torchSpriteSheet.png", 4, 6);
+  torchSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "torchSpriteSheet.png", 4, 1);
+  
 }
  
 
 
 void draw(){
   
-  background(255);
+  background(100);
   //Updatables.update();
   Input.update();
   
   
-  if(scene==SceneState.MainMenu){
-  mouse.position.x = mouseX - mouse.halfDimension.x;
+  if(scene == SceneState.MainMenu){
+    
+    mouse.position.x = mouseX - mouse.halfDimension.x;
     mouse.position.y = mouseY - mouse.halfDimension.y;
    
    fill(0);
@@ -71,22 +79,28 @@ void draw(){
     text(playString, width/2-textWidth(playString),height/2-textSize);
     if(mouse.intersect(playButton)){
       if(mousePressed){
-        scene = SceneState.Game;
-        initGame();
+        scene = SceneState.Loading;
+        //initGame();
+        thread("initGame");
       }
 
     }
     else{
       if(Input.getButtonDown("Jump")){
-        scene = SceneState.Game;
-        initGame();
+        scene = SceneState.Loading;
+        thread("initGame");
       }      
     }
   }
+    
+  else if(scene == SceneState.Loading){
+    text("Loading...", width/2-textWidth(playString),height/2-textSize);
+  }
   
-  else if(scene==SceneState.Game){
+  else if(scene == SceneState.Game){
     gameDraw();
   }
+
   
   else{
     println("ERROR ERROR CASE NOT MANAGED");  
@@ -98,5 +112,6 @@ boolean sketchFullScreen() {
   if(Constants.DEBUG_MODE)
     return false;
     
-  return true;
+  //return true;
+  return false;
 }
