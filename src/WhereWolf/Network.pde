@@ -88,8 +88,21 @@ public static class Network{
    return null;
  }
  
- public void Instantiate(){
-   
+ public void Instantiate(String classToInstantiate, PVector position){
+   if(!isServer)
+     write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y);
+   else{
+     try{
+             Class<?> clazz = Class.forName(classToInstantiate);
+             java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
+             GameObject instance = (GameObject)constructor.newInstance(classToInstantiate, position);
+             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id);
+           }
+           catch (Exception e){
+             //TODO Error message for class not found and other exceptions 
+           }
+   }
+     
  }
  
  
