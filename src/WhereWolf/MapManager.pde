@@ -430,15 +430,15 @@ public class MapManager {
         GameObject emptyPot = new GameObject("emptyPot", new PVector(0, 0 ), tile);
         emptyPot.isChildTile = true;
         emptyPot.addComponent(new Sprite(mapTilesSpriteSheetPath + "pot.png"));
-        tile.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         break;
 
       case FirePot :
 
-        tile.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
         GameObject fireBackground = new GameObject("fireBackground", new PVector(0, -tilePixelSize), tile);
-        fireBackground.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        fireBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         fireBackground.isChildTile = true;
 
         GameObject firePot = new GameObject("firePot", new PVector(0, -8 ), tile);
@@ -453,10 +453,10 @@ public class MapManager {
         break;
 
       case FlowerPot :
-        tile.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
         GameObject flowerBackground = new GameObject("flowerBackground", new PVector(0, -tilePixelSize), tile);
-        flowerBackground.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        flowerBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         flowerBackground.isChildTile = true;
 
         GameObject flowerPot = new GameObject("flowerPot", new PVector(0, -8 ), tile);
@@ -465,10 +465,10 @@ public class MapManager {
         break;
 
       case Bookcase :
-        tile.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
         GameObject bookcaseBackground = new GameObject("bookcaseBackground", new PVector(0, -tilePixelSize), tile);
-        bookcaseBackground.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        bookcaseBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         bookcaseBackground.isChildTile = true;
 
         GameObject bookcase = new GameObject("bookcase", new PVector(0, -8 ), tile);
@@ -477,10 +477,10 @@ public class MapManager {
         break;
 
       case Chest :
-        tile.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
         GameObject chestBackground = new GameObject("chestBackground", new PVector(tilePixelSize, 0), tile);
-        chestBackground.addComponent(new Sprite(tilesSpriteSheet, 17, 15));
+        chestBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         chestBackground.isChildTile = true;
 
         GameObject chest = new GameObject("chest", new PVector(8, 0), tile);

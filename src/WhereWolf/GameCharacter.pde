@@ -60,6 +60,13 @@ public abstract class GameCharacter extends GameObject{
     
     rigid = new Rigidbody();
     addComponent(rigid);
+    
+    deadSpriteSheet = new SpriteSheet(characterSpriteSheetPath + "grave.png", 1, 1);
+    dead = new State(new Animation(deadSpriteSheet, 0, false), 1);
+
+    staticColliderRect = new Rect(0, 4, 6, 24);
+    runningColliderRect = new Rect(0, 4, 10, 24);
+    
   }
   
  
@@ -260,7 +267,9 @@ public abstract class GameCharacter extends GameObject{
   
   public void Die(){
     isAlive = false;
+    println(animator);
     animator.setCurrentState(dead);
+    println();
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
     
     //characterCollider.isTrigger = true;

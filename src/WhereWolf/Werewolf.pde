@@ -60,15 +60,16 @@ public class Werewolf extends GameCharacter {
     SetLife(3);
 
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png", 8, 4);
-    deadSpriteSheet = new SpriteSheet(characterSpriteSheetPath + "grave.png", 1, 1);
 
-    staticColliderRect = humanStaticColliderRect = new Rect(0, 4, 6, 24);
-    runningColliderRect = humanRunningColliderRect = new Rect(0, 4, 10, 24);
+    humanStaticColliderRect = staticColliderRect;
+    humanRunningColliderRect = runningColliderRect;
+    
     
     wherewolfStaticColliderRect = new Rect(-1, 2, 20, 44);
     wherewolfRunningColliderRect = new Rect(-1, 2, 30, 44);
     
     addComponent(new Collider(new Rect(0, 4, 6, 24)));
+    characterCollider = (Collider)this.getComponent(Collider.class);
 
     params = new Parameters();
     params.setFloat("SpeedX", 0.0f);
@@ -77,7 +78,6 @@ public class Werewolf extends GameCharacter {
     walkLeft =  new State(new Animation(walkAndIdle, 1, true), 9);
     idleRight = new State(new Animation(walkAndIdle, 2, true), 1);
     idleLeft =  new State(new Animation(walkAndIdle, 3, true), 1);
-    dead = new State(new Animation(deadSpriteSheet, 0, false), 1);
 
     Transition t = new Transition(idleRight, walkRight, "SpeedX", ConditionType.GreaterThan, 0.1f);
     t = new Transition(idleLeft, walkRight, "SpeedX", ConditionType.GreaterThan, 0.1f);
@@ -95,7 +95,6 @@ public class Werewolf extends GameCharacter {
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png"); 
     
-    characterCollider = (Collider)this.getComponent(Collider.class);
     
     leftHumanAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), this);
     leftHumanAttack.addComponent(new Collider(new Rect(3, 0, 15, 20)));
