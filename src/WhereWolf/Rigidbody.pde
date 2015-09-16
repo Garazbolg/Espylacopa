@@ -6,14 +6,6 @@
 
 
 /*
-  Static class for constants use by rigidbodies
-*/
-public static class Rigidbodies{
- public static float gravity = 350; 
-}
-
-
-/*
   Component that handle movement and gravity
 */
 public class Rigidbody extends Component implements DebugDrawable{
@@ -51,7 +43,7 @@ public class Rigidbody extends Component implements DebugDrawable{
       
       //apply gravity
       if(useGravity)
-        velocity.y += Rigidbodies.gravity * mass * Time.deltaTime();
+        velocity.y += Physics.gravity * mass * Time.deltaTime();
       
             
       //check for collisions
