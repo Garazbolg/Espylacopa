@@ -477,15 +477,23 @@ public class MapManager {
         break;
 
       case Chest :
+      
+        GameObject chest = new GameObject("chest", new PVector(0, 4), tile);
+        chest.isChildTile = true;
+        chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        
+      /*
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
         GameObject chestBackground = new GameObject("chestBackground", new PVector(tilePixelSize, 0), tile);
         chestBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         chestBackground.isChildTile = true;
 
-        GameObject chest = new GameObject("chest", new PVector(8, 0), tile);
+        GameObject chest = new GameObject("chest", new PVector(8, 8), tile);
         chest.isChildTile = true;
         chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
+     */
         break;
 
       case Lava :
