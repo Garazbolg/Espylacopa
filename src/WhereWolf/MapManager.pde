@@ -470,6 +470,14 @@ public class MapManager {
         GameObject bookcaseBackground = new GameObject("bookcaseBackground", new PVector(0, -tilePixelSize), tile);
         bookcaseBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         bookcaseBackground.isChildTile = true;
+        
+        GameObject bookcaseBackground2 = new GameObject("bookcaseBackground2", new PVector(tilePixelSize, 0), tile);
+        bookcaseBackground2.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        bookcaseBackground2.isChildTile = true;
+
+        GameObject bookcaseBackground3 = new GameObject("bookcaseBackground3", new PVector(tilePixelSize, -tilePixelSize), tile);
+        bookcaseBackground3.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        bookcaseBackground3.isChildTile = true;
 
         GameObject bookcase = new GameObject("bookcase", new PVector(0, -8 ), tile);
         bookcase.isChildTile = true;
@@ -497,8 +505,17 @@ public class MapManager {
         break;
 
       case Lava :
-        tile.addComponent(new Sprite(tilesSpriteSheet, 15, 15));     
-        tile.addComponent(new DamageCollider(new Rect(0, 0, tilePixelSize, tilePixelSize), 1));
+        //tile.addComponent(new Sprite(tilesSpriteSheet, 15, 15));
+        
+        State lavaState =  new State(new Animation(lavaSpriteSheet, 0, true), 9);
+        AnimatorController lavaAnimator = new AnimatorController(lavaState, new Parameters());
+        
+        GameObject lava = new GameObject("lava", new PVector(0, 0), tile);
+        lava.isChildTile = true;
+        lava.addComponent(lavaAnimator);
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));     
+        tile.addComponent(new DamageCollider(new Rect(0, 1, tilePixelSize, tilePixelSize-2), 1));
         break;
       }
     }

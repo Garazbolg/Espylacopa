@@ -24,7 +24,29 @@ public class AnimatorController extends Renderer{
   }
   
   public void draw(){
-    if(parameters.getBool("Visible")) currentState.draw();
+    if(parameters.getBool("Visible")) {
+         
+        // Check if the sprite is for a tile
+      if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
+        PVector checkPosition;
+        if(gameObject.isTile) checkPosition = gameObject.position;
+        else checkPosition = PVector.add(gameObject.position, gameObject.parent.position);
+        
+        PImage source = currentState.getSource();
+        
+        if((checkPosition.x + source.width/2) < (cameraPosition.x + resolutionStripSize)
+        || (checkPosition.x - source.width/2) > (cameraPosition.x + cameraWidth)
+        || (checkPosition.y + source.height/2) < (cameraPosition.y)
+        || (checkPosition.y - source.height/2) > (cameraPosition.y + cameraHeight)
+        ){
+          currentState.updateFrame(); // animation is played but not displayed
+          return; 
+        }
+         
+       }
+       
+      currentState.draw();
+    }
   }
 
   public void update(){
@@ -188,6 +210,10 @@ public class State{
    return !animation.getLoop() && currentFrame > animation.getSize();
  }
  
+ public PImage getSource(){
+   return  animation.getImage(((int)(currentFrame*framePerSecond)));
+ }
+ 
  public void draw(){
      PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
      image(source,-source.width/2,-source.height/2); 
@@ -204,6 +230,12 @@ public class State{
    }
    
    return null;
+ }
+ 
+ public void updateFrame(){
+   currentFrame += Time.deltaTime();
+   if(currentFrame > animation.getSize() && animation.getLoop())
+     currentFrame -= animation.getSize();
  }
 }
 
