@@ -90,9 +90,20 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
    if(c.getClass() == cl)
      return c;
   } 
-  
+
   return null;
  }
+ 
+  //same as getComponent but including subclasses
+  public Component getComponentIncludingSubclasses(Class cl){
+    for(Component c : components) {
+      if(cl.isInstance(c)){
+        return c;
+      }
+    }
+
+    return null;
+  }
  
  public void addChildren(GameObject nGameObject){
    if(!children.contains(nGameObject)){

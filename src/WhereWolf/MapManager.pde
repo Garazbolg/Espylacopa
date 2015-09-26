@@ -415,7 +415,7 @@ public class MapManager {
   public void CreateTile(int posX, int posY, TileType type, GameObject blockGameObject) {
 
     if (type != TileType.Empty) {
-      GameObject tile = new GameObject(str(posX)+str(posY), new PVector(posX, posY), blockGameObject);
+      GameObject tile = new GameObject("tile" + str(posX)+str(posY), new PVector(posX, posY), blockGameObject);
       tile.isTile = true;
 
       switch(type) {
@@ -427,6 +427,7 @@ public class MapManager {
 
       case Closed :     
         tile.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        //((Collider)(tile.getComponent(Collider.class))).isTrigger = true;
         //tile.addComponent(new Sprite(tilesSpriteSheet, 1,0));
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "wall.png"));
         break;
@@ -436,6 +437,10 @@ public class MapManager {
         emptyPot.isChildTile = true;
         emptyPot.addComponent(new Sprite(mapTilesSpriteSheetPath + "pot.png"));
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        
+        emptyPot.addComponent(new Collider(new Rect(0, 2, tilePixelSize-4, tilePixelSize-2)));
+        ((Collider)(emptyPot.getComponent(Collider.class))).passablePlatform = true;
+        
         break;
 
       case FirePot :
@@ -467,6 +472,11 @@ public class MapManager {
         GameObject flowerPot = new GameObject("flowerPot", new PVector(0, -8 ), tile);
         flowerPot.isChildTile = true;
         flowerPot.addComponent(new Sprite(mapTilesSpriteSheetPath + "flowerPot.png"));
+        
+        // TODO : change sprite with crushed flowers when someone walk on them
+        tile.addComponent(new Collider(new Rect(0, 2, tilePixelSize-4, tilePixelSize-2)));
+        ((Collider)(tile.getComponent(Collider.class))).passablePlatform = true;
+        
         break;
 
       case Bookcase :
@@ -484,9 +494,13 @@ public class MapManager {
         bookcaseBackground3.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         bookcaseBackground3.isChildTile = true;
 
-        GameObject bookcase = new GameObject("bookcase", new PVector(0, -8 ), tile);
+        GameObject bookcase = new GameObject("bookcase", new PVector(8, -8 ), tile);
         bookcase.isChildTile = true;
         bookcase.addComponent(new Sprite(mapTilesSpriteSheetPath + "bookcase.png"));
+        
+        bookcase.addComponent(new Collider(new Rect(0, 0, 28, 32)));
+        ((Collider)(bookcase.getComponent(Collider.class))).passablePlatform = true;
+        
         break;
 
       case Chest :
@@ -495,6 +509,9 @@ public class MapManager {
         chest.isChildTile = true;
         chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        
+        chest.addComponent(new Collider(new Rect(0, 4, 8, 16)));
+        ((Collider)(chest.getComponent(Collider.class))).passablePlatform = true;
         
       /*
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
@@ -512,7 +529,7 @@ public class MapManager {
       case Lava :
         //tile.addComponent(new Sprite(tilesSpriteSheet, 15, 15));
         
-        State lavaState =  new State(new Animation(lavaSpriteSheet, 0, true), 9);
+        State lavaState =  new State(new Animation(lavaSpriteSheet, 0, true), 6);
         AnimatorController lavaAnimator = new AnimatorController(lavaState, new Parameters());
         
         GameObject lava = new GameObject("lava", new PVector(0, 0), tile);
@@ -522,6 +539,46 @@ public class MapManager {
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));     
         tile.addComponent(new DamageCollider(new Rect(0, 1, tilePixelSize, tilePixelSize-2), 1));
         break;
+        
+      case PlatformLeft :     
+      
+        GameObject platformLeft = new GameObject("platformLeft", new PVector(0, 0), tile);
+        platformLeft.isChildTile = true;
+        platformLeft.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        ((Collider)(platformLeft.getComponent(Collider.class))).passablePlatform = true;
+        platformLeft.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformLeft.png"));
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));     
+
+        
+        break;   
+              
+      case PlatformMid :     
+        
+        GameObject platformMid = new GameObject("platformMid", new PVector(0, 0), tile);
+        platformMid.isChildTile = true;
+        platformMid.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        ((Collider)(platformMid.getComponent(Collider.class))).passablePlatform = true;
+        platformMid.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformMid.png"));
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));    
+        
+        break;  
+        
+                
+      case PlatformRight :     
+        
+        GameObject platformRight = new GameObject("platformRight", new PVector(0, 0), tile);
+        platformRight.isChildTile = true;
+        platformRight.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        ((Collider)(platformRight.getComponent(Collider.class))).passablePlatform = true;
+        platformRight.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformRight.png"));
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));    
+        
+        break;  
+        
+        
       }
     }
   }

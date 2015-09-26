@@ -20,17 +20,17 @@ public class Villager extends GameCharacter {
   private Collider rightShotAttackCollider;
   
   
-  Villager(String name, PVector position){
+  Villager(){
     
-    super(name, position);
+    super();
     
     SetLife(3);
     
     //fireShotSprite = new Sprite(characterSpriteSheetPath + "VillageoisSpriteSheet.png");
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     
-    addComponent(new Collider(new Rect(0,0,walkAndIdle.getSpriteWidth(),walkAndIdle.getSpriteHeight())));
-    characterCollider = (Collider)this.getComponent(Collider.class);
+    gameObject.addComponent(new Collider(new Rect(0,0,walkAndIdle.getSpriteWidth(),walkAndIdle.getSpriteHeight())));
+    characterCollider = (Collider)gameObject.getComponent(Collider.class);
     
     params = new Parameters();
     params.setFloat("SpeedX",0.0f);
@@ -48,14 +48,14 @@ public class Villager extends GameCharacter {
     t = new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
     animator = new AnimatorController(idleLeft,params);
     animator.parameters.setBool("Visible", true);
-    addComponent(animator);
+    gameObject.addComponent(animator);
     
-    leftShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), this);
+    leftShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
     leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
     leftShotAttackCollider.isTrigger = true;
     
-    rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), this);
+    rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     rightShotAttack.addComponent(new Collider(new Rect(53, 0, 88, 10)));
     rightShotAttackCollider = (Collider)rightShotAttack.getComponent(Collider.class);
     rightShotAttackCollider.isTrigger = true;
@@ -124,7 +124,7 @@ public class Villager extends GameCharacter {
    
     for(int i=0 ; i<allColliders.size() ; i++){
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
-        if(allColliders.get(i).gameObject != this && ((GameCharacter)(allColliders.get(i).gameObject)).isAlive()){
+        if(allColliders.get(i).gameObject != this.gameObject && ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).isAlive()){
           if(abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
              closestColliderIndex = i;
              closestPositionX = abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x);
@@ -134,7 +134,7 @@ public class Villager extends GameCharacter {
     }
     
     if(closestColliderIndex > -1){
-      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject)).DecreaseLife(damage, this.position); 
+      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position); 
     }
   } 
   
@@ -151,7 +151,7 @@ public class Villager extends GameCharacter {
     //fireShotSprite = new Sprite(characterSpriteSheetPath + "VillageoisSpriteSheet.png");
      
     //GameObject thisGameObject = (GameObject) this;
-    barrelGun = new GameObject("BarrelGun", new PVector(-10,2), this);
+    barrelGun = new GameObject("BarrelGun", new PVector(-10,2), gameObject);
     barrelGun.addComponent(fireShotSprite);
     
     barrelGun.setActive(false);

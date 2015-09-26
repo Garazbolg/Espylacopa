@@ -33,6 +33,7 @@ public static class Colliders{
        continue;
      if(everyColliders.get(i).layer != everyColliders.get(j).layer)
        continue;
+
          //if they touch
         if(everyColliders.get(i).intersect(everyColliders.get(j))){
                //if either one of them is a trigger
@@ -109,8 +110,11 @@ public class Collider extends Component implements DebugDrawable{
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
  public CollisionLayer layer = CollisionLayer.None;
+ public boolean passablePlatform = false;
  
  public boolean forceDebugDraw = false;
+ 
+ private ArrayList<Collider> overlookColliders;
  
  //ctor
  Collider(Area zone){
@@ -118,6 +122,8 @@ public class Collider extends Component implements DebugDrawable{
   
   currentCollisions = new ArrayList<Collider>();
   currentTriggers = new ArrayList<Collider>();
+  overlookColliders = new ArrayList<Collider>();
+  
   Colliders.add(this);
  }
   
@@ -175,6 +181,11 @@ public class Collider extends Component implements DebugDrawable{
    PVector res = new PVector();
    PVector intersectSize;
    for(Collider c : currentCollisions){
+     
+     if(overlookColliders.contains(c)){
+       continue; 
+     }
+     
      intersectSize = area.getIntersectSize(c.area,gameObject.getPosition(),c.gameObject.getPosition());
      if(abs(intersectSize.x) < abs(intersectSize.y))
        intersectSize.y = 0;
@@ -255,6 +266,10 @@ public class Collider extends Component implements DebugDrawable{
  
  public ArrayList<Collider> getCurrentTriggers(){
    return currentTriggers; 
+ }
+ 
+ public ArrayList<Collider> getOverlookColliders(){
+   return(overlookColliders);
  }
  
  

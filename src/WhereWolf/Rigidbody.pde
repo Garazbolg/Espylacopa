@@ -56,8 +56,9 @@ public class Rigidbody extends Component implements DebugDrawable{
                        
         if((coll.y >0.05 && velocity.y < 0) || (coll.y <-0.05 && velocity.y > 0)){
             velocity.y = 0;
-            if(coll.y<0)
+            if(coll.y<0){
               grounded = true;
+            }
         }
         else
           coll.y = 0;

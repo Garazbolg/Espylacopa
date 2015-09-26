@@ -53,9 +53,10 @@ public class Werewolf extends GameCharacter {
   
 
 
-  Werewolf(String name, PVector position) {
+  Werewolf() {
 
-    super(name, position);
+
+    super();
 
     SetLife(3);
 
@@ -67,10 +68,7 @@ public class Werewolf extends GameCharacter {
     
     wherewolfStaticColliderRect = new Rect(-1, 2, 20, 44);
     wherewolfRunningColliderRect = new Rect(-1, 2, 30, 44);
-    
-    addComponent(new Collider(new Rect(0, 4, 6, 24)));
-    characterCollider = (Collider)this.getComponent(Collider.class);
-
+        
     params = new Parameters();
     params.setFloat("SpeedX", 0.0f);
 
@@ -88,34 +86,12 @@ public class Werewolf extends GameCharacter {
     animator = new AnimatorController(idleLeft, params);
     animator.parameters.setBool("Visible", true);
     animator.parameters.setBool("Alive", true);
-    addComponent(animator);
 
     powerBarChrono = millis();
 
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png"); 
-    
-    
-    leftHumanAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), this);
-    leftHumanAttack.addComponent(new Collider(new Rect(3, 0, 15, 20)));
-    leftHumanAttackCollider = (Collider)leftHumanAttack.getComponent(Collider.class);
-    leftHumanAttackCollider.isTrigger = true;
-    
-    rightHumanAttack = new GameObject("RigtHumanAttack", new PVector(-10,2), this);
-    rightHumanAttack.addComponent(new Collider(new Rect(15, 0, 15, 20)));
-    rightHumanAttackCollider = (Collider)rightHumanAttack.getComponent(Collider.class);
-    rightHumanAttackCollider.isTrigger = true;
-        
-    leftWerewolfAttack = new GameObject("LeftWerewolfAttack", new PVector(-10,2), this);
-    leftWerewolfAttack.addComponent(new Collider(new Rect(0, 5, 22, 30)));
-    leftWerewolfAttackCollider = (Collider)leftWerewolfAttack.getComponent(Collider.class);
-    leftWerewolfAttackCollider.isTrigger = true;
-    
-    rightWerewolfAttack = new GameObject("RigtWerewolfAttack", new PVector(-10,2), this);
-    rightWerewolfAttack.addComponent(new Collider(new Rect(22, 5, 22, 30)));
-    rightWerewolfAttackCollider = (Collider)rightWerewolfAttack.getComponent(Collider.class);
-    rightWerewolfAttackCollider.isTrigger = true;
-    
+
     // DEBUG - TO DO : Delete forceDebugDraw
     //((Collider)rightHumanAttack.getComponent(Collider.class)).forceDebugDraw = true;
     //((Collider)leftHumanAttack.getComponent(Collider.class)).forceDebugDraw = true;
@@ -176,8 +152,8 @@ public class Werewolf extends GameCharacter {
 
     changeCharacterSpriteSheet(characterSpriteSheetPath + "WerewolfSpriteSheet.png", 8, 4);
 
-    ((Collider)this.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
-    this.position.add(new PVector(0, -7)); 
+    ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
+    gameObject.position.add(new PVector(0, -7)); 
 
     SetArmorLife(2);
     AdaptCollidersWithTransformation();
@@ -191,8 +167,8 @@ public class Werewolf extends GameCharacter {
 
     changeCharacterSpriteSheet(characterSpriteSheetPath + "VillageoisLGSpriteSheet.png", 8, 4);
 
-    ((Collider)this.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
-    this.position.add(new PVector(0, 7));
+    ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
+    gameObject.position.add(new PVector(0, 7));
 
     SetArmorLife(0);
     AdaptCollidersWithTransformation();
@@ -222,8 +198,8 @@ public class Werewolf extends GameCharacter {
         
     for(int i=0 ; i<allColliders.size() ; i++){
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
-        if(allColliders.get(i).gameObject != this){
-          ((GameCharacter)(allColliders.get(i).gameObject)).DecreaseLife(damage, this.position);
+        if(allColliders.get(i).gameObject != gameObject){
+          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position);
         }
       }
     }
@@ -270,6 +246,47 @@ public class Werewolf extends GameCharacter {
     }
     
     UpdateCollider();
+  }
+  
+  
+  public void setCharacterCollider(Collider newCharacterCollider){
+    characterCollider = newCharacterCollider;
+  }
+    
+  public void setLeftHumanAttack(GameObject newLeftHumanAttack){
+    leftHumanAttack = newLeftHumanAttack;
+  }
+    
+  public void setLeftHumanAttackCollider(Collider newLeftHumanAttackCollider){
+    leftHumanAttackCollider = newLeftHumanAttackCollider;
+  }
+    
+  public void setRightHumanAttack(GameObject newRightHumanAttack){
+    rightHumanAttack = newRightHumanAttack;
+  }
+    
+  public void setRightHumanAttackCollider(Collider newRightHumanAttackCollider){
+    rightHumanAttackCollider = newRightHumanAttackCollider;
+  }
+    
+  public void setLeftWerewolfAttack(GameObject newLeftWerewolfAttack){
+    leftWerewolfAttack = newLeftWerewolfAttack;
+  }
+    
+  public void setLeftWerewolfAttackCollider(Collider newLeftWerewolfAttackCollider){
+    leftWerewolfAttackCollider = newLeftWerewolfAttackCollider;
+  }
+
+  public void setRightWerewolfAttack(GameObject newRightWerewolfAttack){
+    rightWerewolfAttack = newRightWerewolfAttack;
+  }
+    
+  public void setRightWerewolfAttackCollider(Collider newRightWerewolfAttackCollider){
+    rightWerewolfAttackCollider = newRightWerewolfAttackCollider;
+  }
+  
+  public AnimatorController getAnimator(){
+    return(animator);
   }
   
 }

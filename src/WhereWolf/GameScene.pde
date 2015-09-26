@@ -1,4 +1,5 @@
-GameCharacter player;
+GameObject player;
+GameCharacter playerCharacterComponent;
  
 float globalScale = 1.0;
 
@@ -31,9 +32,14 @@ void initGame() {
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
   
   //player = new Villager("One", GetSpawnPosition());
-  player = new Werewolf("One", GetSpawnPosition());
+  //player = new Werewolf("One", GetSpawnPosition());
+  //player = new Werewolf("One", GetSpawnPosition());
+  player = new WerewolfPrefab("One", GetSpawnPosition());
+  println("checkBefore " + player);
+  playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
+  println("checkAfter " +  player.getComponent(Werewolf.class) + " " + playerCharacterComponent);
   
-  Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  //Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
     
 
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
@@ -60,7 +66,7 @@ void gameDraw() {
   
   
   // DEBUG
-  if(Input.getButtonDown("DebugGetDamage")) player.DecreaseLife(1, player.position);
+  if(Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
 
   if(! Constants.DEBUG_MODE)
   //Draw
@@ -102,7 +108,7 @@ void gameDraw() {
     rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
   }
   
-  player.drawLife();
+  playerCharacterComponent.drawLife();
 
 
   //TODO : display a proper minimap
@@ -166,7 +172,7 @@ private void CameraManagement() {
     
     else{
       
-      if(player.isFacingRight()){
+      if(playerCharacterComponent.isFacingRight()){
         if(cameraForwardOffset < 0) cameraLerpSpeed = 0.03; 
         else cameraLerpSpeed = 0.05;
         cameraForwardOffset = lerp(cameraForwardOffset, maxCameraForwardOffset, cameraLerpSpeed);

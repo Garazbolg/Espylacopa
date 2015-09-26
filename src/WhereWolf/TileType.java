@@ -2,7 +2,7 @@
 
 
 enum TileType{
-  Empty, Opened, Closed, EmptyPot, FirePot, FlowerPot, Bookcase, Chest, Lava;
+  Empty, Opened, Closed, EmptyPot, FirePot, FlowerPot, Bookcase, Chest, Lava, PlatformLeft, PlatformMid, PlatformRight;
 
   public static TileType fromInteger(int x) {
         switch(x) {
@@ -15,6 +15,9 @@ enum TileType{
           case 6 : return Bookcase;
           case 7 : return Chest;
           case 8 : return Lava;
+          case 9 : return PlatformLeft;
+          case 10 : return PlatformMid;
+          case 11 : return PlatformRight;
         }
         
         return null;

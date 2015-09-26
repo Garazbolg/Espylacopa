@@ -13,9 +13,15 @@ public class DamageCollider extends Collider{
   }
   
   public void onCollisionStay(Collider other){
-    //if(Constants.DEBUG_MODE)println(gameObject.name + " Enter Collision with " + other.gameObject.name);
-    if(other.gameObject != null && other.gameObject.getClass().getSuperclass() == GameCharacter.class){
-      ((GameCharacter)(other.gameObject)).DecreaseLife(damage, gameObject.position);   
+    if(other.gameObject != null){
+      
+      GameCharacter gameCharacter = (GameCharacter)other.gameObject.getComponentIncludingSubclasses(GameCharacter.class);
+      //println(this.gameObject.getComponentIncludingSubclasses(GameCharacter.class));
+      if(gameCharacter != null){
+        gameCharacter.DecreaseLife(damage, gameObject.position);   
+      }
     }
   }
+  
+  
 }

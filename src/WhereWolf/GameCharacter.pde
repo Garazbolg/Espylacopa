@@ -7,7 +7,7 @@
 
 /*
 */
-public abstract class GameCharacter extends GameObject{
+public abstract class GameCharacter extends Component{
   
   AnimatorController animator;
   Rigidbody rigid;
@@ -53,13 +53,10 @@ public abstract class GameCharacter extends GameObject{
   
   protected boolean staticGrave = false;
   
- 
- 
-  GameCharacter(String name, PVector position){
-    super(name,position);
-    
-    rigid = new Rigidbody();
-    addComponent(rigid);
+
+   GameCharacter(){
+            
+
     
     deadSpriteSheet = new SpriteSheet(characterSpriteSheetPath + "grave.png", 1, 1);
     dead = new State(new Animation(deadSpriteSheet, 0, false), 1);
@@ -72,9 +69,8 @@ public abstract class GameCharacter extends GameObject{
  
   public void update(){
     super.update();
-      
+    //if(Input.getAxisRaw("Horizontal") != 0) println(gameObject.position.y + ((Rect)(characterCollider.area)).halfDimension.y + characterCollider.area.position.y - 2);
     if(isAlive){
-
       rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f, rigid.getVelocity().y));
       
       rigid.setVelocity(new PVector(rigid.getVelocity().x + xMovementCausedByDamage, rigid.getVelocity().y));
@@ -91,9 +87,25 @@ public abstract class GameCharacter extends GameObject{
       
       // TODO : Prevent air jump
   
-      if(name == "One") // TODO : remove this it's for debug
+      if(gameObject.name == "One") // TODO : remove this it's for debug
       {
-        if(Input.getButtonDown("Jump")) rigid.setVelocity(new PVector(rigid.getVelocity().x,-150.0f));
+        if(Input.getButtonDown("Jump")) {
+
+          if(Input.getAxisRaw("Vertical") > 0){
+            println("jumpBelow");
+            
+            for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
+              if(characterCollider.currentCollisions.get(i).passablePlatform){
+                characterCollider.getOverlookColliders().add(characterCollider.currentCollisions.get(i));
+              }
+            } 
+
+          }
+          
+          else{
+            rigid.setVelocity(new PVector(rigid.getVelocity().x,-150.0f));
+          }
+        }
       }
 
       //float xVelocity = (float)rigid.getVelocity().x;
@@ -137,7 +149,8 @@ public abstract class GameCharacter extends GameObject{
       }
     }
     
-    // TODO : use matrix collider to avoid floating grave (if grave fall on a mooving character for example)
+    // OBSOLETE CODE
+    /*
     else if(!staticGrave) {
       if(rigid.grounded){
         staticGrave = true;
@@ -146,6 +159,7 @@ public abstract class GameCharacter extends GameObject{
         
       } 
     }
+    */
   }
   
   public int GetLife(){
@@ -217,12 +231,11 @@ public abstract class GameCharacter extends GameObject{
   }
   
   public void drawLife(){
-    int life = player.GetLife();
     for(int i=0 ; i<life ; i++){
       image(lifeSprite,10+(lifeSprite.width+10)*i,10);
     }
    
-    for(int i=0 ; i<player.GetArmorLife() ; i++){
+    for(int i=0 ; i<armorLife ; i++){
       image(armorLifeSprite,10+(lifeSprite.width+10)*(i+life),10);
     }
   }
@@ -232,7 +245,7 @@ public abstract class GameCharacter extends GameObject{
   }
   
   public void makeMoveCausedByDamage(PVector aggressorPosition){
-    PVector direction = PVector.sub(this.position, aggressorPosition);
+    PVector direction = PVector.sub(gameObject.position, aggressorPosition);
     direction.normalize();
     
     if(direction.y < -0.5f){
@@ -248,7 +261,6 @@ public abstract class GameCharacter extends GameObject{
       direction.y = 0.5f; 
     }
     
-    println(direction);
     //rigid.setVelocity(PVector.mult(aggressorPosition,damageMovementFactor));
     xMovementCausedByDamage = direction.x * damageMovementFactor;
     //rigid.setVelocity(new PVector(-150,-150));
@@ -267,9 +279,7 @@ public abstract class GameCharacter extends GameObject{
   
   public void Die(){
     isAlive = false;
-    println(animator);
     animator.setCurrentState(dead);
-    println();
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
     characterCollider.layer = CollisionLayer.Environment;
     
@@ -288,5 +298,38 @@ public abstract class GameCharacter extends GameObject{
       characterCollider.setArea(staticColliderRect); 
     }
   }
+  
+  public void setRigid(Rigidbody newRigid){
+    rigid = newRigid; 
+  }
+  
+  public void onCollisionEnter(Collider other){
+    CheckIfPassThroughtPlatform(other);
+  }
+   
+  public void onCollisionStay(Collider other){
+    CheckIfPassThroughtPlatform(other);
+  }
+   
+  public void CheckIfPassThroughtPlatform(Collider other){
+    if(other.passablePlatform && !characterCollider.getOverlookColliders().contains(other)){
+
+      //if(rigid.velocity.y != 0) println("velocityY " + rigid.velocity.y);
+      float errorMargin = 0.5f;
+      if(rigid!=null) errorMargin +=  rigid.velocity.y/100; // if condition to avoid error at launch when rigid is not set
+      float playerBottomY = gameObject.position.y + ((Rect)(characterCollider.area)).halfDimension.y + characterCollider.area.position.y - errorMargin;
+      float platformTopY = other.gameObject.position.y - ((Rect)(other.area)).halfDimension.y + other.area.position.y; 
+      if(other.gameObject.isChildTile) platformTopY += other.gameObject.parent.position.y;
+     
+      if(playerBottomY > platformTopY)  characterCollider.getOverlookColliders().add(other);
+    }
+  }
+  
+  public void onCollisionExit(Collider other){
+    if(characterCollider.getOverlookColliders().contains(other)){
+      characterCollider.getOverlookColliders().remove(other);
+    }
+  }
+  
   
 }
