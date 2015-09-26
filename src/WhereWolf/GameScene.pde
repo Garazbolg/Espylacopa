@@ -73,7 +73,7 @@ void gameDraw() {
  // pushMatrix();
  if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
-  else translate(-xBlock*map.GetBlockPixelSize(),-yBlock*map.GetBlockPixelSize());
+  else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
  }
  
 
@@ -127,7 +127,7 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSize()*xBlock)+resolutionStripSize){
+  if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -135,7 +135,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSize()*(xBlock+1))){
+  else if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock++; 
@@ -143,7 +143,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y < (map.GetBlockPixelSize()*yBlock)){
+  if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y < (map.GetBlockPixelSizeY()*yBlock)){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock--; 
@@ -151,7 +151,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y > (map.GetBlockPixelSize()*(yBlock+1))){
+  else if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y > (map.GetBlockPixelSizeY()*(yBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock++; 
@@ -161,7 +161,7 @@ private void CameraManagement() {
   
   if(cameraScroll) {
     if(cameradCentered){
-      cameraPosition = new PVector(player.getPosition().x-map.GetBlockPixelSize()+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+      cameraPosition = new PVector(player.getPosition().x-map.GetBlockPixelSizeX()+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
     }
     
     else{

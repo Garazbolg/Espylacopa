@@ -30,7 +30,9 @@ public static class Colliders{
       continue;
    for(int j = i+1;j< everyColliders.size();j++){
      if(!everyColliders.get(j).isActive())
-      continue;
+       continue;
+     if(everyColliders.get(i).layer != everyColliders.get(j).layer)
+       continue;
          //if they touch
         if(everyColliders.get(i).intersect(everyColliders.get(j))){
                //if either one of them is a trigger
@@ -106,6 +108,7 @@ public class Collider extends Component implements DebugDrawable{
  
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
+ public CollisionLayer layer = CollisionLayer.None;
  
  public boolean forceDebugDraw = false;
  

@@ -17,8 +17,6 @@ enum TileType{
           case 8 : return Lava;
         }
         
-
-          
         return null;
     }
     

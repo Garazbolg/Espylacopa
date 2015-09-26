@@ -271,6 +271,7 @@ public abstract class GameCharacter extends GameObject{
     animator.setCurrentState(dead);
     println();
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
+    characterCollider.layer = CollisionLayer.Environment;
     
     //characterCollider.isTrigger = true;
     

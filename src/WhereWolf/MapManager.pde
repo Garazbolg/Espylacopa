@@ -21,8 +21,13 @@ public class MapManager {
   private int nextSpawnPoint;
 
   private int tilePixelSize = 16;
-  private int blockTileSize = 10; // Block = 8 x 8 tiles
-  private int blockPixelSize = blockTileSize*tilePixelSize;
+  
+  // Block = 10 x 8 tiles
+  private int blockTileSizeX = 10; 
+  private int blockTileSizeY = 8;
+ 
+  private int blockPixelSizeX = blockTileSizeX*tilePixelSize;
+  private int blockPixelSizeY = blockTileSizeY*tilePixelSize;
 
 
   // constructor, the size of the map depends of the number of players
@@ -41,7 +46,7 @@ public class MapManager {
 
     mapBlocks = new byte[mapSize][mapSize];
     mapBlocksGameObjects = new GameObject[mapSize][mapSize];
-    mapTiles = new TileType[mapSize][mapSize][blockTileSize*blockTileSize];
+    mapTiles = new TileType[mapSize][mapSize][blockTileSizeX*blockTileSizeY];
     xSpawnPoints = new int[playerNumber];
     ySpawnPoints = new int[playerNumber];
 
@@ -155,7 +160,7 @@ public class MapManager {
   public PVector GetSpawnPosition() {
 
     // TODO : manage returned spawn position index
-    return(new PVector(xSpawnPoints[0]*blockPixelSize+ blockPixelSize, ySpawnPoints[0]*blockPixelSize + blockPixelSize/2));
+    return(new PVector(xSpawnPoints[0]*blockPixelSizeX+ blockPixelSizeX, ySpawnPoints[0]*blockPixelSizeY + blockPixelSizeY/2));
   }
 
   public void DrawMiniMap(int playerPositionX, int playerPositionY) {
@@ -223,9 +228,9 @@ public class MapManager {
 
   // Block = 8x8 tiles
   public void DrawBlock(int xBlock, int yBlock) {
-    for (int i=0; i<blockTileSize; i++) {
-      for (int j=0; j<blockTileSize; j++) {
-        DrawTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i]);
+    for (int i=0; i<blockTileSizeY; i++) {
+      for (int j=0; j<blockTileSizeX; j++) {
+        DrawTile((xBlock*blockPixelSizeX + (i+4)*tilePixelSize), (yBlock*blockPixelSizeY + j*tilePixelSize), mapTiles[xBlock][yBlock][(i*blockTileSizeX)+j]);
       }
     }
   }
@@ -366,13 +371,13 @@ public class MapManager {
 
           String[] data=loadStrings(folderPath + char(choosenBlock+48) + ".txt");
 
-          for (int k=0; k<blockTileSize; k++) {
-            for (int l=0; l<blockTileSize; l++) {
-
+          for (int k=0; k<blockTileSizeY; k++) {
+            for (int l=0; l<blockTileSizeX; l++) {
               int tileType = 10*(data[k].charAt(3*l)-48) + (data[k].charAt((3*l)+1))-48;
-              mapTiles[i][j][k*blockTileSize + l] = TileType.fromInteger(tileType); // WARNING : Do not forget to define new values in TileType.java
+              mapTiles[i][j][k*blockTileSizeX + l] = TileType.fromInteger(tileType); // WARNING : Do not forget to define new values in TileType.java
             }
           }
+
         }
       }
     }
@@ -397,9 +402,9 @@ public class MapManager {
     //mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(xBlock*blockPixelSize,yBlock*blockPixelSize));
     mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(0, 0));
 
-    for (int i=0; i<blockTileSize; i++) {
-      for (int j=0; j<blockTileSize; j++) {
-        CreateTile((xBlock*blockPixelSize + (i+4)*tilePixelSize), (yBlock*blockPixelSize + j*tilePixelSize), mapTiles[xBlock][yBlock][(j*blockTileSize)+i], mapBlocksGameObjects[xBlock][yBlock]);
+    for (int i=0; i<blockTileSizeY; i++) {
+      for (int j=0; j<blockTileSizeX; j++) {
+        CreateTile((xBlock*blockPixelSizeX + (j+4)*tilePixelSize), (yBlock*blockPixelSizeY + i*tilePixelSize), mapTiles[xBlock][yBlock][(i*blockTileSizeX)+j], mapBlocksGameObjects[xBlock][yBlock]);
       }
     }
 
@@ -538,8 +543,12 @@ public class MapManager {
     }
   }
 
-  public float GetBlockPixelSize() {
-    return blockPixelSize;
+  public float GetBlockPixelSizeX() {
+    return blockPixelSizeX;
+  }
+  
+  public float GetBlockPixelSizeY() {
+    return blockPixelSizeY;
   }
   
   public float GetTilePixelSize() {
