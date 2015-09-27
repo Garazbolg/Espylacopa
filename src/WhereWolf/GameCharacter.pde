@@ -31,12 +31,12 @@ public abstract class GameCharacter extends Component{
   protected Parameters params;
   protected State walkLeft,walkRight,idleRight,idleLeft, dead;
   
-  private boolean invulnerable = false;
-  private float blinkDelay = 100;
-  private float blinkChrono;
-  private float blinkNumber = 0;
-  private float maxBlinkNumber = 13;
-  private boolean visible = true;
+  protected boolean invulnerable = false;
+  protected float blinkDelay = 100;
+  protected float blinkChrono;
+  protected float blinkNumber = 0;
+  protected float maxBlinkNumber = 13;
+  protected boolean visible = true;
   
  
   protected boolean isRunning = false;
@@ -91,9 +91,7 @@ public abstract class GameCharacter extends Component{
       {
         if(Input.getButtonDown("Jump")) {
 
-          if(Input.getAxisRaw("Vertical") > 0){
-            println("jumpBelow");
-            
+          if(Input.getAxisRaw("Vertical") > 0){            
             for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
               if(characterCollider.currentCollisions.get(i).passablePlatform){
                 characterCollider.getOverlookColliders().add(characterCollider.currentCollisions.get(i));
@@ -106,6 +104,16 @@ public abstract class GameCharacter extends Component{
             rigid.setVelocity(new PVector(rigid.getVelocity().x,-150.0f));
           }
         }
+        
+        else if(Input.getAxisRaw("Vertical") < 0 && rigid.getVelocity().x == 0){   
+          for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
+            Chest chestComponent = (Chest)(characterCollider.currentCollisions.get(i).gameObject.getComponent(Chest.class));
+            if(chestComponent != null){
+              chestComponent.openChest(this); 
+            }
+          }
+        }
+        
       }
 
       //float xVelocity = (float)rigid.getVelocity().x;
@@ -149,17 +157,6 @@ public abstract class GameCharacter extends Component{
       }
     }
     
-    // OBSOLETE CODE
-    /*
-    else if(!staticGrave) {
-      if(rigid.grounded){
-        staticGrave = true;
-        rigid.isKinematic = true;
-        characterCollider.isTrigger = true;
-        
-      } 
-    }
-    */
   }
   
   public int GetLife(){
@@ -282,10 +279,12 @@ public abstract class GameCharacter extends Component{
     animator.setCurrentState(dead);
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
     characterCollider.layer = CollisionLayer.Environment;
+    rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
     
     //characterCollider.isTrigger = true;
+    //characterCollider.forceDebugDraw = true;
     
-    characterCollider.forceDebugDraw = true;
+    
     staticGrave = false;
   }
   
@@ -312,11 +311,12 @@ public abstract class GameCharacter extends Component{
   }
    
   public void CheckIfPassThroughtPlatform(Collider other){
+    // TODO : too much checks in this if condition, not really optimized but more safe, check rigid.velocity inizialited is essential for sure
+    if(rigid == null || rigid.velocity == null || characterCollider == null || other == null || gameObject == null) return; // if condition to avoid error at launch when initialization is not finish
     if(other.passablePlatform && !characterCollider.getOverlookColliders().contains(other)){
-
-      //if(rigid.velocity.y != 0) println("velocityY " + rigid.velocity.y);
+      
       float errorMargin = 0.5f;
-      if(rigid!=null) errorMargin +=  rigid.velocity.y/100; // if condition to avoid error at launch when rigid is not set
+      errorMargin +=  rigid.velocity.y/100;
       float playerBottomY = gameObject.position.y + ((Rect)(characterCollider.area)).halfDimension.y + characterCollider.area.position.y - errorMargin;
       float platformTopY = other.gameObject.position.y - ((Rect)(other.area)).halfDimension.y + other.area.position.y; 
       if(other.gameObject.isChildTile) platformTopY += other.gameObject.parent.position.y;
@@ -330,6 +330,19 @@ public abstract class GameCharacter extends Component{
       characterCollider.getOverlookColliders().remove(other);
     }
   }
+  
+  public SpriteSheet getWalkAndIdle(){
+    return walkAndIdle;
+  }
+    
+  public void setCharacterCollider(Collider newCharacterCollider){
+    characterCollider = newCharacterCollider;
+  }
+  
+  public AnimatorController getAnimator(){
+    return(animator);
+  }
+    
   
   
 }

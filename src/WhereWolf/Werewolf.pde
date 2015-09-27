@@ -248,11 +248,7 @@ public class Werewolf extends GameCharacter {
     UpdateCollider();
   }
   
-  
-  public void setCharacterCollider(Collider newCharacterCollider){
-    characterCollider = newCharacterCollider;
-  }
-    
+
   public void setLeftHumanAttack(GameObject newLeftHumanAttack){
     leftHumanAttack = newLeftHumanAttack;
   }
@@ -285,8 +281,6 @@ public class Werewolf extends GameCharacter {
     rightWerewolfAttackCollider = newRightWerewolfAttackCollider;
   }
   
-  public AnimatorController getAnimator(){
-    return(animator);
-  }
+
   
 }

@@ -9,6 +9,8 @@ int yBlock = 3;
 int previousYblock = 2;
 int previousXblock = 3;
 
+GameObject trapsContainer;
+
 //enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
 private boolean cameradCentered = false;
@@ -27,18 +29,21 @@ void initGame() {
  
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
+  
   map = new MapManager(3);
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
   
-  //player = new Villager("One", GetSpawnPosition());
-  //player = new Werewolf("One", GetSpawnPosition());
-  //player = new Werewolf("One", GetSpawnPosition());
+  /*
   player = new WerewolfPrefab("One", GetSpawnPosition());
-  println("checkBefore " + player);
   playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  println("checkAfter " +  player.getComponent(Werewolf.class) + " " + playerCharacterComponent);
+  */
   
+  trapsContainer = new GameObject("TrapsContainer", new PVector());
+  Scene.addChildren(trapsContainer);
+  
+  player = new VillagerPrefab("One", GetSpawnPosition());
+  playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   //Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
     
 
@@ -53,13 +58,15 @@ void initGame() {
   Updatables.start();
 
   scene = SceneState.Game;
+  
+
 
 }
 
 void gameDraw() {
 
   Updatables.update();
-
+  
 //Move
 // Done in Villager class
   //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));

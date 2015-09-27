@@ -68,10 +68,18 @@ public class Sprite extends Renderer{
    scaleX = -scaleX;
  }
  
+ public void setSprite(String newPath){
+   source = ImageManager.getImage(newPath); 
+ }
+ 
+ public void setScale(float newScale){
+   scaleX = scaleY = newScale;
+ }
+ 
  public void draw(){
-   
    // Check if the sprite is for a tile
-   if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
+   //if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
+   if(gameObject != null){
      PVector checkPosition;
      if(gameObject.isTile) checkPosition = gameObject.position;
      else checkPosition = PVector.add(gameObject.position, gameObject.parent.position);

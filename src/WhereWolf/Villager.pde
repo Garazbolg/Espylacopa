@@ -18,6 +18,11 @@ public class Villager extends GameCharacter {
   
   private GameObject rightShotAttack;
   private Collider rightShotAttackCollider;
+
+  
+  private float placingTrapChrono;
+  private float placingTrapDelay = 1000;
+  private boolean placingTrap = false;
   
   
   Villager(){
@@ -26,11 +31,7 @@ public class Villager extends GameCharacter {
     
     SetLife(3);
     
-    //fireShotSprite = new Sprite(characterSpriteSheetPath + "VillageoisSpriteSheet.png");
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
-    
-    gameObject.addComponent(new Collider(new Rect(0,0,walkAndIdle.getSpriteWidth(),walkAndIdle.getSpriteHeight())));
-    characterCollider = (Collider)gameObject.getComponent(Collider.class);
     
     params = new Parameters();
     params.setFloat("SpeedX",0.0f);
@@ -48,59 +49,84 @@ public class Villager extends GameCharacter {
     t = new Transition(walkLeft,idleLeft,"SpeedX",ConditionType.GreaterThan,-0.1f);
     animator = new AnimatorController(idleLeft,params);
     animator.parameters.setBool("Visible", true);
-    gameObject.addComponent(animator);
-    
-    leftShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
-    leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
-    leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
-    leftShotAttackCollider.isTrigger = true;
-    
-    rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
-    rightShotAttack.addComponent(new Collider(new Rect(53, 0, 88, 10)));
-    rightShotAttackCollider = (Collider)rightShotAttack.getComponent(Collider.class);
-    rightShotAttackCollider.isTrigger = true;
-    
     
   }
   
   public void update(){
-    
-    super.update();
-    
-    if(showWeapon && fireShotFacingRight != facingRight){
-       fireShotFacingRight = facingRight;
-       Sprite fire = (Sprite)barrelGun.getComponent(Sprite.class);
-       fire.flip();
-       if(fireShotFacingRight) barrelGun.position = new PVector(10,2);
-       else barrelGun.position = new PVector(-10,2);
-    }
-    
-    if(isFiring){
-      rigid.setVelocity(new PVector(0,rigid.getVelocity().y));
-    }
-    
-    if(Input.getButtonDown("Fire")){
-      fire();
-      PVector rigidVelocity = rigid.getVelocity();
-      rigidVelocity.x = 0;
-      rigid.setVelocity(new PVector(0,rigidVelocity.y));
-    }
-    
-   
-   if(isFiring){
-     
-     if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
-       isFiring = false;
-     }
-     
-     else{
-       if(millis() - fireShotChrono > fireShotDelay){
-         barrelGun.setActive(false);
-       }
-     }
-   } 
-   
+    if(isAlive){
+      
+      if(!placingTrap){
+      
+        super.update();
+      
   
+        if(showWeapon && fireShotFacingRight != facingRight){
+           fireShotFacingRight = facingRight;
+           Sprite fire = (Sprite)barrelGun.getComponent(Sprite.class);
+           fire.flip();
+           if(fireShotFacingRight) barrelGun.position = new PVector(10,2);
+           else barrelGun.position = new PVector(-10,2);
+        }
+        
+        if(isFiring){
+          rigid.setVelocity(new PVector(0,rigid.getVelocity().y));
+          animator.parameters.setFloat("SpeedX",0);
+        }
+        
+        if(Input.getButtonDown("Fire")){
+          fire();
+          PVector rigidVelocity = rigid.getVelocity();
+          rigidVelocity.x = 0;
+          rigid.setVelocity(new PVector(0,rigidVelocity.y));
+        }
+        
+       
+        if(isFiring){
+         
+          if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
+            isFiring = false;
+          }
+         
+          else{
+            if(millis() - fireShotChrono > fireShotDelay){
+              barrelGun.setActive(false);
+            }
+          }
+        }
+      
+        else{
+          // TODO : add a limitation to the trap placement
+          if (rigid.grounded && Input.getButtonDown("Special")) {
+            placingTrap = true;
+            placingTrapChrono = millis();
+            rigid.setVelocity(new PVector(0,0));
+            animator.parameters.setFloat("SpeedX",0);
+          } 
+        }
+      }
+     
+      else{
+        if(millis() - placingTrapChrono > placingTrapDelay){
+          placeTrap();
+          placingTrap = false;
+        }
+       
+        if(invulnerable){
+          if(millis() - blinkChrono > blinkDelay){
+            blinkNumber++;
+            visible = !visible;
+            animator.parameters.setBool("Visible", visible);
+            
+            if(blinkNumber == maxBlinkNumber){
+              invulnerable = false; 
+            }
+            
+            blinkChrono = millis();
+            
+          }
+        }
+      }
+    }
   }
   
   
@@ -155,6 +181,50 @@ public class Villager extends GameCharacter {
     barrelGun.addComponent(fireShotSprite);
     
     barrelGun.setActive(false);
+    
+  }
+  
+  public void setLeftShotAttack(GameObject newLeftAttack){
+    leftShotAttack = newLeftAttack;
+  }
+    
+  public void setLeftShotAttackCollider(Collider newLeftShotAttackCollider){
+    leftShotAttackCollider = newLeftShotAttackCollider;
+  }
+    
+      
+  public void setRightShotAttack(GameObject newLeftAttack){
+    leftShotAttack = newLeftAttack;
+  }
+    
+  public void setRightShotAttackCollider(Collider newRightShotAttackCollider){
+    rightShotAttackCollider = newRightShotAttackCollider;
+  }
+
+  public void placeTrap(){
+    
+    GameObject trap = new GameObject("trap" + millis(), new PVector(gameObject.position.x,gameObject.position.y + 8)); // Warning : must create a new pvector else use reference and follow character position
+    Scene.addChildren(trap);
+    trap.addComponent(new Trap()); 
+    ((Trap)trap.getComponent(Trap.class)).init();
+    /*
+    Parameters trapParams = new Parameters();
+    trapParams.setBool("Close", false);
+    
+    State trapIdle = new State(new Animation(trapSpriteSheet,0,false),0);
+    State trapClose =  new State(new Animation(trapSpriteSheet,0,false),9);
+    
+    Transition t = new Transition(trapIdle,trapClose,"Close",ConditionType.Equal,true);
+
+    AnimatorController trapAnimatorController = new AnimatorController(trapIdle,trapParams);
+    trap.addComponent(trapAnimatorController);
+    ((Trap)(trap.getComponent(Trap.class))).setAnimatorController(trapAnimatorController);
+    
+    trap.addComponent(new Collider(new Rect(0,0,15,15)));
+    ((Collider)trap.getComponent(Collider.class)).isTrigger = true;
+    */
+
+
   }
   
 }

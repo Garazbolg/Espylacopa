@@ -508,22 +508,14 @@ public class MapManager {
         GameObject chest = new GameObject("chest", new PVector(0, 4), tile);
         chest.isChildTile = true;
         chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
+        chest.addComponent(new Chest());
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         
         chest.addComponent(new Collider(new Rect(0, 4, 8, 16)));
+        ((Collider)chest.getComponent(Collider.class)).layer = CollisionLayer.CharacterBody;
+        ((Collider)chest.getComponent(Collider.class)).layerManagement = LayerManagement.OnlyMyLayer;
         ((Collider)(chest.getComponent(Collider.class))).passablePlatform = true;
-        
-      /*
-        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
 
-        GameObject chestBackground = new GameObject("chestBackground", new PVector(tilePixelSize, 0), tile);
-        chestBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
-        chestBackground.isChildTile = true;
-
-        GameObject chest = new GameObject("chest", new PVector(8, 8), tile);
-        chest.isChildTile = true;
-        chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
-     */
         break;
 
       case Lava :
@@ -544,7 +536,7 @@ public class MapManager {
       
         GameObject platformLeft = new GameObject("platformLeft", new PVector(0, 0), tile);
         platformLeft.isChildTile = true;
-        platformLeft.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        platformLeft.addComponent(new Collider(new Rect(0, -6, tilePixelSize, 4)));
         ((Collider)(platformLeft.getComponent(Collider.class))).passablePlatform = true;
         platformLeft.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformLeft.png"));
         
@@ -557,8 +549,9 @@ public class MapManager {
         
         GameObject platformMid = new GameObject("platformMid", new PVector(0, 0), tile);
         platformMid.isChildTile = true;
-        platformMid.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        platformMid.addComponent(new Collider(new Rect(0, -6, tilePixelSize, 4)));
         ((Collider)(platformMid.getComponent(Collider.class))).passablePlatform = true;
+        ((Collider)(platformMid.getComponent(Collider.class))).forceDebugDraw = true;
         platformMid.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformMid.png"));
         
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));    
@@ -570,7 +563,7 @@ public class MapManager {
         
         GameObject platformRight = new GameObject("platformRight", new PVector(0, 0), tile);
         platformRight.isChildTile = true;
-        platformRight.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
+        platformRight.addComponent(new Collider(new Rect(0, -6, tilePixelSize, 4)));
         ((Collider)(platformRight.getComponent(Collider.class))).passablePlatform = true;
         platformRight.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformRight.png"));
         

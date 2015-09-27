@@ -31,9 +31,39 @@ public static class Colliders{
    for(int j = i+1;j< everyColliders.size();j++){
      if(!everyColliders.get(j).isActive())
        continue;
+     
+     /*
+     if(everyColliders.get(i).layerManagement != LayerManagement.All && everyColliders.get(j).layerManagement != LayerManagement.All){
+       if(everyColliders.get(i).layerManagement == LayerManagement.AllExceptMyLayer || everyColliders.get(j).layerManagement == LayerManagement.AllExceptMyLayer){
+         if(everyColliders.get(i).layer == everyColliders.get(j).layer)
+           continue;
+       }
+       
+       else{
+         if(everyColliders.get(i).layer != everyColliders.get(j).layer)
+           continue;
+       }
+     }
+     */
+          
+     
+    if(everyColliders.get(i).layerManagement == LayerManagement.OnlyMyLayer || everyColliders.get(j).layerManagement == LayerManagement.OnlyMyLayer){
+      if(everyColliders.get(i).layer != everyColliders.get(j).layer)
+        continue;
+    }
+    
+    else if(everyColliders.get(i).layerManagement == LayerManagement.AllExceptMyLayer || everyColliders.get(j).layerManagement == LayerManagement.AllExceptMyLayer){
+      if(everyColliders.get(i).layer == everyColliders.get(j).layer)
+        continue;
+    }
+
+     
+     
+     /*
      if(everyColliders.get(i).layer != everyColliders.get(j).layer)
        continue;
-
+     */
+     
          //if they touch
         if(everyColliders.get(i).intersect(everyColliders.get(j))){
                //if either one of them is a trigger
@@ -109,7 +139,8 @@ public class Collider extends Component implements DebugDrawable{
  
  //is this collider a trigger ? (it doesn't prevent Rigidbodies to move through itself)
  public boolean isTrigger = false;
- public CollisionLayer layer = CollisionLayer.None;
+ public CollisionLayer layer = CollisionLayer.Environment;
+ public LayerManagement layerManagement = LayerManagement.All;
  public boolean passablePlatform = false;
  
  public boolean forceDebugDraw = false;

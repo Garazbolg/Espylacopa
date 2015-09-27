@@ -12,22 +12,32 @@ public class AnimatorController extends Renderer{
   
   public Parameters parameters;
   private State currentState;
-  
+  private boolean start = false;
+
   AnimatorController(State st, Parameters params){
     super();
     currentState = st;
     parameters = params;
+    
+    if(!start) {
+      currentState.startState();
+      start = true;
+    }
   }
   
   public void start(){
-   currentState.startState(); 
+    if(currentState != null) {
+      currentState.startState();
+      start = true;
+    } 
   }
   
   public void draw(){
     if(parameters.getBool("Visible")) {
          
-        // Check if the sprite is for a tile
-      if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
+      // Check if the sprite is for a tile
+      //if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
+      if(gameObject != null){
         PVector checkPosition;
         if(gameObject.isTile) checkPosition = gameObject.position;
         else checkPosition = PVector.add(gameObject.position, gameObject.parent.position);
@@ -39,12 +49,16 @@ public class AnimatorController extends Renderer{
         || (checkPosition.y + source.height/2) < (cameraPosition.y)
         || (checkPosition.y - source.height/2) > (cameraPosition.y + cameraHeight)
         ){
-          currentState.updateFrame(); // animation is played but not displayed
-          return; 
+          currentState.setVisibleByCamera(false); // animation is played but not displayed
+          //return; 
+        }
+        
+        else{
+          currentState.setVisibleByCamera(true);
         }
          
        }
-       
+      
       currentState.draw();
     }
   }
@@ -192,6 +206,7 @@ public class State{
   protected Animation animation;
   private float framePerSecond;
   private float currentFrame;
+  private boolean visibleByCamera = true;
   
   private ArrayList<Transition> to;
   
@@ -215,11 +230,24 @@ public class State{
  }
  
  public void draw(){
-     PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
-     image(source,-source.width/2,-source.height/2); 
+     if(visibleByCamera){
+       PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
+       image(source,-source.width/2,-source.height/2); 
+     }
      currentFrame += Time.deltaTime();
-     if(currentFrame > animation.getSize() && animation.getLoop())
-       currentFrame -= animation.getSize();
+    
+     // Animations without loop not worked, I add a poor fix 
+     float currentFrameMultiplicator = (animation.getLoop() ? 1 : framePerSecond);
+     
+     if(currentFrame * currentFrameMultiplicator > animation.getSize()){
+       if(animation.getLoop()){
+         currentFrame -= animation.getSize();
+       } else{
+         currentFrame -= Time.deltaTime();
+       }
+     }     
+       
+       
  }
  
  public State update(Parameters params){
@@ -236,6 +264,10 @@ public class State{
    currentFrame += Time.deltaTime();
    if(currentFrame > animation.getSize() && animation.getLoop())
      currentFrame -= animation.getSize();
+ }
+ 
+ public void setVisibleByCamera(boolean state){
+   visibleByCamera = state;
  }
 }
 
