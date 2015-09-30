@@ -93,13 +93,9 @@ public class Werewolf extends GameCharacter {
     powerBarChrono = millis();
 
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
-    moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png"); 
-
-    // DEBUG - TO DO : Delete forceDebugDraw
-    //((Collider)rightHumanAttack.getComponent(Collider.class)).forceDebugDraw = true;
-    //((Collider)leftHumanAttack.getComponent(Collider.class)).forceDebugDraw = true;
-    //((Collider)rightWerewolfAttack.getComponent(Collider.class)).forceDebugDraw = true;
-    //((Collider)leftWerewolfAttack.getComponent(Collider.class)).forceDebugDraw = true;
+    moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png");    
+    
+    activateBlinkOfInvulnerability(); 
     
   }
 

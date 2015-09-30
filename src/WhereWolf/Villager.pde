@@ -24,6 +24,8 @@ public class Villager extends GameCharacter {
   private float placingTrapDelay = 1000;
   private boolean placingTrap = false;
   
+  private int availableTraps = 3;
+  
   
   Villager(){
     
@@ -50,15 +52,18 @@ public class Villager extends GameCharacter {
     animator = new AnimatorController(idleLeft,params);
     animator.parameters.setBool("Visible", true);
     
+    
+    activateBlinkOfInvulnerability(); 
+    
   }
   
   public void update(){
-        super.update();
     if(isAlive){
       
       if(!placingTrap){
       
       
+        super.update();
   
         if(showWeapon && fireShotFacingRight != facingRight){
            fireShotFacingRight = facingRight;
@@ -96,7 +101,8 @@ public class Villager extends GameCharacter {
       
         else{
           // TODO : add a limitation to the trap placement
-          if (rigid.grounded && Input.getButtonDown("Special")) {
+          if (rigid.grounded && Input.getButtonDown("Special") && availableTraps > 0) {
+            availableTraps--;
             placingTrap = true;
             placingTrapChrono = millis();
             rigid.setVelocity(new PVector(0,0));
@@ -203,26 +209,7 @@ public class Villager extends GameCharacter {
 
   public void placeTrap(){
     
-    GameObject trap = new GameObject("trap" + millis(), new PVector(gameObject.position.x,gameObject.position.y + 8)); // Warning : must create a new pvector else use reference and follow character position
-    Scene.addChildren(trap);
-    trap.addComponent(new Trap()); 
-    ((Trap)trap.getComponent(Trap.class)).init();
-    /*
-    Parameters trapParams = new Parameters();
-    trapParams.setBool("Close", false);
-    
-    State trapIdle = new State(new Animation(trapSpriteSheet,0,false),0);
-    State trapClose =  new State(new Animation(trapSpriteSheet,0,false),9);
-    
-    Transition t = new Transition(trapIdle,trapClose,"Close",ConditionType.Equal,true);
-
-    AnimatorController trapAnimatorController = new AnimatorController(trapIdle,trapParams);
-    trap.addComponent(trapAnimatorController);
-    ((Trap)(trap.getComponent(Trap.class))).setAnimatorController(trapAnimatorController);
-    
-    trap.addComponent(new Collider(new Rect(0,0,15,15)));
-    ((Collider)trap.getComponent(Collider.class)).isTrigger = true;
-    */
+    new TrapPrefab(gameObject.position);
 
 
   }
