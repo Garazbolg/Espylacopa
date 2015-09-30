@@ -10,6 +10,8 @@ int previousYblock = 2;
 int previousXblock = 3;
 
 GameObject trapsContainer;
+GameObject sawsContainer;
+GameObject sawsTrailContainer;
 
 //enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
@@ -30,6 +32,7 @@ void initGame() {
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
   
+  
   map = new MapManager(3);
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
@@ -39,11 +42,28 @@ void initGame() {
   playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
   */
   
+  /*
+  sawsTrailsContainer = new GameObject("SawsTrailsContainer", new PVector());
+  Scene.addChildren(sawsTrailsContainer);
+  */
+  
+  sawsContainer = new GameObject("SawsContainer", new PVector());
+  Scene.addChildren(sawsContainer);
+  
+  map.AddSawsToGoodDisplayLayer();
+  
   trapsContainer = new GameObject("TrapsContainer", new PVector());
   Scene.addChildren(trapsContainer);
   
+  /*
   player = new VillagerPrefab("One", GetSpawnPosition());
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
+  */
+  
+  player = new WerewolfPrefab("One", GetSpawnPosition());
+  playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
+  
+  
   //Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
     
 

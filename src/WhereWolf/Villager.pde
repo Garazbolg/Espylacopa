@@ -53,11 +53,11 @@ public class Villager extends GameCharacter {
   }
   
   public void update(){
+        super.update();
     if(isAlive){
       
       if(!placingTrap){
       
-        super.update();
       
   
         if(showWeapon && fireShotFacingRight != facingRight){

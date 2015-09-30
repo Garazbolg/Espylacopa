@@ -51,6 +51,9 @@ public class Werewolf extends GameCharacter {
   private int humanAttackDamage = 1;
   private int werewolfAttackDamage = 2;
   
+  private GameObject transformationEffect;
+  private AnimatorController transformationEffectAnimatorController;
+  
 
 
   Werewolf() {
@@ -97,7 +100,6 @@ public class Werewolf extends GameCharacter {
     //((Collider)leftHumanAttack.getComponent(Collider.class)).forceDebugDraw = true;
     //((Collider)rightWerewolfAttack.getComponent(Collider.class)).forceDebugDraw = true;
     //((Collider)leftWerewolfAttack.getComponent(Collider.class)).forceDebugDraw = true;
-    
     
   }
 
@@ -157,6 +159,9 @@ public class Werewolf extends GameCharacter {
 
     SetArmorLife(2);
     AdaptCollidersWithTransformation();
+    
+    transformationEffectAnimatorController.parameters.setBool("Visible", true);
+    transformationEffectAnimatorController.getCurrentState().startState();
   }
 
   public void transformToHuman() {
@@ -281,6 +286,10 @@ public class Werewolf extends GameCharacter {
     rightWerewolfAttackCollider = newRightWerewolfAttackCollider;
   }
   
+  public void setTransformationEffect(GameObject go, AnimatorController anim){
+    transformationEffect = go; 
+    transformationEffectAnimatorController = anim;
+  }
 
   
 }

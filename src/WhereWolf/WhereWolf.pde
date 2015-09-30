@@ -20,6 +20,8 @@ private SpriteSheet tilesSpriteSheet;
 private SpriteSheet torchSpriteSheet;
 private SpriteSheet lavaSpriteSheet;
 private SpriteSheet trapSpriteSheet;
+private SpriteSheet sawSpriteSheet;
+private SpriteSheet transformationEffectSpriteSheet;
 
 private Sprite emptyPotSprite;
   
@@ -59,6 +61,8 @@ void setup(){
   torchSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "torchSpriteSheet.png", 4, 1);
   lavaSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "lavaSpriteSheet.png", 4, 1);
   trapSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "trapSpriteSheet.png", 3, 1);
+  sawSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "fullSawSpriteSheet.png", 2, 1);
+  transformationEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "transformationEffectSpriteSheet.png", 9, 1);
   
 }
  

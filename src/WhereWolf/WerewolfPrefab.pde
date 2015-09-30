@@ -50,6 +50,21 @@ public class WerewolfPrefab extends GameObject {
     this.addComponent(werewolfComponent.getAnimator());
     
     
+    GameObject transformationEffect = new GameObject("transformationEffect", new PVector(), this);
+    
+    Parameters transformationEffectParams = new Parameters();
+    transformationEffectParams.setBool("Start", true);
+    transformationEffectParams.setBool("Visible", false);
+    
+    State effectAnimation =  new State(new Animation(transformationEffectSpriteSheet,0,false),15);
+    effectAnimation.setScale(1.5f);
+    
+    AnimatorController transformationEffectAnimatorController = new AnimatorController(effectAnimation,transformationEffectParams);
+    transformationEffect.addComponent(transformationEffectAnimatorController);
+    
+    werewolfComponent.setTransformationEffect(transformationEffect, transformationEffectAnimatorController);
+    
+    
   }
   
 }

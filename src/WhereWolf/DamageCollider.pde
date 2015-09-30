@@ -12,6 +12,11 @@ public class DamageCollider extends Collider{
     damage = affectedDamage;
   }
   
+  public void onCollisionEnter(Collider other){
+    onCollisionStay(other);
+  }
+  
+  
   public void onCollisionStay(Collider other){
     if(other.gameObject != null){
       

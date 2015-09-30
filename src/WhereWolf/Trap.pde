@@ -37,7 +37,8 @@ public class Trap extends Component {
   }
 
   public void init(){
-        Parameters trapParams = new Parameters();
+    
+    Parameters trapParams = new Parameters();
     trapParams.setBool("Close", false);
     
     State trapIdle = new State(new Animation(trapSpriteSheet,0,false),0);

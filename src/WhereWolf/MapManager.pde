@@ -28,6 +28,9 @@ public class MapManager {
  
   private int blockPixelSizeX = blockTileSizeX*tilePixelSize;
   private int blockPixelSizeY = blockTileSizeY*tilePixelSize;
+  
+  private ArrayList<GameObject> sawsList;  
+  private ArrayList<GameObject> sawsTrailsList;
 
 
   // constructor, the size of the map depends of the number of players
@@ -50,13 +53,16 @@ public class MapManager {
     xSpawnPoints = new int[playerNumber];
     ySpawnPoints = new int[playerNumber];
 
+    sawsList = new ArrayList<GameObject>();
+    sawsTrailsList = new ArrayList<GameObject>();
+    
     playerSpawnPointIterator = 0;
     spawnpointDelay = numberOfBlocks / playerNumber;
     nextSpawnPoint = numberOfBlocks;
     MapGeneration();
 
     CreateMap();
-    //CreateTile(0,0,TileType.Closed);
+
   }
 
   public void MapGeneration() {
@@ -409,6 +415,15 @@ public class MapManager {
     }
 
     mapBlocksGameObjects[xBlock][yBlock].setActive(false);
+    
+    
+    for(int i=0 ; i<sawsTrailsList.size() ; i++){
+      sawsTrailsList.get(i).addComponent(new SawTrail()); 
+      ((SawTrail)(sawsTrailsList.get(i).getComponent(SawTrail.class))).init(sawsTrailsList, tilePixelSize); 
+    }
+    
+    sawsTrailsList.clear();
+    
   }
 
   // Tile = 16x16 pixels 
@@ -551,7 +566,7 @@ public class MapManager {
         platformMid.isChildTile = true;
         platformMid.addComponent(new Collider(new Rect(0, -6, tilePixelSize, 4)));
         ((Collider)(platformMid.getComponent(Collider.class))).passablePlatform = true;
-        ((Collider)(platformMid.getComponent(Collider.class))).forceDebugDraw = true;
+        //((Collider)(platformMid.getComponent(Collider.class))).forceDebugDraw = true;
         platformMid.addComponent(new Sprite(mapTilesSpriteSheetPath + "platformMid.png"));
         
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));    
@@ -571,7 +586,41 @@ public class MapManager {
         
         break;  
         
+      case CeilingTrap :
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "ceilingTrap.png", 0.35f));     
+        break;
         
+      case Saw :
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));    
+        
+        GameObject sawTrailForSaw = new GameObject("sawTrailForSaw" + str(posX)+str(posY), tile.position, blockGameObject);
+        sawsTrailsList.add(sawTrailForSaw);
+        
+        GameObject saw = new GameObject("saw" + str(posX)+str(posY), tile.position);
+        saw.addComponent(new Saw(sawTrailForSaw));
+        
+        sawsList.add(saw);
+        
+        State sawState =  new State(new Animation(sawSpriteSheet, 0, true), 12);
+        sawState.setScale(0.25f, 0.25f);
+        AnimatorController sawAnimator = new AnimatorController(sawState, new Parameters());
+        
+        saw.addComponent(sawAnimator);
+        
+
+           
+        //saw.addComponent(new DamageCollider(new Rect(0, 1, tilePixelSize, tilePixelSize-2), 1));
+       
+        break;
+        
+      case SawTrail :
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png")); 
+        
+        GameObject sawTrail = new GameObject("sawTrail" + str(posX)+str(posY), tile.position, blockGameObject);
+        sawsTrailsList.add(sawTrail);
+        
+        break;
+      
       }
     }
   }
@@ -603,6 +652,13 @@ public class MapManager {
   
   public float GetTilePixelSize() {
     return tilePixelSize;
+  }
+  
+  public void AddSawsToGoodDisplayLayer(){
+    for(int i=0 ; i<sawsList.size() ; i++){
+      sawsContainer.addChildren(sawsList.get(i)); 
+      ((Saw)sawsList.get(i).getComponent(Saw.class)).init();
+    } 
   }
 }
 

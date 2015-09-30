@@ -207,6 +207,7 @@ public class State{
   private float framePerSecond;
   private float currentFrame;
   private boolean visibleByCamera = true;
+  private float scaleX,scaleY; 
   
   private ArrayList<Transition> to;
   
@@ -215,6 +216,8 @@ public class State{
     animation = anim;
     currentFrame = 0;
     to = new ArrayList<Transition>();
+    
+    scaleX = scaleY = 1.0f;
   }
   
  public void startState(){
@@ -232,21 +235,23 @@ public class State{
  public void draw(){
      if(visibleByCamera){
        PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
-       image(source,-source.width/2,-source.height/2); 
+       pushMatrix();
+       scale(scaleX,scaleY);
+       image(source,-source.width/2,-source.height/2);
+       popMatrix(); 
      }
      currentFrame += Time.deltaTime();
     
      // Animations without loop not worked, I add a poor fix 
      float currentFrameMultiplicator = (animation.getLoop() ? 1 : framePerSecond);
      
-     if(currentFrame * currentFrameMultiplicator > animation.getSize()){
+     if(currentFrame * currentFrameMultiplicator >= animation.getSize()){
        if(animation.getLoop()){
          currentFrame -= animation.getSize();
        } else{
          currentFrame -= Time.deltaTime();
        }
      }     
-       
        
  }
  
@@ -268,6 +273,15 @@ public class State{
  
  public void setVisibleByCamera(boolean state){
    visibleByCamera = state;
+ }
+ 
+ public void setScale(float newScale){
+   scaleX = scaleY = newScale;
+ }
+ 
+ public void setScale(float newScaleX, float newScaleY){
+   scaleX = newScaleX;
+   scaleY = newScaleY;
  }
 }
 
