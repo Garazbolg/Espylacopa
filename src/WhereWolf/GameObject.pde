@@ -38,6 +38,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  private ArrayList<GameObject> children;
  protected GameObject parent;
  public RPCHolder rpcHolder;
+
  
  GameObject(String n, PVector pos){
    position = pos;
@@ -130,7 +131,7 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
 
  public void draw(){
      if(!isActive()) return;
-     
+     //if(name.contains("trap")) println(name + " " + millis());
      pushMatrix();
      translate(position.x,position.y);
      
@@ -217,5 +218,24 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
    for(Component c : components)
        if(! (c instanceof Collider))
           c.onTriggerExit(other);
+ }
+ 
+ public void destroy(){
+   
+   if(parent != null){
+      parent.children.remove(this);
+      this.parent = null;
+   }
+   
+   
+   for(int i=0 ; i<children.size() ; i++){
+     children.get(i).destroy();
+   }
+   
+  for(int i=0 ; i<components.size() ; i++){
+    removeComponent(components.get(i));
+  }
+   
+   super.OnDestroy();
  }
 }

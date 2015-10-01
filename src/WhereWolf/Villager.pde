@@ -24,7 +24,9 @@ public class Villager extends GameCharacter {
   private float placingTrapDelay = 1000;
   private boolean placingTrap = false;
   
-  private int availableTraps = 3;
+  private int maxTrapsNumber = 3;
+  private int availableTraps;
+  
   
   
   Villager(){
@@ -54,6 +56,7 @@ public class Villager extends GameCharacter {
     
     
     activateBlinkOfInvulnerability(); 
+    availableTraps = maxTrapsNumber; 
     
   }
   
@@ -100,13 +103,32 @@ public class Villager extends GameCharacter {
         }
       
         else{
-          // TODO : add a limitation to the trap placement
-          if (rigid.grounded && Input.getButtonDown("Special") && availableTraps > 0) {
-            availableTraps--;
-            placingTrap = true;
-            placingTrapChrono = millis();
-            rigid.setVelocity(new PVector(0,0));
-            animator.parameters.setFloat("SpeedX",0);
+          
+          if (rigid.grounded){
+            if(Input.getButtonDown("Special") && availableTraps > 0) {
+              availableTraps--;
+              placingTrap = true;
+              placingTrapChrono = millis();
+              rigid.setVelocity(new PVector(0,0));
+              animator.parameters.setFloat("SpeedX",0);
+            }
+            
+            // TODO : if animation for pickup trap, add delay  after pickup to avoid multiple traps pickup at once
+            if(availableTraps < maxTrapsNumber && Input.getAxisRaw("Vertical") < 0){
+              ArrayList<Collider> allTriggers = characterCollider.getCurrentTriggers();
+              boolean pickupTrap = false;
+              int iterator = 0;
+              while(!pickupTrap && iterator <  allTriggers.size()){
+                Trap trapComponent = (Trap)(allTriggers.get(iterator).gameObject.getComponent(Trap.class));
+                if(trapComponent != null && trapComponent.getDamageApplied()){
+                  pickupTrap = true;
+                  availableTraps++;
+                  trapComponent.gameObject.destroy();
+                }
+                
+                iterator++;
+              }
+            } 
           } 
         }
       }
@@ -208,10 +230,18 @@ public class Villager extends GameCharacter {
   }
 
   public void placeTrap(){
-    
     new TrapPrefab(gameObject.position);
-
-
   }
+  
+  /*
+  public void onTriggerEnter(Collider other){
+    if(availableTrapsNumber < maxTrapsNumber){
+      Trap trapComponent = (Trap)other.getComponent(Trap.class);
+      if(trapComponent != null){
+         
+      }
+    }
+  }
+  */
   
 }
