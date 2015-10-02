@@ -32,8 +32,9 @@ void initGame() {
   Scene.startScene(new GameObject("Scene", new PVector(), null));
 
   
+  resolutionStripSize = (width - (globalScale*128))/14;
   
-  map = new MapManager(3);
+  map = new MapManager(8);
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
   
@@ -55,21 +56,23 @@ void initGame() {
   trapsContainer = new GameObject("TrapsContainer", new PVector());
   Scene.addChildren(trapsContainer);
   
-  /*
+  // Player = villager
+  
   player = new VillagerPrefab("One", GetSpawnPosition());
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
-  */
   
+  
+  // Player = werewolf
+  /*
   player = new WerewolfPrefab("One", GetSpawnPosition());
   playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  
+  */
   
   //Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
     
 
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
 
-  resolutionStripSize = (width - (globalScale*128))/14;
   cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
 
   cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;

@@ -31,6 +31,15 @@ public class MapManager {
   
   private ArrayList<GameObject> sawsList;  
   private ArrayList<GameObject> sawsTrailsList;
+  
+  private float miniMapBlockSize = 60;
+  private int minBlockX = -1;
+  private int minBlockY = -1;
+  private int maxBlockX = -1;
+  private int maxBlockY = -1;
+  
+  private float miniMapTranslatePositionX;
+  private float miniMapTranslatePositionY;
 
 
   // constructor, the size of the map depends of the number of players
@@ -94,6 +103,7 @@ public class MapManager {
     }
 
     DefineTilesForAllBlock();
+    DefineMiniMapSize();
   }
 
   public void createBlock(int x, int y) {
@@ -118,7 +128,7 @@ public class MapManager {
           if (x>0 && mapBlocks[x-1][y]==0) { // check if the neighbor is in the bounds of the map
             numberOfBlocks--;
             mapBlocks[x][y]|=(1<<3); // update fourth bit of the Block to indicate that it has a left neighbor 
-            mapBlocks[x-1][y]=(1<<1); // update first bit of the new neighbor Block to indicate that the neighbor has a right neighbor
+            mapBlocks[x-1][y]=(1<<1); // update first bit of the new neighbor Block to indicate that the left neighbor has a right neighbor
             createBlock(x-1, y); // continue the generation in that neighbor (recursive call)
           }    
           break;
@@ -170,6 +180,10 @@ public class MapManager {
   }
 
   public void DrawMiniMap(int playerPositionX, int playerPositionY) {
+    
+    pushMatrix();
+    translate(miniMapTranslatePositionX, miniMapTranslatePositionY);
+    
     stroke(255);
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
@@ -177,9 +191,9 @@ public class MapManager {
           fill(255);
 
           if (i==playerPositionX && j==playerPositionY) fill(255, 0, 0); // just to indicate where the player is
-          rect(30+60*i, 20+60*j, 60, 60);
+          rect(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
           fill(0);
-          text(mapBlocks[i][j], 50+60*i, 55+60*j);
+          text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
           //text(i+" "+j, 50+60*i, 55+60*j);
         }
       }
@@ -194,26 +208,28 @@ public class MapManager {
 
           // bottom border
           if ((mapBlocks[i][j] & 1)==0) { 
-            line(30+60*i, 20+60*j+60, 30+60*i+60, 20+60*j+60);
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
           }
 
           // right border
           if ((mapBlocks[i][j] & (1<<1))==0) {
-            line(30+60*i+60, 20+60*j, 30+60*i+60, 20+60*j+60);
+            line(30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
           }
 
           // above border
           if ((mapBlocks[i][j] & (1<<2))==0) {
-            line(30+60*i, 20+60*j, 30+60*i+60, 20+60*j);
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j);
           }
 
           // left border
           if ((mapBlocks[i][j] & (1<<3))==0) {
-            line(30+60*i, 20+60*j, 30+60*i, 20+60*j+60);
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize);
           }
         }
       }
     }
+    
+    popMatrix();
   }
 
   // Tile = 16x16 pixels 
@@ -659,6 +675,78 @@ public class MapManager {
       sawsContainer.addChildren(sawsList.get(i)); 
       ((Saw)sawsList.get(i).getComponent(Saw.class)).init();
     } 
+  }
+  
+  public void DefineMiniMapSize(){
+    
+    int absIterator = 0;
+    int ordIterator = 0;
+    
+    while(minBlockX == -1 && absIterator<mapSize){
+      ordIterator = 0;
+      while(minBlockX == -1 && ordIterator<mapSize){
+        if(mapBlocks[absIterator][ordIterator]>0){
+          minBlockX = absIterator;
+        }
+        ordIterator++;
+      }
+      absIterator++;
+    }
+    
+    
+    absIterator = mapSize-1;
+    
+    
+    while(maxBlockX == -1 && absIterator>=0){
+      ordIterator = mapSize-1;
+      while(maxBlockX == -1 && ordIterator>=0){
+        if(mapBlocks[absIterator][ordIterator]>0){
+          maxBlockX = absIterator;
+        }
+        ordIterator--;
+      }
+      absIterator--;
+    }
+    
+        
+    absIterator = 0;
+    ordIterator = 0;
+
+    while(minBlockY == -1 && ordIterator<mapSize){
+      absIterator = 0;
+      while(minBlockY == -1 && absIterator<mapSize){
+        if(mapBlocks[absIterator][ordIterator]>0){
+          minBlockY = ordIterator;
+        }
+        absIterator++;
+      }
+      ordIterator++;
+    }    
+    
+    absIterator = mapSize-1;
+    ordIterator = mapSize-1;
+    
+    while(maxBlockY == -1 && ordIterator>=0){
+      absIterator = mapSize-1;
+      while(maxBlockY == -1 && absIterator>=0){
+        if(mapBlocks[absIterator][ordIterator]>0){
+          maxBlockY = ordIterator;
+        }
+        absIterator--;
+      }
+      ordIterator--;
+    }
+    
+    int mapWidth = maxBlockX + 1 - minBlockX;
+    int mapHeight = maxBlockY + 1 -  minBlockY;
+    
+    
+    float pixelResolutionStripSize = resolutionStripSize * globalScale;
+    miniMapBlockSize = min(height/(2*mapHeight), (pixelResolutionStripSize-(pixelResolutionStripSize/8))/mapWidth);
+    
+    miniMapTranslatePositionX = -minBlockX*miniMapBlockSize;
+    miniMapTranslatePositionY = height - ((mapHeight+minBlockY+2)*miniMapBlockSize);
+    
   }
 }
 
