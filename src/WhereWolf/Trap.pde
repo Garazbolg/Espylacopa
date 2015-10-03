@@ -13,11 +13,16 @@ public class Trap extends Component {
   private float activationChrono;
   private float damageDelay = 200;
   
+  private GameObject blockLocation;
+  private boolean display = true;
+  
   Trap(){
     
     super();
     
     creationTime = millis();
+    
+    blockLocation = map.getCurrentBlock();
     /*
     gameObject = go;
     Parameters trapParams = new Parameters();
@@ -57,6 +62,19 @@ public class Trap extends Component {
   }
    
   public void update(){
+       
+    if(display){
+      if(!blockLocation.isActive()){
+        display = false;
+        animatorController.parameters.setBool("Visible", false);
+      }
+    } else{
+      if(blockLocation.isActive()){
+        display = true;
+        animatorController.parameters.setBool("Visible", true);
+      }
+    }
+    
      if(activate && !damageApplied){
        if(millis() - activationChrono > damageDelay){
          damageApplied = true;
@@ -66,13 +84,11 @@ public class Trap extends Component {
   }
      
   public void onTriggerEnter(Collider other){
-    if(!activate){
-      if(millis() - creationTime > delayBeforePossibleActivation){
-        if(other.gameObject.getComponent(Trap.class) == null){
-        activate = true;
-        animatorController.parameters.setBool("Close",true);
-        activationChrono = millis();
-        }
+    if(millis() - creationTime > delayBeforePossibleActivation){
+      if(other.gameObject.getComponent(Trap.class) == null){
+      activate = true;
+      animatorController.parameters.setBool("Close",true);
+      activationChrono = millis();
       }
     }
   }

@@ -623,6 +623,7 @@ public class MapManager {
         
         saw.addComponent(sawAnimator);
         
+        ((Saw)saw.getComponent(Saw.class)).setBlockLocation(blockGameObject);
 
            
         //saw.addComponent(new DamageCollider(new Rect(0, 1, tilePixelSize, tilePixelSize-2), 1));
@@ -747,6 +748,10 @@ public class MapManager {
     miniMapTranslatePositionX = -minBlockX*miniMapBlockSize;
     miniMapTranslatePositionY = height - ((mapHeight+minBlockY+2)*miniMapBlockSize);
     
+  }
+  
+  public GameObject getCurrentBlock(){
+    return mapBlocksGameObjects[xBlock][yBlock]; 
   }
 }
 

@@ -53,6 +53,12 @@ public abstract class GameCharacter extends Component{
   
   protected boolean staticGrave = false;
   
+  private boolean canMove = true; 
+  private float immobileChrono;
+  private float immobileDelay;
+  
+  private float openChestImmobileDelay = 1000;
+  
 
    GameCharacter(){
             
@@ -71,7 +77,12 @@ public abstract class GameCharacter extends Component{
     super.update();
     //if(Input.getAxisRaw("Horizontal") != 0) println(gameObject.position.y + ((Rect)(characterCollider.area)).halfDimension.y + characterCollider.area.position.y - 2);
     if(isAlive){
-      rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f, rigid.getVelocity().y));
+      if(canMove) {
+        rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f, rigid.getVelocity().y));
+      } else {
+        rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
+        if(millis() - immobileChrono > immobileDelay) canMove = true;
+      }
       
       rigid.setVelocity(new PVector(rigid.getVelocity().x + xMovementCausedByDamage, rigid.getVelocity().y));
       
@@ -110,6 +121,9 @@ public abstract class GameCharacter extends Component{
             Chest chestComponent = (Chest)(characterCollider.currentCollisions.get(i).gameObject.getComponent(Chest.class));
             if(chestComponent != null){
               chestComponent.openChest(this); 
+              canMove = false;
+              immobileDelay = openChestImmobileDelay;
+              immobileChrono = millis();
             }
           }
         }
@@ -118,6 +132,7 @@ public abstract class GameCharacter extends Component{
 
       //float xVelocity = (float)rigid.getVelocity().x;
       float xVelocity = Input.getAxisRaw("Horizontal")*70.0f;
+      if(!canMove) xVelocity = 0;
       animator.parameters.setFloat("SpeedX",xVelocity);
       if(xVelocity > 0) {
         if(!isRunning){
@@ -176,6 +191,7 @@ public abstract class GameCharacter extends Component{
     
     else{
       life -= n;
+      canMove = true;
       
       if(life <=0){
         life = 0;
@@ -200,6 +216,7 @@ public abstract class GameCharacter extends Component{
   public void DecreaseArmorLife(int n, PVector aggressorPosition){
     if(invulnerable) return;
     armorLife -= n;
+    canMove = true;
     if(armorLife <0){
       DecreaseLife(n+armorLife, aggressorPosition);
       armorLife = 0;
