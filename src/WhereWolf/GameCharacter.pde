@@ -18,8 +18,8 @@ public abstract class GameCharacter extends Component{
   protected boolean isAlive = true;
   
   // TODO : use image manager
-  private PImage lifeSprite = loadImage("Resources/Sprites/heart.png");
-  private PImage armorLifeSprite = loadImage("Resources/Sprites/armorHeart.png");
+  private PImage lifeSprite = ImageManager.getImage("data/Sprites/heart.png");
+  private PImage armorLifeSprite = ImageManager.getImage("data/Sprites/armorHeart.png");
   
   private PVector colliderHalfDimensions;
   

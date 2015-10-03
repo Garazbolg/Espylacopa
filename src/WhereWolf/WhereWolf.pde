@@ -7,9 +7,9 @@ int textSize = 32;
 
 boolean skipMainMenu = false;
 
-String characterSpriteSheetPath = "Resources/Characters/";
-String mapTilesSpriteSheetPath = "Resources/Sprites/";
-String spritesPath = "Resources/Sprites/";
+String characterSpriteSheetPath = "data/Characters/";
+String mapTilesSpriteSheetPath = "data/Sprites/";
+String spritesPath = "data/Sprites/";
 
 PVector cameraPosition;
 float cameraWidth;
