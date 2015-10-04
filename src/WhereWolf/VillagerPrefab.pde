@@ -11,7 +11,6 @@ public class VillagerPrefab extends GameObject {
     
     Collider characterCollider = new Collider(new Rect(0,0,villagerComponent.getWalkAndIdle().getSpriteWidth(),villagerComponent.getWalkAndIdle().getSpriteHeight()));
     characterCollider.layer = CollisionLayer.CharacterBody;
-    characterCollider.passablePlatform = true;
     this.addComponent(characterCollider);
     villagerComponent.setCharacterCollider(characterCollider);
     

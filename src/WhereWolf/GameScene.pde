@@ -61,7 +61,6 @@ void initGame() {
   player = new VillagerPrefab("One", GetSpawnPosition());
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
-  new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
   
   // Player = werewolf
   /*

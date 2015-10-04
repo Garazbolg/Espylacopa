@@ -7,7 +7,7 @@ public class Chest extends Component {
   private float initialContentScale = 0;
   private float finalContentScale = 0.15f;
   private float minBumpContentScale = 0.08f;
-  private float scaleAnimationSpeed = 0.4f;
+  private float scaleAnimationSpeed = 0.2f;
   private boolean contentScaleAnimation = false;
   private float contentScale;
   
@@ -16,10 +16,10 @@ public class Chest extends Component {
   private float initialHeightPosition = -5;  
   private float totalHeightAnimation = 25;
   private float finalHeightPosition;
-  private float positionAnimationSpeed = 40f;
+  private float positionAnimationSpeed = 30f;
   private float contentHeightPosition;
   
-  private int totalBumpNumber = 1;
+  private int totalBumpNumber = 2;
   private int bumpNumber;
   
   private GameObject contentGameObject;

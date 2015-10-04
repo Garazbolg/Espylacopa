@@ -12,7 +12,6 @@ public class WerewolfPrefab extends GameObject {
     
     Collider characterCollider = new Collider(new Rect(0, 4, 6, 24));
     characterCollider.layer = CollisionLayer.CharacterBody;
-    characterCollider.passablePlatform = true;
     this.addComponent(characterCollider);
     werewolfComponent.setCharacterCollider(characterCollider);
     

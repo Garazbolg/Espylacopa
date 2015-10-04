@@ -40,9 +40,6 @@ public class MapManager {
   
   private float miniMapTranslatePositionX;
   private float miniMapTranslatePositionY;
-  
-  private boolean fogOfWar = true;
-  private boolean[][] visitedBlocks;
 
 
   // constructor, the size of the map depends of the number of players
@@ -64,15 +61,6 @@ public class MapManager {
     mapTiles = new TileType[mapSize][mapSize][blockTileSizeX*blockTileSizeY];
     xSpawnPoints = new int[playerNumber];
     ySpawnPoints = new int[playerNumber];
-    
-    if(fogOfWar){
-      visitedBlocks = new boolean[mapSize][mapSize];
-      for(int i=0 ; i<mapSize ; i++){
-        for(int j=0 ; j<mapSize ; j++){
-          visitedBlocks[i][j] = false;
-        } 
-      }
-    }
 
     sawsList = new ArrayList<GameObject>();
     sawsTrailsList = new ArrayList<GameObject>();
@@ -200,47 +188,42 @@ public class MapManager {
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         if (mapBlocks[i][j]>0) {
-          if(!fogOfWar || visitedBlocks[i][j]){ 
-            fill(255);
-  
-            if (i==playerPositionX && j==playerPositionY) fill(255, 0, 0); // just to indicate where the player is
-            rect(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
-            fill(0);
-            text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
-            //text(i+" "+j, 50+60*i, 55+60*j);
-          }
+          fill(255);
+
+          if (i==playerPositionX && j==playerPositionY) fill(255, 0, 0); // just to indicate where the player is
+          rect(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
+          fill(0);
+          text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
+          //text(i+" "+j, 50+60*i, 55+60*j);
         }
       }
     }
 
 
     // this code will draw the borders of each Blocks, no border = link door, border = wall
-    strokeWeight(3);
-    stroke(122);
+    stroke(0);
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         if (mapBlocks[i][j]>0) {
-          if(!fogOfWar || visitedBlocks[i][j]){ 
 
-            // bottom border
-            if ((mapBlocks[i][j] & 1)==0) { 
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
-            }
-  
-            // right border
-            if ((mapBlocks[i][j] & (1<<1))==0) {
-              line(30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
-            }
-  
-            // above border
-            if ((mapBlocks[i][j] & (1<<2))==0) {
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j);
-            }
-  
-            // left border
-            if ((mapBlocks[i][j] & (1<<3))==0) {
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize);
-            }
+          // bottom border
+          if ((mapBlocks[i][j] & 1)==0) { 
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
+          }
+
+          // right border
+          if ((mapBlocks[i][j] & (1<<1))==0) {
+            line(30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
+          }
+
+          // above border
+          if ((mapBlocks[i][j] & (1<<2))==0) {
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j);
+          }
+
+          // left border
+          if ((mapBlocks[i][j] & (1<<3))==0) {
+            line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize);
           }
         }
       }
@@ -327,9 +310,7 @@ public class MapManager {
       return;
     }
 
-    if(fogOfWar){
-      visitedBlocks[xCurrentBlock][yCurrentBlock] = true; 
-    }
+
     // TODO : optimization please
 
     if (HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left)) {
