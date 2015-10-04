@@ -16,7 +16,6 @@ public class AnimatorController extends Renderer{
 
   AnimatorController(State st, Parameters params){
     super();
-    
     currentState = st;
     parameters = params;
     
@@ -34,8 +33,10 @@ public class AnimatorController extends Renderer{
   }
   
   public void draw(){
-
     if(parameters.getBool("Visible")) {
+         
+      // Check if the sprite is for a tile
+      //if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
       if(gameObject != null){
         PVector checkPosition;
         if(gameObject.isTile) checkPosition = gameObject.position;
@@ -57,7 +58,7 @@ public class AnimatorController extends Renderer{
         }
          
        }
-       
+      
       currentState.draw();
     }
   }
@@ -232,7 +233,6 @@ public class State{
  }
  
  public void draw(){
-   
      if(visibleByCamera){
        PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
        pushMatrix();
