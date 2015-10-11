@@ -17,7 +17,6 @@ public abstract class GameCharacter extends Component{
   private int armorLife;
   protected boolean isAlive = true;
   
-  // TODO : use image manager
   private PImage lifeSprite = ImageManager.getImage("data/Sprites/heart.png");
   private PImage armorLifeSprite = ImageManager.getImage("data/Sprites/armorHeart.png");
   
@@ -59,6 +58,11 @@ public abstract class GameCharacter extends Component{
   
   private float openChestImmobileDelay = 1000;
   
+  private float movementSpeed = 70.0f;
+  //private float movementSpeed = 170.0f;
+  
+  private boolean airJumpForDebug = true;
+  
 
    GameCharacter(){
             
@@ -75,10 +79,10 @@ public abstract class GameCharacter extends Component{
  
   public void update(){
     super.update();
-    //if(Input.getAxisRaw("Horizontal") != 0) println(gameObject.position.y + ((Rect)(characterCollider.area)).halfDimension.y + characterCollider.area.position.y - 2);
+    
     if(isAlive){
       if(canMove) {
-        rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f, rigid.getVelocity().y));
+        rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*movementSpeed, rigid.getVelocity().y));
       } else {
         rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
         if(millis() - immobileChrono > immobileDelay) canMove = true;
@@ -95,10 +99,8 @@ public abstract class GameCharacter extends Component{
         xMovementCausedByDamage -= damageMovementDecreaseSpeed;
         if(xMovementCausedByDamage < 0) xMovementCausedByDamage = 0;
       }
-      
-      // TODO : Prevent air jump
-  
-        if(Input.getButtonDown("Jump")) {
+        
+        if(Input.getButtonDown("Jump") && canMove && (rigid.grounded || airJumpForDebug)) {
 
           if(Input.getAxisRaw("Vertical") > 0){            
             for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
@@ -110,7 +112,7 @@ public abstract class GameCharacter extends Component{
           }
           
           else{
-            rigid.setVelocity(new PVector(rigid.getVelocity().x,-150.0f));
+            rigid.setVelocity(new PVector(rigid.getVelocity().x,-160.0f));
           }
         }
         
@@ -128,7 +130,7 @@ public abstract class GameCharacter extends Component{
         
 
       //float xVelocity = (float)rigid.getVelocity().x;
-      float xVelocity = Input.getAxisRaw("Horizontal")*70.0f;
+      float xVelocity = Input.getAxisRaw("Horizontal")*movementSpeed;
       if(!canMove) xVelocity = 0;
       animator.parameters.setFloat("SpeedX",xVelocity);
       if(xVelocity > 0) {
@@ -272,11 +274,8 @@ public abstract class GameCharacter extends Component{
       direction.y = 0.5f; 
     }
     
-    //rigid.setVelocity(PVector.mult(aggressorPosition,damageMovementFactor));
     xMovementCausedByDamage = direction.x * damageMovementFactor;
-    //rigid.setVelocity(new PVector(-150,-150));
-    rigid.setVelocity(new PVector(rigid.getVelocity().x, direction.y * damageMovementFactor - 100));
-    //rigid.setVelocity(new PVector(rigid.getVelocity().x,-100.0f));
+    rigid.setVelocity(new PVector(rigid.getVelocity().x, direction.y * damageMovementFactor - 100));;
   }
   
   public void activateBlinkOfInvulnerability(){
@@ -293,7 +292,7 @@ public abstract class GameCharacter extends Component{
     animator.setCurrentState(dead);
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
     //characterCollider.layer = CollisionLayer.Environment;
-    //rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
+    rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
     
     //characterCollider.isTrigger = true;
     //characterCollider.forceDebugDraw = true;

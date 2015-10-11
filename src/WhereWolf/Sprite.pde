@@ -76,6 +76,11 @@ public class Sprite extends Renderer{
    scaleX = scaleY = newScale;
  }
  
+ public void setScale(float newScaleX, float newScaleY){
+   scaleX = newScaleX;
+   scaleY = newScaleY;
+ }
+ 
  public void draw(){
    // Check if the sprite is for a tile
    //if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){

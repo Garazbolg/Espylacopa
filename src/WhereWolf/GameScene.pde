@@ -25,6 +25,11 @@ private PVector playerColliderHalfDimensions;
 
 private float resolutionStripSize; // taille des bandes noires
 
+private PVector spawnPosition;
+private int spawnXblock;
+private int spawnYblock;
+
+
 void initGame() {
   
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
@@ -62,6 +67,7 @@ void initGame() {
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
   new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  spawnPosition = new PVector(player.position.x, player.position.y);
   
   // Player = werewolf
   /*
@@ -160,6 +166,10 @@ void gameDraw() {
     fill(255, 0, 0);
     text(Time.getFPS(), 0, textAscent());
   }
+  
+  if(map.BlockOutOfMap(xBlock, yBlock)){
+     ResetToSpawnPosition();
+  }
 }
 
 
@@ -180,7 +190,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y < (map.GetBlockPixelSizeY()*yBlock)){
+  if(player.getPosition().y + playerColliderHalfDimensions.y - map.tilePixelSize/2 < (map.GetBlockPixelSizeY()*yBlock)){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock--; 
@@ -188,7 +198,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().y + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.y > (map.GetBlockPixelSizeY()*(yBlock+1))){
+  else if(player.getPosition().y + playerColliderHalfDimensions.y - map.tilePixelSize/2 > (map.GetBlockPixelSizeY()*(yBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     yBlock++; 
@@ -230,10 +240,27 @@ public PVector GetSpawnPosition(){
   xBlock = map.GetSpawnIndexX();
   yBlock = map.GetSpawnIndexY();
   
+  spawnXblock = xBlock;
+  spawnYblock = yBlock;
+  
+  
   map.UpdateMap(xBlock, yBlock, xBlock, yBlock);
   
   return map.GetSpawnPosition();
 }
+
+public void ResetToSpawnPosition(){
+  xBlock = spawnXblock;
+  yBlock = spawnYblock;  
+  
+  map.UpdateMap(xBlock, yBlock, xBlock, yBlock);
+  
+  player.position = new PVector(spawnPosition.x, spawnPosition.y);
+  
+  cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+  
+}
+
 
 
     
