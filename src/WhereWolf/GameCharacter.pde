@@ -98,8 +98,6 @@ public abstract class GameCharacter extends Component{
       
       // TODO : Prevent air jump
   
-      if(gameObject.name == "One") // TODO : remove this it's for debug
-      {
         if(Input.getButtonDown("Jump")) {
 
           if(Input.getAxisRaw("Vertical") > 0){            
@@ -128,7 +126,6 @@ public abstract class GameCharacter extends Component{
           }
         }
         
-      }
 
       //float xVelocity = (float)rigid.getVelocity().x;
       float xVelocity = Input.getAxisRaw("Horizontal")*70.0f;
@@ -295,8 +292,8 @@ public abstract class GameCharacter extends Component{
     isAlive = false;
     animator.setCurrentState(dead);
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
-    characterCollider.layer = CollisionLayer.Environment;
-    rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
+    //characterCollider.layer = CollisionLayer.Environment;
+    //rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
     
     //characterCollider.isTrigger = true;
     //characterCollider.forceDebugDraw = true;
