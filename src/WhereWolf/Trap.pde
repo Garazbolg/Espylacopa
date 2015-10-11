@@ -107,7 +107,14 @@ public class Trap extends Component {
     }
     
     trapsContainer.addChildren(gameObject);
-    
-
+  }
+  
+  public boolean getDamageApplied(){
+    return damageApplied; 
+  }
+  
+  public void OnDestroy(){
+    animatorController.OnDestroy();
+    super.OnDestroy();
   }
 }
