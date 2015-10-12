@@ -43,6 +43,9 @@ public class MapManager {
   
   private boolean fogOfWar = false;
   private boolean[][] visitedBlocks;
+  
+  private int brokeProbability = 50;
+   
 
 
   // constructor, the size of the map depends of the number of players
@@ -82,6 +85,7 @@ public class MapManager {
     nextSpawnPoint = numberOfBlocks;
     MapGeneration();
 
+
     CreateMap();
 
   }
@@ -113,7 +117,9 @@ public class MapManager {
         }
       }
     }
-
+    
+    BreakWalls();
+    
     DefineTilesForAllBlock();
     DefineMiniMapSize();
   }
@@ -140,7 +146,7 @@ public class MapManager {
           if (x>0 && mapBlocks[x-1][y]==0) { // check if the neighbor is in the bounds of the map
             numberOfBlocks--;
             mapBlocks[x][y]|=(1<<3); // update fourth bit of the Block to indicate that it has a left neighbor 
-            mapBlocks[x-1][y]=(1<<1); // update first bit of the new neighbor Block to indicate that the left neighbor has a right neighbor
+            mapBlocks[x-1][y]=(1<<1); // update second bit of the new neighbor Block to indicate that the left neighbor has a right neighbor
             createBlock(x-1, y); // continue the generation in that neighbor (recursive call)
           }    
           break;
@@ -176,6 +182,85 @@ public class MapManager {
     }
   }
 
+  private void BreakWalls(){
+    
+    // Determine the numbers of breakable walls on the generated map
+    int breakableWalls = 0;
+    for(int i=0 ; i<mapSize ; i++){
+      for(int j=0 ; j<mapSize ; j++){
+        if(mapBlocks[i][j] != 0){
+          if((i+1) < mapSize && mapBlocks[i+1][j]!=0 && !HaveNeighborInDirection(i, j, Direction.Right)) breakableWalls++;
+          if((j+1) < mapSize && mapBlocks[i][j+1]!=0 && !HaveNeighborInDirection(i, j, Direction.Down)) breakableWalls++;
+        }
+      }
+    }
+    
+    // We will break a percent of these walls to aerate the map
+    breakableWalls /= 3;
+    
+    int brokenWalls = 0;
+    
+    while(brokenWalls < breakableWalls){
+
+      int xBlock = (int)random(0, mapSize-2);
+      int yBlock = (int)random(0, mapSize-2);
+      boolean broke = false;
+      
+      while(!broke && xBlock < mapSize){
+         while(!broke && yBlock < mapSize){
+           
+           if(mapBlocks[xBlock][yBlock] != 0){
+             if((xBlock-1)>0 && mapBlocks[xBlock-1][yBlock]!=0 && !HaveNeighborInDirection(xBlock, yBlock, Direction.Left)){
+               if(random(0,100) > brokeProbability){
+                 mapBlocks[xBlock][yBlock]|=(1<<3); // update fourth bit of the Block to indicate that it has a left neighbor 
+                 mapBlocks[xBlock-1][yBlock]|=(1<<1); // update second bit of the left neighbor to indicate that it has a right neighbor
+                 broke = true;
+                 brokenWalls++;
+               }
+             }
+             
+             if((yBlock-1) > 0 && mapBlocks[xBlock][yBlock-1]!=0 && !HaveNeighborInDirection(xBlock, yBlock, Direction.Up)){
+               if(random(0,100) > brokeProbability){
+                 mapBlocks[xBlock][yBlock]|=(1<<2); // update third bit of the Block to indicate that it has a up neighbor 
+                 mapBlocks[xBlock][yBlock-1]|=1; // update first bit of the up neighbor to indicate that it has a down neighbor
+                 broke = true;
+                 brokenWalls++;
+               }
+             }
+             
+             if((xBlock+1) < mapSize && mapBlocks[xBlock+1][yBlock]!=0 && !HaveNeighborInDirection(xBlock, yBlock, Direction.Right)){
+               if(random(0,100) > brokeProbability){
+                 mapBlocks[xBlock][yBlock]|=(1<<1); // update second bit of the Block to indicate that it has a right neighbor 
+                 mapBlocks[xBlock+1][yBlock]|=(1<<3); // update fourth bit of the right neighbor to indicate that it has a left neighbor
+                 broke = true;
+                 brokenWalls++;
+               }
+             }
+             
+             if((yBlock+1)<mapSize && mapBlocks[xBlock][yBlock+1]!=0 && !HaveNeighborInDirection(xBlock, yBlock, Direction.Down)){
+               if(random(0,100) > brokeProbability){
+                 mapBlocks[xBlock][yBlock]|=1; // update first bit of the Block to indicate that it has a down neihbor
+                 mapBlocks[xBlock][yBlock+1]|=(1<<2); // update third bit of the down neighbor to indicate that it has a up neighbor
+                 broke = true;
+                 brokenWalls++;
+               }
+               
+               println(brokenWalls + " " + breakableWalls); 
+             }
+           }
+           
+           
+           
+           
+           
+           yBlock++;
+         }
+         
+         xBlock++;
+      } 
+       
+    }
+  }
 
   public int GetSpawnIndexX() {
     return xSpawnPoints[0];
@@ -410,7 +495,7 @@ public class MapManager {
 
           File dataFolder = new File(path); 
 
-          int numberOfBlocksPossibilities = dataFolder.list().length;
+          int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
           int choosenBlock = (int)random(0, numberOfBlocksPossibilities);
           folderPath += "/"; // WARNING : this line must be done before the loadStrings
 
@@ -923,6 +1008,18 @@ public class MapManager {
   
   public GameObject getCurrentBlock(){
     return mapBlocksGameObjects[xBlock][yBlock]; 
+  }
+  
+  public void DebugPrintMap(){
+    println("Print map :");
+    for(int j=0 ; j<mapSize ; j++){
+      for(int i=0 ; i<mapSize ; i++){
+        if(mapBlocks[i][j] == 0) print("   ");
+        else if(mapBlocks[i][j] < 10) print("0" + mapBlocks[i][j] + " ");
+        else print(mapBlocks[i][j] + " ");
+      }
+      println("");
+    } 
   }
 }
 
