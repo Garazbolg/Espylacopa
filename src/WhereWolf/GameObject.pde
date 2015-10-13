@@ -131,7 +131,8 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
 
  public void draw(){
      if(!isActive()) return;
-     //if(name.contains("trap")) println(name + " " + millis());
+     
+     
      pushMatrix();
      translate(position.x,position.y);
      
@@ -237,5 +238,16 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   }
    
    super.OnDestroy();
+ }
+ 
+ public PVector getGlobalPosition(){
+    PVector globalPosition = new PVector(position.x, position.y);
+    GameObject parentIterator = parent;
+    while(parentIterator != null){
+      globalPosition.add(parentIterator.position);
+      parentIterator = parentIterator.parent;
+    }
+    
+    return globalPosition;
  }
 }

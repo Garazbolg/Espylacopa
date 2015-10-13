@@ -29,6 +29,13 @@ private PVector spawnPosition;
 private int spawnXblock;
 private int spawnYblock;
 
+private float orientCameraDelay = 400;
+private float orientCameraChrono;
+private boolean playerImmobileAndLookUp;
+private boolean playerImmobileAndLookDown;
+
+private float cameraOrientation = 0;
+private float maxCameraOrientation = 30;
 
 void initGame() {
   
@@ -75,7 +82,7 @@ void initGame() {
   playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
   */
   
-  //Werewolf playerTwo = new Werewolf("Two", PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  
     
 
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
@@ -119,6 +126,7 @@ void gameDraw() {
   else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
  }
  
+ manageCameraOrientation();
 
   Scene.draw();
  // popMatrix();
@@ -257,8 +265,54 @@ public void ResetToSpawnPosition(){
   
   player.position = new PVector(spawnPosition.x, spawnPosition.y);
   
-  cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+  cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y); 
+}
+
+public void manageCameraOrientation(){
   
+  float verticalAxisValue = Input.getAxisRaw("Vertical");
+    
+  if(!playerCharacterComponent.isImmobile() || verticalAxisValue == 0){
+    playerImmobileAndLookUp = false;
+    playerImmobileAndLookDown = false;
+      
+    if(cameraOrientation > 0) cameraOrientation--;
+    else if(cameraOrientation < 0) cameraOrientation++;
+  }
+  else if(verticalAxisValue < 0){
+    if(!playerImmobileAndLookDown){
+      playerImmobileAndLookDown = true;
+      if(cameraOrientation == 0){
+        orientCameraChrono = Time.getTime();
+      }
+    }
+    
+    if(Time.getTime() - orientCameraChrono > orientCameraDelay){
+      cameraOrientation++;
+      if(cameraOrientation > maxCameraOrientation) cameraOrientation =  maxCameraOrientation;
+    }
+    
+  } else if(verticalAxisValue > 0){
+    if(!playerImmobileAndLookDown){
+      playerImmobileAndLookDown = true;
+      if(cameraOrientation == 0){
+        orientCameraChrono = Time.getTime();
+      }
+    }
+    
+    if(Time.getTime() - orientCameraChrono > orientCameraDelay){
+      cameraOrientation--;
+      if(cameraOrientation < -maxCameraOrientation) cameraOrientation =  -maxCameraOrientation;        
+    }
+    
+  }
+   
+  translate(0,cameraOrientation); 
+
+}
+
+public float getCameraOrientation(){
+  return cameraOrientation; 
 }
 
 

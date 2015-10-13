@@ -91,8 +91,8 @@ public class Sprite extends Renderer{
      
      if((checkPosition.x + source.width/2) < (cameraPosition.x + resolutionStripSize)
      || (checkPosition.x - source.width/2) > (cameraPosition.x + cameraWidth)
-     || (checkPosition.y + source.height/2) < (cameraPosition.y)
-     || (checkPosition.y - source.height/2) > (cameraPosition.y + cameraHeight)
+     || (checkPosition.y + source.height/2) < (cameraPosition.y - cameraOrientation)
+     || (checkPosition.y - source.height/2) > (cameraPosition.y - cameraOrientation + cameraHeight)
      ){
        return; 
      }

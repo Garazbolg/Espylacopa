@@ -116,4 +116,8 @@ public class Chest extends Component {
       
     }
   }
+  
+  public boolean getOpened(){
+    return opened; 
+  }
 }

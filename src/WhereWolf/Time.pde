@@ -40,6 +40,10 @@ public static class Time{
     return int( 1/delta); 
   }
   
+  public static int getTime(){
+    return lastTime; 
+  }
+  
   //set the speed of time in the game compared to speed in real world (1 => same)
   public static void setTimeScale(float f){
     timeScale = ((f<0)?-f:f);

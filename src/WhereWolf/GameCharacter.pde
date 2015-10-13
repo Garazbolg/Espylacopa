@@ -119,11 +119,15 @@ public abstract class GameCharacter extends Component{
         else if(Input.getAxisRaw("Vertical") < 0 && rigid.getVelocity().x == 0){   
           for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
             Chest chestComponent = (Chest)(characterCollider.currentCollisions.get(i).gameObject.getComponent(Chest.class));
-            if(chestComponent != null){
-              chestComponent.openChest(this); 
-              canMove = false;
-              immobileDelay = openChestImmobileDelay;
-              immobileChrono = millis();
+            if(chestComponent != null){ // if collider is a chest and chest is closed
+            
+              float heightDelta = gameObject.getGlobalPosition().y - characterCollider.currentCollisions.get(i).gameObject.getGlobalPosition().y;
+              if(heightDelta > -13 && heightDelta < -9){
+                chestComponent.openChest(this); 
+                canMove = false;
+                immobileDelay = openChestImmobileDelay;
+                immobileChrono = millis();
+              }
             }
           }
         }
@@ -355,7 +359,10 @@ public abstract class GameCharacter extends Component{
   public AnimatorController getAnimator(){
     return(animator);
   }
-    
+  
+  public boolean isImmobile(){
+    return rigid.getVelocity().x == 0 && rigid.getVelocity().y == 0;
+  }
   
   
 }

@@ -529,7 +529,6 @@ public class MapManager {
   // Block = 8x8 tiles
   public void CreateBlock(int xBlock, int yBlock) {
 
-    //mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(xBlock*blockPixelSize,yBlock*blockPixelSize));
     mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(0, 0));
 
     for (int i=0; i<blockTileSizeY; i++) {
@@ -547,6 +546,7 @@ public class MapManager {
     }
     
     sawsTrailsList.clear();
+    
     
   }
 
