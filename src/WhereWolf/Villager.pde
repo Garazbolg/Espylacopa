@@ -33,7 +33,7 @@ public class Villager extends GameCharacter {
     
     super();
     
-    SetLife(3);
+    SetLife(30);
     
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     
@@ -55,7 +55,7 @@ public class Villager extends GameCharacter {
     animator.parameters.setBool("Visible", true);
     
     
-    activateBlinkOfInvulnerability(); 
+    activateBlinkOfInvulnerability(takeDamageCooldown); 
     availableTraps = maxTrapsNumber; 
     
   }
@@ -175,8 +175,9 @@ public class Villager extends GameCharacter {
     ArrayList<Collider> allColliders = collider.getCurrentTriggers();
     int  closestColliderIndex = -1;
     float closestPositionX = (float)Double.POSITIVE_INFINITY;
-   
+   println("size + " + allColliders.size());
     for(int i=0 ; i<allColliders.size() ; i++){
+      println(allColliders.get(i).gameObject.getComponent(GameCharacter.class));
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
         if(allColliders.get(i).gameObject != this.gameObject && ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).isAlive()){
           if(abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
@@ -188,6 +189,7 @@ public class Villager extends GameCharacter {
     }
     
     if(closestColliderIndex > -1){
+      println("check");
       ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position); 
     }
   } 

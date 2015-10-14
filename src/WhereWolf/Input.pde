@@ -45,10 +45,10 @@ public static class Input{
       println("Devices :");
       println("Keyboard : " + (keyboard != null)); 
       println("Mouse : " + (mouse != null));
-      println("Controller : " + (controller != null));      
-    }
-    
-    
+      println("Controller : " + (controller != null));     
+     
+     
+    } 
   }
   
   public static void update(){
@@ -139,9 +139,11 @@ public static class Input{
   
   public static boolean getButtonDown(String name){
     ArrayList<Button> collection = buttons.get(name);
-    for(Button b : collection){
-     if(b.getButtonDown()) 
-       return true;
+    if(collection != null){ // Important, else crash when test on Mac
+      for(Button b : collection){
+       if(b.getButtonDown()) 
+         return true;
+      }
     }
     return false;
   }

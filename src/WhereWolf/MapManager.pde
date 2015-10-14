@@ -45,12 +45,15 @@ public class MapManager {
   private boolean[][] visitedBlocks;
   
   private int brokeProbability = 50;
+  
+  public boolean lowPerf = false;
+  
+  
    
 
 
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber) {
-
     if (playerNumber < 4) {
       mapSize = 6;
       numberOfBlocks = 7;
@@ -91,7 +94,7 @@ public class MapManager {
   }
 
   public void MapGeneration() {
-
+println("mapgeneration");
     // initialization, get a empty map
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
@@ -102,13 +105,16 @@ public class MapManager {
     generationOriginX = mapSize/2;
     generationOriginY = mapSize/2;
 
+println("mapgeneration2");
     while (numberOfBlocks>0) {
+      println("number of blocks : " + numberOfBlocks);
       if (mapBlocks[generationOriginX][generationOriginY] != 15) { // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
         createBlock(generationOriginX, generationOriginY);
       }
 
       // else, we have to change the origin 
       else {
+        println(generationOriginX + " " + generationOriginY);
         if (generationOriginX<mapSize-1) generationOriginX++;
         else if (generationOriginY<mapSize-1) generationOriginY++;
         else {
@@ -118,10 +124,13 @@ public class MapManager {
       }
     }
     
+    
+println("mapgeneration3");
+    
     BreakWalls();
     
     DefineTilesForAllBlock();
-    DefineMiniMapSize();
+    //DefineMiniMapSize();
   }
 
   public void createBlock(int x, int y) {
@@ -139,6 +148,7 @@ public class MapManager {
     for (int i=0; i<neighborNumber; i++) {
       int neighborSelected = (int)random(0, 4); // the type of neighbor is also random, 0 = left, 1 = up, 2 = right, 3 = down;
 
+      println("for iteration, numberOfBlocks = " + numberOfBlocks + " neighborNumber = " + neighborNumber + " neighborSelected = " + neighborSelected);
       if (numberOfBlocks>0) {
         switch(neighborSelected) {
 
@@ -332,6 +342,7 @@ public class MapManager {
     }
     
     popMatrix();
+    strokeWeight(1); // Important to reset strokeWeight
   }
 
   // Tile = 16x16 pixels 
@@ -465,7 +476,7 @@ public class MapManager {
   }
   
   public boolean BlockOutOfMap(int xBlock, int yBlock){
-    return(mapBlocks[xBlock][yBlock]==0 || xBlock < 0 || xBlock >= mapSize || yBlock < 0 || yBlock >= mapSize);
+    return(xBlock < 0 || xBlock >= mapSize || yBlock < 0 || yBlock >= mapSize || mapBlocks[xBlock][yBlock]==0);
   }
 
   public void DefineTilesForAllBlock() {
@@ -494,9 +505,12 @@ public class MapManager {
           String path = sketchPath + "/data" + "/" + folderPath; 
 
           File dataFolder = new File(path); 
-
+println( dataFolder.list().length);
           int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
           int choosenBlock = (int)random(0, numberOfBlocksPossibilities);
+          
+          choosenBlock = numberOfBlocksPossibilities-1; // WARNING : line of code used to facilitate tests of level design, don't forget to comment this
+          
           folderPath += "/"; // WARNING : this line must be done before the loadStrings
 
           String[] data=loadStrings(folderPath + char(choosenBlock+48) + ".txt");
@@ -561,7 +575,7 @@ public class MapManager {
 
       case Opened :  
         //tile.addComponent(new Sprite(tilesSpriteSheet, 17,15));
-        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        if(!lowPerf) tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         break;
 
       case Closed :     
@@ -710,8 +724,26 @@ public class MapManager {
         
         break;  
         
-      case CeilingTrap :
-        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "ceilingTrap.png", 0.35f));     
+      case Canvas :
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+
+        GameObject canvasBackground = new GameObject("canvasBackground", new PVector(0, -tilePixelSize), tile);
+        canvasBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground.isChildTile = true;
+        
+        GameObject canvasBackground2 = new GameObject("canvasBackground2", new PVector(tilePixelSize, 0), tile);
+        canvasBackground2.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground2.isChildTile = true;
+
+        GameObject canvasBackground3 = new GameObject("canvasBackground3", new PVector(tilePixelSize, -tilePixelSize), tile);
+        canvasBackground3.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground3.isChildTile = true;
+
+        GameObject canvas = new GameObject("canvas", new PVector(tilePixelSize/2, -5), tile);
+        canvas.isChildTile = true;
+        canvas.addComponent(new Sprite(mapTilesSpriteSheetPath + "canvas.png", 0.66f));        
+                
         break;
         
       case Saw :
@@ -850,7 +882,8 @@ public class MapManager {
         upSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "horizontalSpikes.png"));
         ((Sprite)(upSpikes.getComponent(Sprite.class))).setScale(0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(0, 5, tilePixelSize, tilePixelSize/2), 1));
+        tile.addComponent(new DamageCollider(new Rect(0, 4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
       
@@ -863,7 +896,8 @@ public class MapManager {
         downSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "horizontalSpikes.png"));
         ((Sprite)(downSpikes.getComponent(Sprite.class))).setScale(0.5f, -0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(0, -5, tilePixelSize, tilePixelSize/2), 1));
+        tile.addComponent(new DamageCollider(new Rect(0, -4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
         
@@ -876,7 +910,8 @@ public class MapManager {
         leftSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "verticalSpikes.png"));
         ((Sprite)(leftSpikes.getComponent(Sprite.class))).setScale(-0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(5, 0, tilePixelSize/2, tilePixelSize), 1));
+        tile.addComponent(new DamageCollider(new Rect(4, 0, (tilePixelSize/2 - 1), (tilePixelSize -3)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
            
@@ -889,7 +924,8 @@ public class MapManager {
         rightSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "verticalSpikes.png"));
         ((Sprite)(rightSpikes.getComponent(Sprite.class))).setScale(0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(-5, 0, tilePixelSize/2, tilePixelSize), 1));
+        tile.addComponent(new DamageCollider(new Rect(-4, 0, (tilePixelSize/2 - 1), (tilePixelSize -3)), 1));
+        //((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
       
@@ -1021,5 +1057,7 @@ public class MapManager {
       println("");
     } 
   }
+  
+
 }
 

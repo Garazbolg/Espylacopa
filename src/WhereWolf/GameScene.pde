@@ -35,10 +35,11 @@ private boolean playerImmobileAndLookUp;
 private boolean playerImmobileAndLookDown;
 
 private float cameraOrientation = 0;
-private float maxCameraOrientation = 30;
+private float maxCameraOrientation = 50;
+
+public boolean showMiniMap = true;
 
 void initGame() {
-  
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
  
   Scene.startScene(new GameObject("Scene", new PVector(), null));
@@ -137,7 +138,7 @@ void gameDraw() {
   //Debug Draw
   if (!Constants.DEBUG_MODE){
     cameraDrawDebug();
-    //Scene.debugDraw();
+    Scene.debugDraw();
   }
 
 
@@ -157,7 +158,12 @@ void gameDraw() {
 
 
   //TODO : display a proper minimap
-  map.DrawMiniMap(xBlock, yBlock);
+  
+  if(Input.getButtonDown("ShowHideMiniMap")){
+    showMiniMap = !showMiniMap; 
+  }
+  
+  if(showMiniMap) map.DrawMiniMap(xBlock, yBlock);
   
 
   // Matrix to manage the
@@ -182,7 +188,7 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
+  if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -190,10 +196,10 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
+  else if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
-    xBlock++; 
+    xBlock++;
     
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
@@ -270,16 +276,16 @@ public void ResetToSpawnPosition(){
 
 public void manageCameraOrientation(){
   
-  float verticalAxisValue = Input.getAxisRaw("Vertical");
+  float AxisValue = Input.getAxisRaw("Vertical");
     
-  if(!playerCharacterComponent.isImmobile() || verticalAxisValue == 0){
+  if(!playerCharacterComponent.isImmobile() || AxisValue == 0){
     playerImmobileAndLookUp = false;
     playerImmobileAndLookDown = false;
       
     if(cameraOrientation > 0) cameraOrientation--;
     else if(cameraOrientation < 0) cameraOrientation++;
   }
-  else if(verticalAxisValue < 0){
+  else if(AxisValue < 0){
     if(!playerImmobileAndLookDown){
       playerImmobileAndLookDown = true;
       if(cameraOrientation == 0){
@@ -292,7 +298,7 @@ public void manageCameraOrientation(){
       if(cameraOrientation > maxCameraOrientation) cameraOrientation =  maxCameraOrientation;
     }
     
-  } else if(verticalAxisValue > 0){
+  } else if(AxisValue > 0){
     if(!playerImmobileAndLookDown){
       playerImmobileAndLookDown = true;
       if(cameraOrientation == 0){

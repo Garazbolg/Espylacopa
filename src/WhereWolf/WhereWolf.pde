@@ -44,11 +44,13 @@ void setup(){
  Input.addAxis("Horizontal","joystick Axe X");
  Input.addAxis("Vertical","Z","S");
  Input.addAxis("Vertical","joystick Axe Y");
- Input.addButton("Jump","ESPACE");
+ Input.addButton("Jump","ESPACE"); // Warning : not working on mac... so I also add K button to jump
+ Input.addButton("Jump","K");
  Input.addButton("Jump","joystick Bouton 0");
  Input.addButton("Fire","A");
  Input.addButton("Fire","joystick Bouton 1");
  Input.addButton("DebugGetDamage","P");
+ Input.addButton("ShowHideMiniMap","M");
  
  Input.addButton("Special","joystick Bouton 2");
  Input.addButton("Special","E");
@@ -73,7 +75,6 @@ void draw(){
   background(100);
   //Updatables.update();
   Input.update();
-  
   
   if(scene == SceneState.MainMenu){
     

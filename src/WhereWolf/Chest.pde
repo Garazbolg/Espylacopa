@@ -27,6 +27,10 @@ public class Chest extends Component {
   
   private GameCharacter characterOwner;
   
+  private boolean bonusAttribued = false;
+  private float effectDuration = 0; 
+  private float effectChrono; 
+  
   Chest(){
     DefineContent();
   }
@@ -77,6 +81,13 @@ public class Chest extends Component {
       
       contentGameObject.position = new PVector(contentGameObject.position.x, contentHeightPosition);
     } 
+    
+    if(bonusAttribued){
+      if(Time.getTime() - effectChrono > effectDuration){
+        RemoveContentEffect();
+        contentGameObject.destroy();
+      } 
+    }
   }
   
   private void DefineContent(){
@@ -86,7 +97,24 @@ public class Chest extends Component {
   } 
   
   public void openChest(GameCharacter owner){
+    
+    ((Sprite)(gameObject.getComponent(Sprite.class))).setSprite(mapTilesSpriteSheetPath + "openChest.png");
+          
     if(!opened){
+
+      
+      switch(chestContent){
+        case ArmorHeart :
+          break;
+        case Invincibility :
+          break;
+        case SpeedBoost :
+          effectDuration = 1000;
+          break;
+        case Empty :
+          return;
+      }
+      
       opened = true;
       characterOwner = owner;
       
@@ -95,13 +123,13 @@ public class Chest extends Component {
       contentScale = initialContentScale;
       bumpNumber = 0;
       
-      ((Sprite)(gameObject.getComponent(Sprite.class))).setSprite(mapTilesSpriteSheetPath + "openChest.png");
-    
+
+      
       contentGameObject = new GameObject("chestContent", PVector.add(gameObject.position, gameObject.parent.position, new PVector(0,initialHeightPosition)));
-      //Scene.addChildren(contentGameObject);
+
       contentGameObject.addComponent(new Sprite(mapTilesSpriteSheetPath + "armorHeart.png", initialContentScale));
       contentSpriteComponent = (Sprite)contentGameObject.getComponent(Sprite.class);
-      
+    
       contentHeightPosition = contentGameObject.position.y;
       finalHeightPosition = contentHeightPosition - totalHeightAnimation;
     }
@@ -113,11 +141,28 @@ public class Chest extends Component {
       case ArmorHeart :
         characterOwner.IncreaseArmorLife(1);
         break;
-      
+      case Invincibility :
+        characterOwner.activateBlinkOfInvulnerability(5000);
+        break;
+      case SpeedBoost :
+        effectDuration = 1000;
+        characterOwner.setMovementSpeed(120);
     }
+    
+    effectChrono = millis();
+    bonusAttribued = true;
+    //contentGameObject.destroy();
   }
   
   public boolean getOpened(){
     return opened; 
+  }
+  
+  public void RemoveContentEffect(){
+    switch(chestContent){
+      case SpeedBoost :
+        characterOwner.setMovementSpeed(70);
+        break;
+    }
   }
 }

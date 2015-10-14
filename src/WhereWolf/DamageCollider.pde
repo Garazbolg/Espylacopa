@@ -21,7 +21,6 @@ public class DamageCollider extends Collider{
     if(other.gameObject != null){
       
       GameCharacter gameCharacter = (GameCharacter)other.gameObject.getComponentIncludingSubclasses(GameCharacter.class);
-      //println(this.gameObject.getComponentIncludingSubclasses(GameCharacter.class));
       if(gameCharacter != null){
         gameCharacter.DecreaseLife(damage, gameObject.position);   
       }

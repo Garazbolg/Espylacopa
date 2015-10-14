@@ -55,6 +55,8 @@ public class Werewolf extends GameCharacter {
   private AnimatorController transformationEffectAnimatorController;
   
 
+  
+
 
   Werewolf() {
 
@@ -95,7 +97,7 @@ public class Werewolf extends GameCharacter {
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png");    
     
-    activateBlinkOfInvulnerability(); 
+    activateBlinkOfInvulnerability(takeDamageCooldown); 
     
   }
 

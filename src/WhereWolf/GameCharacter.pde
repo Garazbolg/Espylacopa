@@ -31,10 +31,11 @@ public abstract class GameCharacter extends Component{
   protected State walkLeft,walkRight,idleRight,idleLeft, dead;
   
   protected boolean invulnerable = false;
+  protected float takeDamageCooldown = 1300;
   protected float blinkDelay = 100;
   protected float blinkChrono;
   protected float blinkNumber = 0;
-  protected float maxBlinkNumber = 13;
+  protected float maxBlinkNumber; // defined by takeDamageCooldown
   protected boolean visible = true;
   
  
@@ -62,6 +63,9 @@ public abstract class GameCharacter extends Component{
   //private float movementSpeed = 170.0f;
   
   private boolean airJumpForDebug = true;
+  
+  private float invinciblityDuration;
+  
   
 
    GameCharacter(){
@@ -202,7 +206,7 @@ public abstract class GameCharacter extends Component{
       }
       
       else{
-        activateBlinkOfInvulnerability(); 
+        activateBlinkOfInvulnerability(takeDamageCooldown); 
         makeMoveCausedByDamage(aggressorPosition);
       }
     }
@@ -226,7 +230,7 @@ public abstract class GameCharacter extends Component{
     }
     
     else{
-      activateBlinkOfInvulnerability(); 
+      activateBlinkOfInvulnerability(takeDamageCooldown); 
       makeMoveCausedByDamage(aggressorPosition);
     }
   }
@@ -282,10 +286,12 @@ public abstract class GameCharacter extends Component{
     rigid.setVelocity(new PVector(rigid.getVelocity().x, direction.y * damageMovementFactor - 100));;
   }
   
-  public void activateBlinkOfInvulnerability(){
+  public void activateBlinkOfInvulnerability(float duration){
     invulnerable = true;
     blinkChrono = millis();
     blinkNumber = 0;
+    maxBlinkNumber = duration / blinkDelay;
+    if(maxBlinkNumber % 2 == 0) maxBlinkNumber++; // maxBlinkNumber must be impair number
     
     visible = false;
     animator.parameters.setBool("Visible", visible);
@@ -362,6 +368,10 @@ public abstract class GameCharacter extends Component{
   
   public boolean isImmobile(){
     return rigid.getVelocity().x == 0 && rigid.getVelocity().y == 0;
+  }
+  
+  public void setMovementSpeed(float newSpeed){
+    movementSpeed = newSpeed;
   }
   
   
