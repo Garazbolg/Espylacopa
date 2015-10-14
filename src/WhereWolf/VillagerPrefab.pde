@@ -2,9 +2,11 @@ public class VillagerPrefab extends GameObject {
   
   VillagerPrefab(String name, PVector position){
     super(name, position);
+    Scene.addChildren(this);
+    
     Villager villagerComponent = new Villager();
     this.addComponent(villagerComponent);
-    
+    villagerComponent.init();
     Rigidbody rigid = new Rigidbody();
     this.addComponent(rigid);
     villagerComponent.setRigid(rigid);

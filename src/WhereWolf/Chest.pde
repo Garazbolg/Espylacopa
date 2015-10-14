@@ -92,7 +92,6 @@ public class Chest extends Component {
   
   private void DefineContent(){
     int numberOfPossibilities = ChestContent.values().length;
-    
     chestContent = ChestContent.fromInteger((int)(random(numberOfPossibilities)));
   } 
   
@@ -103,16 +102,23 @@ public class Chest extends Component {
     if(!opened){
 
       
+      String spriteName = null;
+    
       switch(chestContent){
         case ArmorHeart :
+          spriteName = "armorHeart.png";
           break;
         case Invincibility :
+          spriteName = "shieldContent.png";
           break;
         case SpeedBoost :
-          effectDuration = 1000;
+          spriteName = "speedContent.png";
           break;
         case Empty :
           return;
+        case PowerBoost :
+          spriteName = "powerContent.png";
+          break;
       }
       
       opened = true;
@@ -123,13 +129,18 @@ public class Chest extends Component {
       contentScale = initialContentScale;
       bumpNumber = 0;
       
-
-      
       contentGameObject = new GameObject("chestContent", PVector.add(gameObject.position, gameObject.parent.position, new PVector(0,initialHeightPosition)));
 
-      contentGameObject.addComponent(new Sprite(mapTilesSpriteSheetPath + "armorHeart.png", initialContentScale));
+      contentGameObject.addComponent(new Sprite(mapTilesSpriteSheetPath + spriteName, 1));
       contentSpriteComponent = (Sprite)contentGameObject.getComponent(Sprite.class);
-    
+      
+      float spriteWidth = contentSpriteComponent.getWidth();
+      contentSpriteComponent.setScale(0); // this line must be after definition of spriteWidth
+      
+      finalContentScale = 1 - (spriteWidth/46.0f);
+      minBumpContentScale = finalContentScale / 2;
+      scaleAnimationSpeed = 2.7f * finalContentScale;
+      
       contentHeightPosition = contentGameObject.position.y;
       finalHeightPosition = contentHeightPosition - totalHeightAnimation;
     }
@@ -143,15 +154,22 @@ public class Chest extends Component {
         break;
       case Invincibility :
         characterOwner.activateBlinkOfInvulnerability(5000);
+        characterOwner.activateInvincibilityFeedback();
         break;
       case SpeedBoost :
-        effectDuration = 1000;
-        characterOwner.setMovementSpeed(120);
+        effectDuration = 5000;
+        characterOwner.setMovementSpeed(150);
+        break;
+      case PowerBoost :
+        effectDuration = 5000;
+        characterOwner.setDamageMultiplicator(2);
+        characterOwner.getPowerEffect().setActive(true);
+        break;
+        
     }
     
     effectChrono = millis();
     bonusAttribued = true;
-    //contentGameObject.destroy();
   }
   
   public boolean getOpened(){
@@ -163,6 +181,11 @@ public class Chest extends Component {
       case SpeedBoost :
         characterOwner.setMovementSpeed(70);
         break;
+       case PowerBoost :
+         characterOwner.setDamageMultiplicator(1);
+        characterOwner.getPowerEffect().setActive(false);
+         break;
+        
     }
   }
 }

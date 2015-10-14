@@ -58,6 +58,8 @@ public class Villager extends GameCharacter {
     activateBlinkOfInvulnerability(takeDamageCooldown); 
     availableTraps = maxTrapsNumber; 
     
+    
+    
   }
   
   public void update(){
@@ -190,7 +192,7 @@ public class Villager extends GameCharacter {
     
     if(closestColliderIndex > -1){
       println("check");
-      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position); 
+      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position); 
     }
   } 
   

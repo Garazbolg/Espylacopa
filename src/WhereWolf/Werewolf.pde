@@ -155,7 +155,7 @@ public class Werewolf extends GameCharacter {
     ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
     gameObject.position.add(new PVector(0, -7)); 
 
-    SetArmorLife(2);
+    AddArmorLife(2);
     AdaptCollidersWithTransformation();
     
     transformationEffectAnimatorController.parameters.setBool("Visible", true);
@@ -173,7 +173,9 @@ public class Werewolf extends GameCharacter {
     ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
     gameObject.position.add(new PVector(0, 7));
 
-    SetArmorLife(0);
+    if(armorLife > 1) DecreaseArmorLife(2);
+    else if(armorLife == 1) DecreaseArmorLife(1);
+    
     AdaptCollidersWithTransformation();
   }
 
@@ -202,7 +204,7 @@ public class Werewolf extends GameCharacter {
     for(int i=0 ; i<allColliders.size() ; i++){
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
         if(allColliders.get(i).gameObject != gameObject){
-          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position);
+          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position);
         }
       }
     }

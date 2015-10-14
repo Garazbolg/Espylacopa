@@ -49,9 +49,6 @@ public class MapManager {
   public boolean lowPerf = false;
   
   
-   
-
-
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber) {
     if (playerNumber < 4) {
@@ -94,7 +91,6 @@ public class MapManager {
   }
 
   public void MapGeneration() {
-println("mapgeneration");
     // initialization, get a empty map
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
@@ -105,16 +101,13 @@ println("mapgeneration");
     generationOriginX = mapSize/2;
     generationOriginY = mapSize/2;
 
-println("mapgeneration2");
     while (numberOfBlocks>0) {
-      println("number of blocks : " + numberOfBlocks);
-      if (mapBlocks[generationOriginX][generationOriginY] != 15) { // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
+      if (mapBlocks[generationOriginX][generationOriginY] != 15 && canHaveNewNeighbor(generationOriginX, generationOriginY)) { // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
         createBlock(generationOriginX, generationOriginY);
       }
 
       // else, we have to change the origin 
       else {
-        println(generationOriginX + " " + generationOriginY);
         if (generationOriginX<mapSize-1) generationOriginX++;
         else if (generationOriginY<mapSize-1) generationOriginY++;
         else {
@@ -124,13 +117,14 @@ println("mapgeneration2");
       }
     }
     
-    
-println("mapgeneration3");
-    
     BreakWalls();
     
     DefineTilesForAllBlock();
     //DefineMiniMapSize();
+  }
+  
+  public boolean canHaveNewNeighbor(int x, int y){
+    return( (x > 0 && mapBlocks[x-1][y] == 0) || (y > 0 && mapBlocks[x][y-1] == 0) || (x+1 < mapSize && mapBlocks[x+1][y] == 0) || (y+1 < mapSize && mapBlocks[x][y+1] == 0) ); 
   }
 
   public void createBlock(int x, int y) {
@@ -148,7 +142,6 @@ println("mapgeneration3");
     for (int i=0; i<neighborNumber; i++) {
       int neighborSelected = (int)random(0, 4); // the type of neighbor is also random, 0 = left, 1 = up, 2 = right, 3 = down;
 
-      println("for iteration, numberOfBlocks = " + numberOfBlocks + " neighborNumber = " + neighborNumber + " neighborSelected = " + neighborSelected);
       if (numberOfBlocks>0) {
         switch(neighborSelected) {
 
@@ -255,13 +248,8 @@ println("mapgeneration3");
                  brokenWalls++;
                }
                
-               println(brokenWalls + " " + breakableWalls); 
              }
            }
-           
-           
-           
-           
            
            yBlock++;
          }
@@ -370,7 +358,7 @@ println("mapgeneration3");
     }
   }
 
-  // OBSOLTE METHOD
+  // OBSOLETE METHOD
   public void DrawMap(int xCurrentBlock, int yCurrentBlock) {
 
     if (xCurrentBlock < 0 || xCurrentBlock >= mapSize || yCurrentBlock < 0 || yCurrentBlock >= mapSize) {
@@ -505,7 +493,7 @@ println("mapgeneration3");
           String path = sketchPath + "/data" + "/" + folderPath; 
 
           File dataFolder = new File(path); 
-println( dataFolder.list().length);
+          
           int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
           int choosenBlock = (int)random(0, numberOfBlocksPossibilities);
           

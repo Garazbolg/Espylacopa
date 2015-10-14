@@ -22,6 +22,8 @@ private SpriteSheet lavaSpriteSheet;
 private SpriteSheet trapSpriteSheet;
 private SpriteSheet sawSpriteSheet;
 private SpriteSheet transformationEffectSpriteSheet;
+private SpriteSheet invincibilityEffectSpriteSheet;
+private SpriteSheet powerEffectSpriteSheet;
 
 private Sprite emptyPotSprite;
   
@@ -65,7 +67,8 @@ void setup(){
   trapSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "trapSpriteSheet.png", 3, 1);
   sawSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "fullSawSpriteSheet.png", 2, 1);
   transformationEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "transformationEffectSpriteSheet.png", 9, 1);
-  
+  invincibilityEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "invincibilityEffectSpriteSheet.png", 6, 1);
+  powerEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "powerEffectSpriteSheet.png", 3, 1);
 }
  
 
