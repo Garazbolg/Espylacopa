@@ -29,6 +29,7 @@ public static class Network{
    isConnected = true;
     isServer = true;
     client = null;
+    println("server connected");
     return true;
    }
    catch(RuntimeException e){
@@ -54,6 +55,7 @@ public static class Network{
     isConnected = true;
     isServer = false;
     server = null;
+    println("new client connected");
     return true;
    }
  }
@@ -63,11 +65,13 @@ public static class Network{
    if(!isConnected) return false;
    if(isServer){
      server.write(message);
+     println("server write : " + message);
      return true; 
    }
    
    if(!isServer && client.active()){
      client.write(message);
+     println("client write : " + message);
      return true; 
    }
    
@@ -78,12 +82,15 @@ public static class Network{
    if(!isConnected) return null;
    if(isServer ){
      client = server.available();
-     if(client != null)
-       return client.readString();
+     if(client != null){
+       String readString = client.readString();
+       return readString;
+     }
    }
    
    if(!isServer && client.active() && client.available()>0){
-     return client.readString();
+     String readString = client.readString();
+     return readString;
    }
    return null;
  }
@@ -96,7 +103,7 @@ public static class Network{
              Class<?> clazz = Class.forName(classToInstantiate);
              java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
              GameObject instance = (GameObject)constructor.newInstance(classToInstantiate, position);
-             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id);
+             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id + "endMessage");
            }
            catch (Exception e){
              //TODO Error message for class not found and other exceptions 

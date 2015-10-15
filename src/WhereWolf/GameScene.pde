@@ -40,16 +40,17 @@ private float maxCameraOrientation = 50;
 public boolean showMiniMap = true;
 
 void initGame() {
+  
+
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
  
-  Scene.startScene(new GameObject("Scene", new PVector(), null));
 
   
   resolutionStripSize = (width - (globalScale*128))/14;
   
-  map = new MapManager(8);
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
+  
   
   /*
   player = new WerewolfPrefab("One", GetSpawnPosition());
@@ -128,7 +129,6 @@ void gameDraw() {
  }
  
  manageCameraOrientation();
-
   Scene.draw();
  // popMatrix();
 

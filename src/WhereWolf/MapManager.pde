@@ -4,6 +4,7 @@ import java.io.FilenameFilter;
 public class MapManager {
 
   private byte[][] mapBlocks; // each Block is stocked as a byte, the four least significant bits defines the connections with neighboring Blocks, the 4 most significant bits are for used to get the specific type of brick to use
+  private int[][] selectedBlocks; // .txt file selected to define tiles in each blocks, must be sent by serer to copy map
   private GameObject[][] mapBlocksGameObjects;
   private TileType[][][] mapTiles; // [xBlock][yBlock][tileNumber] = tileType
 
@@ -50,7 +51,7 @@ public class MapManager {
   
   
   // constructor, the size of the map depends of the number of players
-  MapManager(int playerNumber) {
+  MapManager(int playerNumber, String mapModel) {
     if (playerNumber < 4) {
       mapSize = 6;
       numberOfBlocks = 7;
@@ -63,6 +64,7 @@ public class MapManager {
     }
 
     mapBlocks = new byte[mapSize][mapSize];
+    selectedBlocks = new int[mapSize][mapSize];
     mapBlocksGameObjects = new GameObject[mapSize][mapSize];
     mapTiles = new TileType[mapSize][mapSize][blockTileSizeX*blockTileSizeY];
     xSpawnPoints = new int[playerNumber];
@@ -83,10 +85,25 @@ public class MapManager {
     playerSpawnPointIterator = 0;
     spawnpointDelay = numberOfBlocks / playerNumber;
     nextSpawnPoint = numberOfBlocks;
-    MapGeneration();
+    
 
+    
+    if(Network.isServer){
+      MapGeneration();
+    } else{
+      GenerateMapFromModel(mapModel);
+    }
+    
+      
+    if(Network.isServer){
+      writeMapOnServer(playerNumber); 
+      writeSelectedBlocksOnServer();
+      writeSpawnPositionsOnServer();
+      CreateMap();
+    }
 
-    CreateMap();
+    
+
 
   }
 
@@ -473,7 +490,7 @@ public class MapManager {
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         if (mapBlocks[i][j] != 0) {
-
+          
           String folderPath = "";
 
           if ((mapBlocks[i][j] & (1<<3))==8) folderPath += '1';
@@ -494,10 +511,18 @@ public class MapManager {
 
           File dataFolder = new File(path); 
           
-          int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
-          int choosenBlock = (int)random(0, numberOfBlocksPossibilities);
+          int choosenBlock;
           
-          choosenBlock = numberOfBlocksPossibilities-1; // WARNING : line of code used to facilitate tests of level design, don't forget to comment this
+          if(Network.isServer){
+            int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
+            choosenBlock = (int)random(0, numberOfBlocksPossibilities);
+            selectedBlocks[i][j] = choosenBlock;
+          }
+          
+          else choosenBlock =  selectedBlocks[i][j];
+          
+          
+          //choosenBlock = numberOfBlocksPossibilities-1; // WARNING : line of code used to facilitate tests of level design, don't forget to comment this
           
           folderPath += "/"; // WARNING : this line must be done before the loadStrings
 
@@ -532,7 +557,6 @@ public class MapManager {
   public void CreateBlock(int xBlock, int yBlock) {
 
     mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(0, 0));
-
     for (int i=0; i<blockTileSizeY; i++) {
       for (int j=0; j<blockTileSizeX; j++) {
         CreateTile((xBlock*blockPixelSizeX + (j+4)*tilePixelSize), (yBlock*blockPixelSizeY + i*tilePixelSize), mapTiles[xBlock][yBlock][(i*blockTileSizeX)+j], mapBlocksGameObjects[xBlock][yBlock]);
@@ -554,7 +578,7 @@ public class MapManager {
 
   // Tile = 16x16 pixels 
   public void CreateTile(int posX, int posY, TileType type, GameObject blockGameObject) {
-
+    
     if (type != TileType.Empty) {
       GameObject tile = new GameObject("tile" + str(posX)+str(posY), new PVector(posX, posY), blockGameObject);
       tile.isTile = true;
@@ -1046,6 +1070,105 @@ public class MapManager {
     } 
   }
   
+  // TODO : use one method to remplace three methods used to write arrays on server (use argument)
+  public void writeMapOnServer(int playerNumber){
+    String mapComposition = "GeneratedMap " + playerNumber + " ";
+    
+    for(int j = 0 ; j<mapSize ; j++){
+      for(int i = 0 ; i<mapSize ; i++){
+        if(mapBlocks[i][j] == 0) mapComposition += "   ";
+        else if(mapBlocks[i][j] < 10) mapComposition += "0" + mapBlocks[i][j] + " ";
+        else mapComposition += mapBlocks[i][j] + " ";
+      } 
+      
+      mapComposition += "\n";
+    }
+    
+    Network.write(mapComposition+"endMessage");
+  }
+  
+  public void writeSelectedBlocksOnServer(){
+    
+      String mapComposition = "SelectedBlocks ";
+    
+      for(int i = 0 ; i<mapSize ; i++){
+        for(int j = 0 ; j<mapSize ; j++){
+          if(selectedBlocks[i][j] == 0) mapComposition += "   ";
+          else if(selectedBlocks[i][j] < 10) mapComposition += "0" + selectedBlocks[i][j] + " ";
+          else mapComposition += selectedBlocks[i][j] + " ";
+        } 
+        
+        mapComposition += "\n";
+      }
+      
+      Network.write(mapComposition+"endMessage");
+  }
+ 
+ public void writeSpawnPositionsOnServer(){
+     String mapComposition = "SpawnPositions ";
+    
+      for(int i = 0 ; i<xSpawnPoints.length ; i++){
+        mapComposition += xSpawnPoints[i] + " " + ySpawnPoints[i] + " ";
+      }
+      
+      Network.write(mapComposition+"endMessage");
+ }
+ 
+ public void CopySpawnPositionsFromModel(String dataString){
+   int data[] = int(split(dataString, ' ')); // Split values into an array
+   for(int i=0 ; i<data.length/2 ; i++){
+     xSpawnPoints[i] = data[2*i];
+     ySpawnPoints[i] = data[(2*i)+1];
+   }  
+ }
+  
+  private void GenerateMapFromModel(String mapModel){
+    
+    String[] mapLines = mapModel.split("\n",mapSize);
+    
+    for(int i=0 ; i<mapSize ; i++){
+      for(int j=0 ; j<mapSize ; j++){
+        
+        String blockValue = "";  
+        
+        if(mapLines[i].charAt(3*j) != ' '){
+          blockValue += mapLines[i].charAt(3*j);
+        }
+        if(mapLines[i].charAt((3*j)+1) != ' '){
+          blockValue += mapLines[i].charAt((3*j)+1);
+        } else {
+          blockValue = "0"; 
+        }
+        
+        mapBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
+      }
+    }
+    
+  }
+  
+  public void CopySelectedBlocksFromModel(String model){
+    
+    String[] mapLines = model.split("\n",mapSize);
+    
+    for(int i=0 ; i<mapSize ; i++){
+      for(int j=0 ; j<mapSize ; j++){
+        
+          String blockValue = "";  
+          
+          if(mapLines[i].charAt(3*j) != ' '){
+            blockValue += mapLines[i].charAt(3*j);
+          }
+          
+          if(mapLines[i].charAt((3*j)+1) != ' '){
+            blockValue += mapLines[i].charAt((3*j)+1);
+          } else {
+            blockValue = "0"; 
+          }
+          
+          selectedBlocks[i][j] = (byte)(Integer.parseInt(blockValue));
+      }
+    }
+  }
 
 }
 

@@ -71,7 +71,7 @@ public class NetworkView extends Component{
    String buffer = "";
    for(int i = 0; i< arg.length ; i++)
      buffer += " "+ arg[i];
-   Network.write("RPC "+ target.name() + " " + Network.localIP + " " + id + " " + callbackName + buffer);
+   Network.write("RPC "+ target.name() + " " + Network.localIP + " " + id + " " + callbackName + buffer + "endMessage");
  }
  
 }
