@@ -49,7 +49,9 @@ public class MapManager {
   
   public boolean lowPerf = false;
   
-  
+  public MapManager(){
+     
+  }
   // constructor, the size of the map depends of the number of players
   MapManager(int playerNumber, String mapModel) {
     if (playerNumber < 4) {
@@ -1081,7 +1083,7 @@ public class MapManager {
         else mapComposition += mapBlocks[i][j] + " ";
       } 
       
-      mapComposition += "\n";
+      mapComposition += " \n";
     }
     
     Network.write(mapComposition+"endMessage");
@@ -1098,7 +1100,7 @@ public class MapManager {
           else mapComposition += selectedBlocks[i][j] + " ";
         } 
         
-        mapComposition += "\n";
+        mapComposition += " \n";
       }
       
       Network.write(mapComposition+"endMessage");
@@ -1125,25 +1127,40 @@ public class MapManager {
   private void GenerateMapFromModel(String mapModel){
     
     String[] mapLines = mapModel.split("\n",mapSize);
-    
     for(int i=0 ; i<mapSize ; i++){
+      println(mapLines[i]);
       for(int j=0 ; j<mapSize ; j++){
         
-        String blockValue = "";  
+        //String blockValue = "";  
+        int blockValue = 0;
         
-        if(mapLines[i].charAt(3*j) != ' '){
-          blockValue += mapLines[i].charAt(3*j);
+        blockValue = 10 * Character.getNumericValue(mapLines[i].charAt(3*j));
+        if(blockValue < 0) blockValue = 0;
+        blockValue += Character.getNumericValue(mapLines[i].charAt((3*j)+1));
+        if(blockValue < 0) blockValue = 0;
+        
+        /*
+        if(mapLines[i].charAt(3*j) != ' ' && mapLines[i].charAt(3*j) != '0'){
+          //blockValue += mapLines[i].charAt(3*j);
+          blockValue = 10 * Character.getNumericValue(mapLines[i].charAt(3*j));
         }
-        if(mapLines[i].charAt((3*j)+1) != ' '){
-          blockValue += mapLines[i].charAt((3*j)+1);
+        if(mapLines[i].charAt((3*j)+1) != ' ' && mapLines[i].charAt(3*j)){
+          //blockValue += mapLines[i].charAt((3*j)+1);
+          blockValue += Character.getNumericValue(mapLines[i].charAt((3*j)+1));
         } else {
-          blockValue = "0"; 
+          //blockValue = "0"; 
         }
+        */
         
-        mapBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
+        println("blockValue = " + blockValue);
+        //println("int blockValue = " + Integer.parseInt(blockValue));
+        //mapBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
+        mapBlocks[j][i] = (byte)blockValue;
+        println("byte blockValue = " + mapBlocks[j][i]);
       }
     }
     
+    println("end of GenerateMapFromModel");
   }
   
   public void CopySelectedBlocksFromModel(String model){

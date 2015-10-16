@@ -1,6 +1,7 @@
 public class VillagerPrefab extends GameObject {
   
-  VillagerPrefab(String name, PVector position){
+
+  public VillagerPrefab(String name, PVector position){
     super(name, position);
     Scene.addChildren(this);
     

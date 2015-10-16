@@ -21,18 +21,21 @@ public static class NetworkViews{
   
   public static int add(NetworkView nv){
     
-    for(int i = 0; i<nbMaxIds;i++){
-     if(get(i) == null)
-       items.add(nv);
-       return i;
+    for(int i = 0; i<items.size() ; i++){
+     if(items.get(i) == null)
+       return(add(nv, i));
+       //return i;
     }
     
-    return -1;
+    items.add(nv);
+    return items.size()-1;
+    
+    //return -1;
     
   }
   
   public static int add(NetworkView nv, int index){
-    if(get(index) == null){
+    if(index < items.size() && items.get(index) == null){
        items.add(nv); 
        return index;
     }
@@ -59,6 +62,7 @@ public class NetworkView extends Component{
     
     NetworkView(){
       id = NetworkViews.add(this); 
+      println("id = " + id);
     }
     
  /*

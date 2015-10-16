@@ -40,7 +40,11 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
  public RPCHolder rpcHolder;
 
  
- GameObject(String n, PVector pos){
+ public GameObject(){
+    println("GO bad constructor called");  
+  }
+  
+ public GameObject(String n, PVector pos){
    position = pos;
    name = n;
   components = new ArrayList<Component>(); 

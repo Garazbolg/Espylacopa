@@ -95,21 +95,43 @@ public static class Network{
    return null;
  }
  
- public void Instantiate(String classToInstantiate, PVector position){
+ public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position){
    if(!isServer)
      write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y);
    else{
      try{
              Class<?> clazz = Class.forName(classToInstantiate);
-             java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
-             GameObject instance = (GameObject)constructor.newInstance(classToInstantiate, position);
-             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id + "endMessage");
+             //Class clazz = 
+             java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
+
+             println("check");
+             GameObject instance = (GameObject)constructor.newInstance(env, classToInstantiate, position);
+             println("check2");
+             
+             int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
+             
+             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
+             println("check3");
+             
+             return newObjectId;
            }
-           catch (Exception e){
+    catch(Exception e){
              //TODO Error message for class not found and other exceptions 
+             println("Instantiate exception ; " + e);
            }
    }
+   
+   return -1;
      
+ }
+ 
+ public static void MyInstantiate(WhereWolf env, Class classToInstantiate, PVector position){
+   try{ 
+     java.lang.reflect.Constructor constructor = classToInstantiate.getConstructor(WhereWolf.class, String.class, PVector.class);
+   } catch(Exception e){
+     //TODO Error message for class not found and other exceptions 
+     println("Instantiate exception ; " + e);
+   }
  }
  
  

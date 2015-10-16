@@ -81,9 +81,12 @@ public abstract class GameCharacter extends Component{
     staticColliderRect = new Rect(0, 4, 6, 24);
     runningColliderRect = new Rect(0, 4, 10, 24);
     
+    
   }
   
   public void init(){
+    
+    gameObject.addComponent(new NetworkView());
     
     invincibilityEffect = new GameObject("invincibilityEffect", new PVector(-1,5), this.gameObject);
     
@@ -124,7 +127,7 @@ public abstract class GameCharacter extends Component{
   public void update(){
     super.update();
     
-    if(isAlive){
+    if(isAlive && Network.isServer){
       if(canMove) {
         rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*movementSpeed, rigid.getVelocity().y));
       } else {

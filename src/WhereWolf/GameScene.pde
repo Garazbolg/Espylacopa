@@ -72,11 +72,21 @@ void initGame() {
   
   // Player = villager
   
+  
   player = new VillagerPrefab("One", GetSpawnPosition());
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
-  new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  
+  //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  
   spawnPosition = new PVector(player.position.x, player.position.y);
+  
+  
+  println(Network.Instantiate(this, "WhereWolf$VillagerPrefab", spawnPosition));
+  
+  
+  //Network.Instantiate("WhereWolf$GameObject", spawnPosition);
+  //Network.MyInstantiate(this, GameObject.class, spawnPosition);
   
   // Player = werewolf
   /*

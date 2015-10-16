@@ -49,7 +49,7 @@ public abstract class Updatable{
   private boolean activeInHierarchy;
   
   //ctor
-  Updatable(){
+  public Updatable(){
     activeSelf = true;
     activeInHierarchy = true;
     Updatables.add(this);
