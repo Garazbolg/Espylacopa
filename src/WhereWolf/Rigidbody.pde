@@ -27,13 +27,17 @@ public class Rigidbody extends Component implements DebugDrawable{
   
   //current opposing Vector
   private PVector coll = new PVector();
+
   
   //start
   public void start(){
+    
+    if(getGameObject() == null) return;
+    
     velocity = new PVector();
     Component c = getGameObject().getComponent(Collider.class);
-    if(c != null)
-      collider = (Collider)c;
+    if(c != null) collider = (Collider)c;
+    
   }
   
   //update

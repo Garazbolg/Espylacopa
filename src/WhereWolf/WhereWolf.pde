@@ -32,6 +32,11 @@ private SpriteSheet powerEffectSpriteSheet;
 
 MessageHandler messageHandler;
 
+int clientId = (int)random(2,255);
+String ipAdress = "127.0.0."+clientId;
+
+static WhereWolf globalEnv;
+
 void setup(){
   
  //Init Programme
@@ -43,7 +48,7 @@ void setup(){
  
  ImageManager.start(this);
  Input.start(this);
- messageHandler = new MessageHandler();
+ messageHandler = new MessageHandler(this);
  
  scene = SceneState.MainMenu;
  
@@ -77,7 +82,8 @@ void setup(){
   invincibilityEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "invincibilityEffectSpriteSheet.png", 6, 1);
   powerEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "powerEffectSpriteSheet.png", 3, 1);
   
-
+  globalEnv = this;
+  //Time.setTimeScale(0);
 
 }
  
@@ -89,11 +95,16 @@ void draw(){
   
   Input.update();
   
-
+  messageHandler.update();
+  
+  fill(0);
+  text(ipAdress, width - textWidth(ipAdress), 32);
     
   switch(scene){
    
    case MainMenu :
+    
+
     
     fill(255);
     launchButton.draw();   
@@ -125,8 +136,10 @@ void draw(){
     text(waitingPlayerString, width/2-textWidth(playString),height/2-textSize);
     text(playString, playButton.position.x - textWidth(playString)/2, playButton.position.y + textSize/4);
     
-    if(Input.getButtonDown("Jump")){
-        launchGame();
+    if(Input.getButtonDown("Jump")){          
+      Scene.startScene(new GameObject("Scene", new PVector(), null));
+      map = new MapManager(8, ""); 
+      launchGame();
     } else{  
       if(mouse.intersect(playButton)){
         fill(255,0,0);
@@ -145,7 +158,6 @@ void draw(){
 
     
     
-    messageHandler.update();
     
   break;
   
@@ -187,7 +199,7 @@ boolean sketchFullScreen() {
 }
 
 public void connectToServer(){
-  if(!Network.connectClient(this, "127.0.0.1", 12345)){
+  if(!Network.connectClient(this, "127.0.0.1", 12345, ipAdress)){
     Network.connectServer(this, 12345); 
     waitingPlayerString = "You are the host.\nWaiting for player connexion...";
     scene = SceneState.ServerWaitingForLaunch;

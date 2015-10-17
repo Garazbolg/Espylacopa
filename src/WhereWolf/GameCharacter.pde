@@ -71,33 +71,33 @@ public abstract class GameCharacter extends Component{
   
   protected float damageMultiplicator = 1;
   
-  
 
-   GameCharacter(){
-            
+  GameCharacter(){
     deadSpriteSheet = new SpriteSheet(characterSpriteSheetPath + "grave.png", 1, 1);
     dead = new State(new Animation(deadSpriteSheet, 0, false), 1);
 
     staticColliderRect = new Rect(0, 4, 6, 24);
     runningColliderRect = new Rect(0, 4, 10, 24);
-    
-    
   }
   
   public void init(){
-    
+
     gameObject.addComponent(new NetworkView());
+    this.addRPC("initPlayer", new DelegateInitPlayer(this));
+    
     
     invincibilityEffect = new GameObject("invincibilityEffect", new PVector(-1,5), this.gameObject);
     
     Parameters invincibilityEffectParams = new Parameters();
     invincibilityEffectParams.setBool("Start", true);
     
+    
     State invincibilityEffectAnimation =  new State(new Animation(invincibilityEffectSpriteSheet,0,true),15);
     invincibilityEffectAnimation.setScale(0.5f);
     
     AnimatorController invincibilityEffectAnimatorController = new AnimatorController(invincibilityEffectAnimation,invincibilityEffectParams);
     invincibilityEffect.addComponent(invincibilityEffectAnimatorController); 
+    
     
     invincibilityEffectAnimatorController.parameters.setBool("Visible", true);
     invincibilityEffectAnimatorController.getCurrentState().startState();
@@ -110,24 +110,46 @@ public abstract class GameCharacter extends Component{
     Parameters powerEffectParams = new Parameters();
     powerEffectParams.setBool("Start", true);
     
+    
     State powerEffectAnimation =  new State(new Animation(powerEffectSpriteSheet,0,true),15);
     powerEffectAnimation.setScale(0.75f);
     
     AnimatorController powerEffectAnimatorController = new AnimatorController(powerEffectAnimation,powerEffectParams);
     powerEffect.addComponent(powerEffectAnimatorController); 
     
+    
     powerEffectAnimatorController.parameters.setBool("Visible", true);
     powerEffectAnimatorController.getCurrentState().startState();
     
     powerEffect.setActive(false);
+    
+    gameObject.addComponent(new Collider(new Rect(0,0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight())));
+    characterCollider = (Collider)(gameObject.getComponent(Collider.class));
+    characterCollider.layer = CollisionLayer.CharacterBody;
+    characterCollider.passablePlatform = true;
+    
+    gameObject.addComponent(new Rigidbody());
+    rigid = (Rigidbody)(gameObject.getComponent(Rigidbody.class));
+    rigid.start();
+    
+   
 
+    //characterCollider.forceDebugDraw = true;
+    
+    gameObject.addComponent(animator);
   }
   
  
   public void update(){
+    if(!playerInitialized) return;
     super.update();
     
-    if(isAlive && Network.isServer){
+    if(rigid.getVelocity().x != 0 || rigid.getVelocity().y != 0){
+      //Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "endMessage");
+    }
+    
+    //println(isAlive);
+    if(isAlive){
       if(canMove) {
         rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*movementSpeed, rigid.getVelocity().y));
       } else {
@@ -437,6 +459,37 @@ public abstract class GameCharacter extends Component{
   
   public void setDamageMultiplicator(float newMultiplicator){
     damageMultiplicator = newMultiplicator; 
+  }
+  
+  public void initPlayer(){
+    player = this.gameObject;
+    playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
+    spawnPosition = new PVector(player.position.x, player.position.y);
+    
+    playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
+  
+    cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+  
+    cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
+    cameraHeight = displayHeight / globalScale;
+    
+    Updatables.start();
+  
+    scene = SceneState.Game;    
+    
+    playerInitialized = true; 
+    playerId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
+    
+    gameObject.printAllComponents();
+    gameObject.printGameObjectParents();
+    
+    gameObject.setActive(true);
+    rigid.isKinematic = false;
+  }
+  
+  
+  public void Debug(){
+     
   }
   
   

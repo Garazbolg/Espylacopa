@@ -62,7 +62,12 @@ public class NetworkView extends Component{
     
     NetworkView(){
       id = NetworkViews.add(this); 
-      println("id = " + id);
+      println("NetworkView add new id in NetworkViews, this id is = " + id);
+      println("NetworkView.gameObject = " + gameObject);
+    }
+    
+    public int getId(){
+      return id; 
     }
     
  /*

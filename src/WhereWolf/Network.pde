@@ -41,9 +41,12 @@ public static class Network{
    
  }
 
- public static boolean connectClient(processing.core.PApplet env,String serverIP,int port){
+ public static boolean connectClient(processing.core.PApplet env,String serverIP,int port, String ipAdress){
    if(isConnected) return false;
+   
    client = new Client(env,serverIP,port);
+
+   println("fail");
    
    if(!client.active()){
     client = null;
@@ -55,6 +58,7 @@ public static class Network{
     isConnected = true;
     isServer = false;
     server = null;
+    localIP = ipAdress;
     println("new client connected");
     return true;
    }
@@ -95,45 +99,43 @@ public static class Network{
    return null;
  }
  
- public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position){
+ public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String ipAdress){
    if(!isServer)
-     write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y);
+     write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + ipAdress + "endMessage");
    else{
      try{
+             println("Network.Instantiate : env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position + " ipAdress = " + ipAdress);
              Class<?> clazz = Class.forName(classToInstantiate);
-             //Class clazz = 
              java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
+println("global Chech : " + constructor + " " + env + " " + classToInstantiate + " " + position);
+// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
+// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
 
-             println("check");
-             GameObject instance = (GameObject)constructor.newInstance(env, classToInstantiate, position);
-             println("check2");
-             
+             println("Server Going to create intance");
+             println("Server - env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position);
+             GameObject instance = (GameObject)constructor.newInstance(globalEnv, classToInstantiate, position);
+             println("Server created intance");
+             instance.setActive(false);
+             println("Server instance set active to false");
+              println("after instance");
+              println("instance = " + instance);
+              println("net component = " + (NetworkView)instance.getComponent(NetworkView.class));
              int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
              
-             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
-             println("check3");
-             
+             Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
+             Network.write("RPC " + RPCMode.Specific + " " + ipAdress + " " + newObjectId + " initPlayerendMessage");                          
              return newObjectId;
            }
     catch(Exception e){
              //TODO Error message for class not found and other exceptions 
-             println("Instantiate exception ; " + e);
+             println("Server Instantiate exception ; " + e.getCause());
            }
    }
    
    return -1;
      
  }
- 
- public static void MyInstantiate(WhereWolf env, Class classToInstantiate, PVector position){
-   try{ 
-     java.lang.reflect.Constructor constructor = classToInstantiate.getConstructor(WhereWolf.class, String.class, PVector.class);
-   } catch(Exception e){
-     //TODO Error message for class not found and other exceptions 
-     println("Instantiate exception ; " + e);
-   }
- }
- 
+
  
  
  

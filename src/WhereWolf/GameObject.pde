@@ -89,6 +89,10 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   return position; 
  }
  
+ public void setPosition(PVector newPosition){
+   position = new PVector(newPosition.x, newPosition.y);
+ }
+ 
  //return the first component of type T and null if there isn't
  public Component getComponent(Class cl){
   for(Component c : components){
@@ -254,4 +258,47 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
     
     return globalPosition;
  }
+ 
+ 
+ 
+ //------------------------------------------
+ // DEBUG METHODS
+ //------------------------------------------
+ 
+ // print all components attached to gameObject
+ public void printAllComponents(){
+   
+   println("\n");
+   println("Debug Method - printAllComponents");
+   println("isServer = " + Network.isServer);
+   println("Gameobject " + this.name);
+   println("Parent = " + this.parent);
+   if(this.parent != null) println("Like parent is not null,  his name is : " + this.parent.name);
+   println("List of gameObject's components :");
+   for(Component c : components){
+     println(c);
+   } 
+  
+   println("End of Debug Method - printAllComponents");
+   println("\n");
+ }
+ 
+ // print hierarchy from gameObject to root
+ public void printGameObjectParents(){
+   
+   println("\n");
+   println("Debug Method - printGameObjectParents");
+   println("isServer = " + Network.isServer);
+   println("Current gameObject name is " + this.name);
+   println("Parents succession : ");
+   GameObject parentIterator = parent;
+    while(parentIterator != null){
+      println(parentIterator.name);
+      parentIterator = parentIterator.parent;
+    }
+    
+   println("End of Debug Method - printGameObjectParents");
+   println("\n");
+ }
+ 
 }

@@ -31,7 +31,9 @@ public class RPCHolder{
   }
   
   public void callback(String name,String [] argv){
+    println("RPCHolder - Callback with name = " + name + " and argv = " + argv); 
     Delegate func = delegates.get(name);
+    println("RPCHolder - Callback, func = " + func);
     if(func != null)
       func.call(argv);
   }

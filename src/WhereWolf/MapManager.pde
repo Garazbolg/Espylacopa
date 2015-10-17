@@ -47,7 +47,7 @@ public class MapManager {
   
   private int brokeProbability = 50;
   
-  public boolean lowPerf = false;
+  public boolean lowPerf = true;
   
   public MapManager(){
      
@@ -114,6 +114,7 @@ public class MapManager {
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         mapBlocks[i][j] = 0;
+        selectedBlocks[i][j] = -1;
       }
     }
 
@@ -595,6 +596,7 @@ public class MapManager {
       case Closed :     
         tile.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
         //((Collider)(tile.getComponent(Collider.class))).isTrigger = true;
+        //((Collider)(tile.getComponent(Collider.class))).forceDebugDraw = true;
         //tile.addComponent(new Sprite(tilesSpriteSheet, 1,0));
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "wall.png"));
         break;
@@ -1075,7 +1077,7 @@ public class MapManager {
   // TODO : use one method to remplace three methods used to write arrays on server (use argument)
   public void writeMapOnServer(int playerNumber){
     String mapComposition = "GeneratedMap " + playerNumber + " ";
-    
+    println("writeMapOnServer, playerNumber = " + playerNumber + " mapSize = " + mapSize);
     for(int j = 0 ; j<mapSize ; j++){
       for(int i = 0 ; i<mapSize ; i++){
         if(mapBlocks[i][j] == 0) mapComposition += "   ";
@@ -1095,9 +1097,9 @@ public class MapManager {
     
       for(int i = 0 ; i<mapSize ; i++){
         for(int j = 0 ; j<mapSize ; j++){
-          if(selectedBlocks[i][j] == 0) mapComposition += "   ";
-          else if(selectedBlocks[i][j] < 10) mapComposition += "0" + selectedBlocks[i][j] + " ";
-          else mapComposition += selectedBlocks[i][j] + " ";
+          if(selectedBlocks[j][i] == -1) mapComposition += "   ";
+          else if(selectedBlocks[j][i] < 10) mapComposition += "0" + selectedBlocks[j][i] + " ";
+          else mapComposition += selectedBlocks[j][i] + " ";
         } 
         
         mapComposition += " \n";
@@ -1125,8 +1127,15 @@ public class MapManager {
  }
   
   private void GenerateMapFromModel(String mapModel){
+    println("Begin of GenerateMapFromModel");
+    println("Map model :");
+    println(mapModel);
+    println("Map model ended");
     
     String[] mapLines = mapModel.split("\n",mapSize);
+    
+    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
+    
     for(int i=0 ; i<mapSize ; i++){
       println(mapLines[i]);
       for(int j=0 ; j<mapSize ; j++){
@@ -1152,11 +1161,11 @@ public class MapManager {
         }
         */
         
-        println("blockValue = " + blockValue);
+        //println("blockValue = " + blockValue);
         //println("int blockValue = " + Integer.parseInt(blockValue));
         //mapBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
         mapBlocks[j][i] = (byte)blockValue;
-        println("byte blockValue = " + mapBlocks[j][i]);
+        //println("byte blockValue = " + mapBlocks[j][i]);
       }
     }
     
@@ -1164,10 +1173,17 @@ public class MapManager {
   }
   
   public void CopySelectedBlocksFromModel(String model){
+    println("Begin of CopySelectedBlocksFromModel");
+    println("Selected block model :");
+    println(model);
+    println("Selected block ended");
     
     String[] mapLines = model.split("\n",mapSize);
+    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
     
     for(int i=0 ; i<mapSize ; i++){
+      println("mapLines["+i+"].length = " + mapLines[i].length());
+      println(mapLines[i]);
       for(int j=0 ; j<mapSize ; j++){
         
           String blockValue = "";  
@@ -1182,7 +1198,7 @@ public class MapManager {
             blockValue = "0"; 
           }
           
-          selectedBlocks[i][j] = (byte)(Integer.parseInt(blockValue));
+          selectedBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
       }
     }
   }

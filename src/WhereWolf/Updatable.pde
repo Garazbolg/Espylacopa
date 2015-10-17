@@ -16,6 +16,7 @@ public static class Updatables{
  //to add a Updatable to items
  public static void add(Updatable u){
     items.add(u); 
+    
     if(alreadyStarted)
       u.start();
  }

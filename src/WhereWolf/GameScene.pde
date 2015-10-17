@@ -9,6 +9,8 @@ int yBlock = 3;
 int previousYblock = 2;
 int previousXblock = 3;
 
+int playerId;
+
 GameObject trapsContainer;
 GameObject sawsContainer;
 GameObject sawsTrailContainer;
@@ -38,6 +40,9 @@ private float cameraOrientation = 0;
 private float maxCameraOrientation = 50;
 
 public boolean showMiniMap = true;
+
+private boolean playerInitialized = false;
+
 
 void initGame() {
   
@@ -70,10 +75,31 @@ void initGame() {
   trapsContainer = new GameObject("TrapsContainer", new PVector());
   Scene.addChildren(trapsContainer);
   
-  // Player = villager
   
   
-  player = new VillagerPrefab("One", GetSpawnPosition());
+  //int idTest = Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition());
+  //println("GameScene idTest = " + idTest);
+  
+  //player = new VillagerPrefab("One", GetSpawnPosition());
+  
+  println("GameScene - isServer = " + Network.isServer + " and call Network.Instantiate and ipAdress = " + ipAdress);
+  if(Network.isServer) {
+    
+    player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress)).gameObject;
+    println("Server play = " + player);
+    ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
+    
+  }
+  //else player = new VillagerPrefab("One", GetSpawnPosition());
+  else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  
+   
+  //Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  
+/*
+  
+  println("GameScene check et player = " + player);
+ 
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
   
@@ -82,17 +108,14 @@ void initGame() {
   spawnPosition = new PVector(player.position.x, player.position.y);
   
   
-  println(Network.Instantiate(this, "WhereWolf$VillagerPrefab", spawnPosition));
   
   
   //Network.Instantiate("WhereWolf$GameObject", spawnPosition);
-  //Network.MyInstantiate(this, GameObject.class, spawnPosition);
   
   // Player = werewolf
-  /*
-  player = new WerewolfPrefab("One", GetSpawnPosition());
-  playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  */
+  //player = new WerewolfPrefab("One", GetSpawnPosition());
+  //playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
+  
   
   
     
@@ -108,12 +131,12 @@ void initGame() {
 
   scene = SceneState.Game;
   
-
+*/
 
 }
 
 void gameDraw() {
-
+  //println("GameScene - gameDraw");
   Updatables.update();
   
 //Move
@@ -122,7 +145,7 @@ void gameDraw() {
   
   
   // DEBUG
-  if(Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
+  if(Network.isServer && Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
 
   if(! Constants.DEBUG_MODE)
   //Draw
@@ -133,12 +156,13 @@ void gameDraw() {
 
 
  // pushMatrix();
+ 
  if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
   else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
  }
  
- manageCameraOrientation();
+ //manageCameraOrientation();
   Scene.draw();
  // popMatrix();
 
@@ -146,6 +170,7 @@ void gameDraw() {
   
 
   //Debug Draw
+  
   if (!Constants.DEBUG_MODE){
     cameraDrawDebug();
     Scene.debugDraw();
@@ -163,6 +188,7 @@ void gameDraw() {
     rect(0, 0, globalScale*resolutionStripSize, height); // bande noire gauche
     rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
   }
+  
   
   playerCharacterComponent.drawLife();
 
@@ -190,8 +216,8 @@ void gameDraw() {
     fill(255, 0, 0);
     text(Time.getFPS(), 0, textAscent());
   }
-  
   if(map.BlockOutOfMap(xBlock, yBlock)){
+    
      ResetToSpawnPosition();
   }
 }
@@ -330,7 +356,6 @@ public void manageCameraOrientation(){
 public float getCameraOrientation(){
   return cameraOrientation; 
 }
-
 
 
     
