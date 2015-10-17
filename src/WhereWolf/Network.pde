@@ -29,6 +29,7 @@ public static class Network{
    isConnected = true;
     isServer = true;
     client = null;
+    println("server connected");
     return true;
    }
    catch(RuntimeException e){
@@ -40,9 +41,12 @@ public static class Network{
    
  }
 
- public static boolean connectClient(processing.core.PApplet env,String serverIP,int port){
+ public static boolean connectClient(processing.core.PApplet env,String serverIP,int port, String ipAdress){
    if(isConnected) return false;
+   
    client = new Client(env,serverIP,port);
+
+   println("fail");
    
    if(!client.active()){
     client = null;
@@ -54,6 +58,8 @@ public static class Network{
     isConnected = true;
     isServer = false;
     server = null;
+    localIP = ipAdress;
+    println("new client connected");
     return true;
    }
  }
@@ -63,11 +69,13 @@ public static class Network{
    if(!isConnected) return false;
    if(isServer){
      server.write(message);
+     println("server write : " + message);
      return true; 
    }
    
    if(!isServer && client.active()){
      client.write(message);
+     println("client write : " + message);
      return true; 
    }
    
@@ -78,33 +86,56 @@ public static class Network{
    if(!isConnected) return null;
    if(isServer ){
      client = server.available();
-     if(client != null)
-       return client.readString();
+     if(client != null){
+       String readString = client.readString();
+       return readString;
+     }
    }
    
    if(!isServer && client.active() && client.available()>0){
-     return client.readString();
+     String readString = client.readString();
+     return readString;
    }
    return null;
  }
  
- public void Instantiate(String classToInstantiate, PVector position){
+ public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String ipAdress){
    if(!isServer)
-     write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y);
+     write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + ipAdress + "endMessage");
    else{
      try{
+             println("Network.Instantiate : env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position + " ipAdress = " + ipAdress);
              Class<?> clazz = Class.forName(classToInstantiate);
-             java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
-             GameObject instance = (GameObject)constructor.newInstance(classToInstantiate, position);
-             Network.write("Instantiate " + classToInstantiate + " " + position.x + " " + position.y + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id);
+             java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
+println("global Chech : " + constructor + " " + env + " " + classToInstantiate + " " + position);
+// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
+// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
+
+             println("Server Going to create intance");
+             println("Server - env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position);
+             GameObject instance = (GameObject)constructor.newInstance(globalEnv, classToInstantiate, position);
+             println("Server created intance");
+             instance.setActive(false);
+             println("Server instance set active to false");
+              println("after instance");
+              println("instance = " + instance);
+              println("net component = " + (NetworkView)instance.getComponent(NetworkView.class));
+             int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
+             
+             Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
+             Network.write("RPC " + RPCMode.Specific + " " + ipAdress + " " + newObjectId + " initPlayerendMessage");                          
+             return newObjectId;
            }
-           catch (Exception e){
+    catch(Exception e){
              //TODO Error message for class not found and other exceptions 
+             println("Server Instantiate exception ; " + e.getCause());
            }
    }
+   
+   return -1;
      
  }
- 
+
  
  
  

@@ -16,6 +16,7 @@ public static class Updatables{
  //to add a Updatable to items
  public static void add(Updatable u){
     items.add(u); 
+    
     if(alreadyStarted)
       u.start();
  }
@@ -49,7 +50,7 @@ public abstract class Updatable{
   private boolean activeInHierarchy;
   
   //ctor
-  Updatable(){
+  public Updatable(){
     activeSelf = true;
     activeInHierarchy = true;
     Updatables.add(this);

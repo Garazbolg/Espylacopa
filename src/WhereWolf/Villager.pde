@@ -33,7 +33,7 @@ public class Villager extends GameCharacter {
     
     super();
     
-    SetLife(3);
+    SetLife(30);
     
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     
@@ -55,19 +55,37 @@ public class Villager extends GameCharacter {
     animator.parameters.setBool("Visible", true);
     
     
-    activateBlinkOfInvulnerability(); 
+    activateBlinkOfInvulnerability(takeDamageCooldown); 
     availableTraps = maxTrapsNumber; 
     
   }
   
+  
+  public void init(){
+    super.init();
+    
+    leftShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
+    leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
+    Collider leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
+    leftShotAttackCollider.isTrigger = true;
+    
+    
+    rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
+    rightShotAttack.addComponent(new Collider(new Rect(53, 0, 88, 10)));
+    Collider rightShotAttackCollider = (Collider)rightShotAttack.getComponent(Collider.class);
+    rightShotAttackCollider.isTrigger = true;  
+ 
+  }
+  
   public void update(){
+    if(!playerInitialized) return;
     if(isAlive){
       
       if(!placingTrap){
       
       
         super.update();
-  
+        //println("update");
         if(showWeapon && fireShotFacingRight != facingRight){
            fireShotFacingRight = facingRight;
            Sprite fire = (Sprite)barrelGun.getComponent(Sprite.class);
@@ -165,7 +183,7 @@ public class Villager extends GameCharacter {
     animator.getCurrentState().startState(); // To have a fixed height for the weapon
     barrelGun.setActive(true);
     fireShotChrono = millis();
-    
+    println("Fire - " + rightShotAttackCollider + " " + leftShotAttackCollider);
     if(facingRight) DamageClosestCollider(rightShotAttackCollider, 1, true);
     else DamageClosestCollider(leftShotAttackCollider, 1, false);
     
@@ -175,8 +193,9 @@ public class Villager extends GameCharacter {
     ArrayList<Collider> allColliders = collider.getCurrentTriggers();
     int  closestColliderIndex = -1;
     float closestPositionX = (float)Double.POSITIVE_INFINITY;
-   
+   println("size + " + allColliders.size());
     for(int i=0 ; i<allColliders.size() ; i++){
+      println(allColliders.get(i).gameObject.getComponent(GameCharacter.class));
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
         if(allColliders.get(i).gameObject != this.gameObject && ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).isAlive()){
           if(abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
@@ -188,7 +207,8 @@ public class Villager extends GameCharacter {
     }
     
     if(closestColliderIndex > -1){
-      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position); 
+      println("check");
+      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position); 
     }
   } 
   
@@ -211,23 +231,7 @@ public class Villager extends GameCharacter {
     barrelGun.setActive(false);
     
   }
-  
-  public void setLeftShotAttack(GameObject newLeftAttack){
-    leftShotAttack = newLeftAttack;
-  }
-    
-  public void setLeftShotAttackCollider(Collider newLeftShotAttackCollider){
-    leftShotAttackCollider = newLeftShotAttackCollider;
-  }
-    
-      
-  public void setRightShotAttack(GameObject newLeftAttack){
-    leftShotAttack = newLeftAttack;
-  }
-    
-  public void setRightShotAttackCollider(Collider newRightShotAttackCollider){
-    rightShotAttackCollider = newRightShotAttackCollider;
-  }
+
 
   public void placeTrap(){
     new TrapPrefab(gameObject.position);

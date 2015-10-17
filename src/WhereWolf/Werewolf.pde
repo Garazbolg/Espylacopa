@@ -55,6 +55,8 @@ public class Werewolf extends GameCharacter {
   private AnimatorController transformationEffectAnimatorController;
   
 
+  
+
 
   Werewolf() {
 
@@ -95,10 +97,50 @@ public class Werewolf extends GameCharacter {
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png");    
     
-    activateBlinkOfInvulnerability(); 
+    activateBlinkOfInvulnerability(takeDamageCooldown); 
     
   }
 
+  
+  public void init(){
+    super.init();
+    
+    leftHumanAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
+    leftHumanAttack.addComponent(new Collider(new Rect(3, 0, 15, 20)));
+    Collider leftHumanAttackCollider = (Collider)leftHumanAttack.getComponent(Collider.class);
+    leftHumanAttackCollider.isTrigger = true;
+    
+    GameObject rightHumanAttack = new GameObject("RigtHumanAttack", new PVector(-10,2), gameObject);
+    rightHumanAttack.addComponent(new Collider(new Rect(15, 0, 15, 20)));
+    Collider rightHumanAttackCollider = (Collider)rightHumanAttack.getComponent(Collider.class);
+    rightHumanAttackCollider.isTrigger = true;
+    
+    leftWerewolfAttack = new GameObject("LeftWerewolfAttack", new PVector(-10,2), gameObject);
+    leftWerewolfAttack.addComponent(new Collider(new Rect(0, 5, 22, 30)));
+    Collider leftWerewolfAttackCollider = (Collider)leftWerewolfAttack.getComponent(Collider.class);
+    leftWerewolfAttackCollider.isTrigger = true;
+        
+     rightWerewolfAttack = new GameObject("RigtWerewolfAttack", new PVector(-10,2), gameObject);
+    rightWerewolfAttack.addComponent(new Collider(new Rect(22, 5, 22, 30)));
+    Collider rightWerewolfAttackCollider = (Collider)rightWerewolfAttack.getComponent(Collider.class);
+    rightWerewolfAttackCollider.isTrigger = true;
+   
+    
+    transformationEffect = new GameObject("transformationEffect", new PVector(), gameObject);
+    
+    Parameters transformationEffectParams = new Parameters();
+    transformationEffectParams.setBool("Start", true);
+    transformationEffectParams.setBool("Visible", false);
+    
+    State effectAnimation =  new State(new Animation(transformationEffectSpriteSheet,0,false),15);
+    effectAnimation.setScale(1.5f);
+    
+    transformationEffectAnimatorController = new AnimatorController(effectAnimation,transformationEffectParams);
+    transformationEffect.addComponent(transformationEffectAnimatorController);
+         
+  }
+  
+  
   public void update() {
 
     if(isAlive){
@@ -153,7 +195,7 @@ public class Werewolf extends GameCharacter {
     ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
     gameObject.position.add(new PVector(0, -7)); 
 
-    SetArmorLife(2);
+    AddArmorLife(2);
     AdaptCollidersWithTransformation();
     
     transformationEffectAnimatorController.parameters.setBool("Visible", true);
@@ -171,7 +213,9 @@ public class Werewolf extends GameCharacter {
     ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
     gameObject.position.add(new PVector(0, 7));
 
-    SetArmorLife(0);
+    if(armorLife > 1) DecreaseArmorLife(2);
+    else if(armorLife == 1) DecreaseArmorLife(1);
+    
     AdaptCollidersWithTransformation();
   }
 
@@ -200,7 +244,7 @@ public class Werewolf extends GameCharacter {
     for(int i=0 ; i<allColliders.size() ; i++){
       if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
         if(allColliders.get(i).gameObject != gameObject){
-          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife(damage, gameObject.position);
+          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position);
         }
       }
     }
@@ -249,43 +293,6 @@ public class Werewolf extends GameCharacter {
     UpdateCollider();
   }
   
-
-  public void setLeftHumanAttack(GameObject newLeftHumanAttack){
-    leftHumanAttack = newLeftHumanAttack;
-  }
-    
-  public void setLeftHumanAttackCollider(Collider newLeftHumanAttackCollider){
-    leftHumanAttackCollider = newLeftHumanAttackCollider;
-  }
-    
-  public void setRightHumanAttack(GameObject newRightHumanAttack){
-    rightHumanAttack = newRightHumanAttack;
-  }
-    
-  public void setRightHumanAttackCollider(Collider newRightHumanAttackCollider){
-    rightHumanAttackCollider = newRightHumanAttackCollider;
-  }
-    
-  public void setLeftWerewolfAttack(GameObject newLeftWerewolfAttack){
-    leftWerewolfAttack = newLeftWerewolfAttack;
-  }
-    
-  public void setLeftWerewolfAttackCollider(Collider newLeftWerewolfAttackCollider){
-    leftWerewolfAttackCollider = newLeftWerewolfAttackCollider;
-  }
-
-  public void setRightWerewolfAttack(GameObject newRightWerewolfAttack){
-    rightWerewolfAttack = newRightWerewolfAttack;
-  }
-    
-  public void setRightWerewolfAttackCollider(Collider newRightWerewolfAttackCollider){
-    rightWerewolfAttackCollider = newRightWerewolfAttackCollider;
-  }
-  
-  public void setTransformationEffect(GameObject go, AnimatorController anim){
-    transformationEffect = go; 
-    transformationEffectAnimatorController = anim;
-  }
 
   
 }

@@ -4,6 +4,7 @@ import java.io.FilenameFilter;
 public class MapManager {
 
   private byte[][] mapBlocks; // each Block is stocked as a byte, the four least significant bits defines the connections with neighboring Blocks, the 4 most significant bits are for used to get the specific type of brick to use
+  private int[][] selectedBlocks; // .txt file selected to define tiles in each blocks, must be sent by serer to copy map
   private GameObject[][] mapBlocksGameObjects;
   private TileType[][][] mapTiles; // [xBlock][yBlock][tileNumber] = tileType
 
@@ -45,12 +46,14 @@ public class MapManager {
   private boolean[][] visitedBlocks;
   
   private int brokeProbability = 50;
-   
-
-
+  
+  public boolean lowPerf = true;
+  
+  public MapManager(){
+     
+  }
   // constructor, the size of the map depends of the number of players
-  MapManager(int playerNumber) {
-
+  MapManager(int playerNumber, String mapModel) {
     if (playerNumber < 4) {
       mapSize = 6;
       numberOfBlocks = 7;
@@ -63,6 +66,7 @@ public class MapManager {
     }
 
     mapBlocks = new byte[mapSize][mapSize];
+    selectedBlocks = new int[mapSize][mapSize];
     mapBlocksGameObjects = new GameObject[mapSize][mapSize];
     mapTiles = new TileType[mapSize][mapSize][blockTileSizeX*blockTileSizeY];
     xSpawnPoints = new int[playerNumber];
@@ -83,19 +87,34 @@ public class MapManager {
     playerSpawnPointIterator = 0;
     spawnpointDelay = numberOfBlocks / playerNumber;
     nextSpawnPoint = numberOfBlocks;
-    MapGeneration();
+    
 
+    
+    if(Network.isServer){
+      MapGeneration();
+    } else{
+      GenerateMapFromModel(mapModel);
+    }
+    
+      
+    if(Network.isServer){
+      writeMapOnServer(playerNumber); 
+      writeSelectedBlocksOnServer();
+      writeSpawnPositionsOnServer();
+      CreateMap();
+    }
 
-    CreateMap();
+    
+
 
   }
 
   public void MapGeneration() {
-
     // initialization, get a empty map
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         mapBlocks[i][j] = 0;
+        selectedBlocks[i][j] = -1;
       }
     }
 
@@ -103,7 +122,7 @@ public class MapManager {
     generationOriginY = mapSize/2;
 
     while (numberOfBlocks>0) {
-      if (mapBlocks[generationOriginX][generationOriginY] != 15) { // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
+      if (mapBlocks[generationOriginX][generationOriginY] != 15 && canHaveNewNeighbor(generationOriginX, generationOriginY)) { // 15 = (0000 1111)2 if the origin of map generation doesn't already have 4 neighbors
         createBlock(generationOriginX, generationOriginY);
       }
 
@@ -121,7 +140,11 @@ public class MapManager {
     BreakWalls();
     
     DefineTilesForAllBlock();
-    DefineMiniMapSize();
+    //DefineMiniMapSize();
+  }
+  
+  public boolean canHaveNewNeighbor(int x, int y){
+    return( (x > 0 && mapBlocks[x-1][y] == 0) || (y > 0 && mapBlocks[x][y-1] == 0) || (x+1 < mapSize && mapBlocks[x+1][y] == 0) || (y+1 < mapSize && mapBlocks[x][y+1] == 0) ); 
   }
 
   public void createBlock(int x, int y) {
@@ -245,13 +268,8 @@ public class MapManager {
                  brokenWalls++;
                }
                
-               println(brokenWalls + " " + breakableWalls); 
              }
            }
-           
-           
-           
-           
            
            yBlock++;
          }
@@ -332,6 +350,7 @@ public class MapManager {
     }
     
     popMatrix();
+    strokeWeight(1); // Important to reset strokeWeight
   }
 
   // Tile = 16x16 pixels 
@@ -359,7 +378,7 @@ public class MapManager {
     }
   }
 
-  // OBSOLTE METHOD
+  // OBSOLETE METHOD
   public void DrawMap(int xCurrentBlock, int yCurrentBlock) {
 
     if (xCurrentBlock < 0 || xCurrentBlock >= mapSize || yCurrentBlock < 0 || yCurrentBlock >= mapSize) {
@@ -465,7 +484,7 @@ public class MapManager {
   }
   
   public boolean BlockOutOfMap(int xBlock, int yBlock){
-    return(mapBlocks[xBlock][yBlock]==0 || xBlock < 0 || xBlock >= mapSize || yBlock < 0 || yBlock >= mapSize);
+    return(xBlock < 0 || xBlock >= mapSize || yBlock < 0 || yBlock >= mapSize || mapBlocks[xBlock][yBlock]==0);
   }
 
   public void DefineTilesForAllBlock() {
@@ -474,7 +493,7 @@ public class MapManager {
     for (int i=0; i<mapSize; i++) {
       for (int j=0; j<mapSize; j++) {
         if (mapBlocks[i][j] != 0) {
-
+          
           String folderPath = "";
 
           if ((mapBlocks[i][j] & (1<<3))==8) folderPath += '1';
@@ -494,9 +513,20 @@ public class MapManager {
           String path = sketchPath + "/data" + "/" + folderPath; 
 
           File dataFolder = new File(path); 
-
-          int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
-          int choosenBlock = (int)random(0, numberOfBlocksPossibilities);
+          
+          int choosenBlock;
+          
+          if(Network.isServer){
+            int numberOfBlocksPossibilities = dataFolder.list().length-1; // -1 to not take the Void.txt file, which represent an empty template used to create new blocks
+            choosenBlock = (int)random(0, numberOfBlocksPossibilities);
+            selectedBlocks[i][j] = choosenBlock;
+          }
+          
+          else choosenBlock =  selectedBlocks[i][j];
+          
+          
+          //choosenBlock = numberOfBlocksPossibilities-1; // WARNING : line of code used to facilitate tests of level design, don't forget to comment this
+          
           folderPath += "/"; // WARNING : this line must be done before the loadStrings
 
           String[] data=loadStrings(folderPath + char(choosenBlock+48) + ".txt");
@@ -530,7 +560,6 @@ public class MapManager {
   public void CreateBlock(int xBlock, int yBlock) {
 
     mapBlocksGameObjects[xBlock][yBlock] = new GameObject("Block"+str(xBlock)+str(yBlock), new PVector(0, 0));
-
     for (int i=0; i<blockTileSizeY; i++) {
       for (int j=0; j<blockTileSizeX; j++) {
         CreateTile((xBlock*blockPixelSizeX + (j+4)*tilePixelSize), (yBlock*blockPixelSizeY + i*tilePixelSize), mapTiles[xBlock][yBlock][(i*blockTileSizeX)+j], mapBlocksGameObjects[xBlock][yBlock]);
@@ -552,7 +581,7 @@ public class MapManager {
 
   // Tile = 16x16 pixels 
   public void CreateTile(int posX, int posY, TileType type, GameObject blockGameObject) {
-
+    
     if (type != TileType.Empty) {
       GameObject tile = new GameObject("tile" + str(posX)+str(posY), new PVector(posX, posY), blockGameObject);
       tile.isTile = true;
@@ -561,12 +590,13 @@ public class MapManager {
 
       case Opened :  
         //tile.addComponent(new Sprite(tilesSpriteSheet, 17,15));
-        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        if(!lowPerf) tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
         break;
 
       case Closed :     
         tile.addComponent(new Collider(new Rect(0, 0, tilePixelSize, tilePixelSize)));
         //((Collider)(tile.getComponent(Collider.class))).isTrigger = true;
+        //((Collider)(tile.getComponent(Collider.class))).forceDebugDraw = true;
         //tile.addComponent(new Sprite(tilesSpriteSheet, 1,0));
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "wall.png"));
         break;
@@ -710,8 +740,26 @@ public class MapManager {
         
         break;  
         
-      case CeilingTrap :
-        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "ceilingTrap.png", 0.35f));     
+      case Canvas :
+        
+        tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+
+        GameObject canvasBackground = new GameObject("canvasBackground", new PVector(0, -tilePixelSize), tile);
+        canvasBackground.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground.isChildTile = true;
+        
+        GameObject canvasBackground2 = new GameObject("canvasBackground2", new PVector(tilePixelSize, 0), tile);
+        canvasBackground2.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground2.isChildTile = true;
+
+        GameObject canvasBackground3 = new GameObject("canvasBackground3", new PVector(tilePixelSize, -tilePixelSize), tile);
+        canvasBackground3.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        canvasBackground3.isChildTile = true;
+
+        GameObject canvas = new GameObject("canvas", new PVector(tilePixelSize/2, -5), tile);
+        canvas.isChildTile = true;
+        canvas.addComponent(new Sprite(mapTilesSpriteSheetPath + "canvas.png", 0.66f));        
+                
         break;
         
       case Saw :
@@ -850,7 +898,8 @@ public class MapManager {
         upSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "horizontalSpikes.png"));
         ((Sprite)(upSpikes.getComponent(Sprite.class))).setScale(0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(0, 5, tilePixelSize, tilePixelSize/2), 1));
+        tile.addComponent(new DamageCollider(new Rect(0, 4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
       
@@ -863,7 +912,8 @@ public class MapManager {
         downSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "horizontalSpikes.png"));
         ((Sprite)(downSpikes.getComponent(Sprite.class))).setScale(0.5f, -0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(0, -5, tilePixelSize, tilePixelSize/2), 1));
+        tile.addComponent(new DamageCollider(new Rect(0, -4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
         
@@ -876,7 +926,8 @@ public class MapManager {
         leftSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "verticalSpikes.png"));
         ((Sprite)(leftSpikes.getComponent(Sprite.class))).setScale(-0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(5, 0, tilePixelSize/2, tilePixelSize), 1));
+        tile.addComponent(new DamageCollider(new Rect(4, 0, (tilePixelSize/2 - 1), (tilePixelSize -3)), 1));
+        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
            
@@ -889,7 +940,8 @@ public class MapManager {
         rightSpikes.addComponent(new Sprite(mapTilesSpriteSheetPath + "verticalSpikes.png"));
         ((Sprite)(rightSpikes.getComponent(Sprite.class))).setScale(0.5f, 0.5f);
               
-        tile.addComponent(new DamageCollider(new Rect(-5, 0, tilePixelSize/2, tilePixelSize), 1));
+        tile.addComponent(new DamageCollider(new Rect(-4, 0, (tilePixelSize/2 - 1), (tilePixelSize -3)), 1));
+        //((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
       
@@ -1021,5 +1073,135 @@ public class MapManager {
       println("");
     } 
   }
+  
+  // TODO : use one method to remplace three methods used to write arrays on server (use argument)
+  public void writeMapOnServer(int playerNumber){
+    String mapComposition = "GeneratedMap " + playerNumber + " ";
+    println("writeMapOnServer, playerNumber = " + playerNumber + " mapSize = " + mapSize);
+    for(int j = 0 ; j<mapSize ; j++){
+      for(int i = 0 ; i<mapSize ; i++){
+        if(mapBlocks[i][j] == 0) mapComposition += "   ";
+        else if(mapBlocks[i][j] < 10) mapComposition += "0" + mapBlocks[i][j] + " ";
+        else mapComposition += mapBlocks[i][j] + " ";
+      } 
+      
+      mapComposition += " \n";
+    }
+    
+    Network.write(mapComposition+"endMessage");
+  }
+  
+  public void writeSelectedBlocksOnServer(){
+    
+      String mapComposition = "SelectedBlocks ";
+    
+      for(int i = 0 ; i<mapSize ; i++){
+        for(int j = 0 ; j<mapSize ; j++){
+          if(selectedBlocks[j][i] == -1) mapComposition += "   ";
+          else if(selectedBlocks[j][i] < 10) mapComposition += "0" + selectedBlocks[j][i] + " ";
+          else mapComposition += selectedBlocks[j][i] + " ";
+        } 
+        
+        mapComposition += " \n";
+      }
+      
+      Network.write(mapComposition+"endMessage");
+  }
+ 
+ public void writeSpawnPositionsOnServer(){
+     String mapComposition = "SpawnPositions ";
+    
+      for(int i = 0 ; i<xSpawnPoints.length ; i++){
+        mapComposition += xSpawnPoints[i] + " " + ySpawnPoints[i] + " ";
+      }
+      
+      Network.write(mapComposition+"endMessage");
+ }
+ 
+ public void CopySpawnPositionsFromModel(String dataString){
+   int data[] = int(split(dataString, ' ')); // Split values into an array
+   for(int i=0 ; i<data.length/2 ; i++){
+     xSpawnPoints[i] = data[2*i];
+     ySpawnPoints[i] = data[(2*i)+1];
+   }  
+ }
+  
+  private void GenerateMapFromModel(String mapModel){
+    println("Begin of GenerateMapFromModel");
+    println("Map model :");
+    println(mapModel);
+    println("Map model ended");
+    
+    String[] mapLines = mapModel.split("\n",mapSize);
+    
+    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
+    
+    for(int i=0 ; i<mapSize ; i++){
+      println(mapLines[i]);
+      for(int j=0 ; j<mapSize ; j++){
+        
+        //String blockValue = "";  
+        int blockValue = 0;
+        
+        blockValue = 10 * Character.getNumericValue(mapLines[i].charAt(3*j));
+        if(blockValue < 0) blockValue = 0;
+        blockValue += Character.getNumericValue(mapLines[i].charAt((3*j)+1));
+        if(blockValue < 0) blockValue = 0;
+        
+        /*
+        if(mapLines[i].charAt(3*j) != ' ' && mapLines[i].charAt(3*j) != '0'){
+          //blockValue += mapLines[i].charAt(3*j);
+          blockValue = 10 * Character.getNumericValue(mapLines[i].charAt(3*j));
+        }
+        if(mapLines[i].charAt((3*j)+1) != ' ' && mapLines[i].charAt(3*j)){
+          //blockValue += mapLines[i].charAt((3*j)+1);
+          blockValue += Character.getNumericValue(mapLines[i].charAt((3*j)+1));
+        } else {
+          //blockValue = "0"; 
+        }
+        */
+        
+        //println("blockValue = " + blockValue);
+        //println("int blockValue = " + Integer.parseInt(blockValue));
+        //mapBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
+        mapBlocks[j][i] = (byte)blockValue;
+        //println("byte blockValue = " + mapBlocks[j][i]);
+      }
+    }
+    
+    println("end of GenerateMapFromModel");
+  }
+  
+  public void CopySelectedBlocksFromModel(String model){
+    println("Begin of CopySelectedBlocksFromModel");
+    println("Selected block model :");
+    println(model);
+    println("Selected block ended");
+    
+    String[] mapLines = model.split("\n",mapSize);
+    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
+    
+    for(int i=0 ; i<mapSize ; i++){
+      println("mapLines["+i+"].length = " + mapLines[i].length());
+      println(mapLines[i]);
+      for(int j=0 ; j<mapSize ; j++){
+        
+          String blockValue = "";  
+          
+          if(mapLines[i].charAt(3*j) != ' '){
+            blockValue += mapLines[i].charAt(3*j);
+          }
+          
+          if(mapLines[i].charAt((3*j)+1) != ' '){
+            blockValue += mapLines[i].charAt((3*j)+1);
+          } else {
+            blockValue = "0"; 
+          }
+          
+          selectedBlocks[j][i] = (byte)(Integer.parseInt(blockValue));
+      }
+    }
+  }
+
 }
 

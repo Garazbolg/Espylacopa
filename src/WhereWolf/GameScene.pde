@@ -9,6 +9,8 @@ int yBlock = 3;
 int previousYblock = 2;
 int previousXblock = 3;
 
+int playerId;
+
 GameObject trapsContainer;
 GameObject sawsContainer;
 GameObject sawsTrailContainer;
@@ -35,20 +37,25 @@ private boolean playerImmobileAndLookUp;
 private boolean playerImmobileAndLookDown;
 
 private float cameraOrientation = 0;
-private float maxCameraOrientation = 30;
+private float maxCameraOrientation = 50;
+
+public boolean showMiniMap = true;
+
+private boolean playerInitialized = false;
+
 
 void initGame() {
   
+
   globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
  
-  Scene.startScene(new GameObject("Scene", new PVector(), null));
 
   
   resolutionStripSize = (width - (globalScale*128))/14;
   
-  map = new MapManager(8);
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
+  
   
   /*
   player = new WerewolfPrefab("One", GetSpawnPosition());
@@ -68,19 +75,47 @@ void initGame() {
   trapsContainer = new GameObject("TrapsContainer", new PVector());
   Scene.addChildren(trapsContainer);
   
-  // Player = villager
   
-  player = new VillagerPrefab("One", GetSpawnPosition());
+  
+  //int idTest = Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition());
+  //println("GameScene idTest = " + idTest);
+  
+  //player = new VillagerPrefab("One", GetSpawnPosition());
+  
+  println("GameScene - isServer = " + Network.isServer + " and call Network.Instantiate and ipAdress = " + ipAdress);
+  if(Network.isServer) {
+    
+    player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress)).gameObject;
+    println("Server play = " + player);
+    ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
+    
+  }
+  //else player = new VillagerPrefab("One", GetSpawnPosition());
+  else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  
+   
+  //Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  
+/*
+  
+  println("GameScene check et player = " + player);
+ 
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
-  new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  
+  //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
+  
   spawnPosition = new PVector(player.position.x, player.position.y);
   
+  
+  
+  
+  //Network.Instantiate("WhereWolf$GameObject", spawnPosition);
+  
   // Player = werewolf
-  /*
-  player = new WerewolfPrefab("One", GetSpawnPosition());
-  playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  */
+  //player = new WerewolfPrefab("One", GetSpawnPosition());
+  //playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
+  
   
   
     
@@ -96,12 +131,12 @@ void initGame() {
 
   scene = SceneState.Game;
   
-
+*/
 
 }
 
 void gameDraw() {
-
+  //println("GameScene - gameDraw");
   Updatables.update();
   
 //Move
@@ -110,7 +145,7 @@ void gameDraw() {
   
   
   // DEBUG
-  if(Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
+  if(Network.isServer && Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
 
   if(! Constants.DEBUG_MODE)
   //Draw
@@ -121,13 +156,13 @@ void gameDraw() {
 
 
  // pushMatrix();
+ 
  if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
   else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
  }
  
- manageCameraOrientation();
-
+ //manageCameraOrientation();
   Scene.draw();
  // popMatrix();
 
@@ -135,9 +170,10 @@ void gameDraw() {
   
 
   //Debug Draw
+  
   if (!Constants.DEBUG_MODE){
     cameraDrawDebug();
-    //Scene.debugDraw();
+    Scene.debugDraw();
   }
 
 
@@ -153,11 +189,17 @@ void gameDraw() {
     rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
   }
   
+  
   playerCharacterComponent.drawLife();
 
 
   //TODO : display a proper minimap
-  map.DrawMiniMap(xBlock, yBlock);
+  
+  if(Input.getButtonDown("ShowHideMiniMap")){
+    showMiniMap = !showMiniMap; 
+  }
+  
+  if(showMiniMap) map.DrawMiniMap(xBlock, yBlock);
   
 
   // Matrix to manage the
@@ -174,15 +216,15 @@ void gameDraw() {
     fill(255, 0, 0);
     text(Time.getFPS(), 0, textAscent());
   }
-  
   if(map.BlockOutOfMap(xBlock, yBlock)){
+    
      ResetToSpawnPosition();
   }
 }
 
 
 private void CameraManagement() {
-  if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
+  if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -190,10 +232,10 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x + map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
+  else if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
-    xBlock++; 
+    xBlock++;
     
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
@@ -270,16 +312,16 @@ public void ResetToSpawnPosition(){
 
 public void manageCameraOrientation(){
   
-  float verticalAxisValue = Input.getAxisRaw("Vertical");
+  float AxisValue = Input.getAxisRaw("Vertical");
     
-  if(!playerCharacterComponent.isImmobile() || verticalAxisValue == 0){
+  if(!playerCharacterComponent.isImmobile() || AxisValue == 0){
     playerImmobileAndLookUp = false;
     playerImmobileAndLookDown = false;
       
     if(cameraOrientation > 0) cameraOrientation--;
     else if(cameraOrientation < 0) cameraOrientation++;
   }
-  else if(verticalAxisValue < 0){
+  else if(AxisValue < 0){
     if(!playerImmobileAndLookDown){
       playerImmobileAndLookDown = true;
       if(cameraOrientation == 0){
@@ -292,7 +334,7 @@ public void manageCameraOrientation(){
       if(cameraOrientation > maxCameraOrientation) cameraOrientation =  maxCameraOrientation;
     }
     
-  } else if(verticalAxisValue > 0){
+  } else if(AxisValue > 0){
     if(!playerImmobileAndLookDown){
       playerImmobileAndLookDown = true;
       if(cameraOrientation == 0){
@@ -314,7 +356,6 @@ public void manageCameraOrientation(){
 public float getCameraOrientation(){
   return cameraOrientation; 
 }
-
 
 
     

@@ -21,7 +21,7 @@ public class Saw extends Component {
   }
   
   public void init(){
-    gameObject.addComponent(new DamageCollider(new Circle(0, 0, 14), 1));
+    gameObject.addComponent(new DamageCollider(new Circle(0, 0, 12), 1));
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layer = CollisionLayer.CharacterBody;
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layerManagement = LayerManagement.OnlyMyLayer;
     

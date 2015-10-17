@@ -1,4 +1,4 @@
 
 
 
-enum SceneState{MainMenu, Loading, Game};
+enum SceneState{MainMenu, ServerWaitingForLaunch, ClientWaitingForLaunch, Loading, Game};

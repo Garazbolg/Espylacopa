@@ -82,8 +82,6 @@ public class Sprite extends Renderer{
  }
  
  public void draw(){
-   // Check if the sprite is for a tile
-   //if(gameObject != null && (gameObject.isTile || gameObject.isChildTile)){
    if(gameObject != null){
      PVector checkPosition;
      if(gameObject.isTile) checkPosition = gameObject.position;
