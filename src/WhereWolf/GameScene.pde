@@ -130,12 +130,9 @@ void initGame() {
 }
 
 void gameDraw() {
-<<<<<<< HEAD
-  Updatables.update();
-=======
+  
   //println("GameScene - gameDraw");
   //Updatables.update();
->>>>>>> origin/master
   
 //Move
 // Done in Villager class

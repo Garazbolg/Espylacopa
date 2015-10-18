@@ -56,76 +56,36 @@ float cameraResolutionOffsetY;
 
 static WhereWolf globalEnv;
 
-<<<<<<< HEAD
-void setup() {
-=======
 void setup(){
   
- //Init Programme
- size(displayWidth,displayHeight, P2D);
- frameRate(120);
- noSmooth(); //To prevent antialiasing
- ((PGraphicsOpenGL)g).textureSampling(3);
- textSize(textSize);   
- 
- ImageManager.start(this);
- Input.start(this);
- messageHandler = new MessageHandler(this);
- 
- scene = SceneState.Title;
- 
- launchButton = new Rect(width/2, height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
->>>>>>> origin/master
-
   //Init Programme
   //size(displayWidth/2, (displayWidth/2)*(4/3), P2D); // Test display with 4/3
   size(displayWidth/2,displayHeight/2, P2D);
   //size(displayWidth,displayHeight, P2D);
- 
-<<<<<<< HEAD
   frameRate(120);
   noSmooth(); //To prevent antialiasing
   ((PGraphicsOpenGL)g).textureSampling(3);
   textSize(textSize);   
-
-  globalScale = ((height < width)?height:width)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
-  resolutionStripSize = ((width - (4*height)/3)/2)/globalScale;
-  if(resolutionStripSize < 0) resolutionStripSize = 0;
-  pixelResolutionStripSize = resolutionStripSize * globalScale;
-  
-  cameraWidth = (width - (2*resolutionStripSize)) / globalScale;
-  cameraHeight = height / globalScale;
-  cameraResolutionOffsetX = width/(2*globalScale);
-  cameraResolutionOffsetY = height/(2*globalScale);
-  //cameraResolutionOffset = cameraWidth/2;
+ 
+  ImageManager.start(this);
+  Input.start(this);
+  messageHandler = new MessageHandler(this);
+ 
+  scene = SceneState.Title;
+ 
+  launchButton = new Rect(width/2, height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
 
   frame.setResizable(true);
   
   frame.addComponentListener(new ComponentAdapter() { 
     public void componentResized(ComponentEvent e) { 
       if(e.getSource()==frame) { 
-        globalScale = ((height < width)?height:width)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
-        resolutionStripSize = ((width - (4*height)/3)/2)/globalScale;
-        if(resolutionStripSize < 0) resolutionStripSize = 0;
-        pixelResolutionStripSize = resolutionStripSize * globalScale;
-        
-        cameraWidth = (width - (2*resolutionStripSize)) / globalScale;
-        cameraHeight = height / globalScale;
-        cameraResolutionOffsetX = width/(2*globalScale);
-        cameraResolutionOffsetY = height/(2*globalScale);
-        if(map != null) map.DefineMiniMapSize();
+        adaptDisplayVariablesToResolution();
       } 
     } 
   });
 
-
-  ImageManager.start(this);
-  Input.start(this);
-  messageHandler = new MessageHandler(this);
-
-  scene = SceneState.MainMenu;
-
-  launchButton = new Rect(width/2, height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
+  //scene = SceneState.MainMenu;
 
 
   mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
@@ -156,41 +116,13 @@ void setup(){
   Input.addButton("Jump3", "0");
   Input.addButton("Fire3", "7");
   Input.addButton("Special3", "9");
-=======
- mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
+  
+  mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
  
- titleBackground = ImageManager.getImage("Misc/title_WhereWolf.png");
- //titleBackground.resize(0,displayHeight);
- titleScale = displayHeight* 1.0f /titleBackground.height;
- title = ImageManager.getImage("Misc/title.png");
- 
- // Defines inputs
- Input.addAxis("Horizontal","Q","D");
- Input.addAxis("Horizontal","joystick Axe X");
- Input.addAxis("Vertical","Z","S");
- Input.addAxis("Vertical","joystick Axe Y");
- Input.addButton("Jump","ESPACE"); // Warning : not working on mac... so I also add K button to jump
- //Input.addButton("Jump","K");
- Input.addButton("Jump","joystick Bouton 0");
- Input.addButton("Fire","A");
- Input.addButton("Fire","joystick Bouton 1");
- Input.addButton("DebugGetDamage","P");
- Input.addButton("ShowHideMiniMap","M");
- Input.addButton("Special","joystick Bouton 2");
- Input.addButton("Special","E");
- 
- Input.addAxis("Horizontal2","J","L");
- Input.addAxis("Vertical2","I","K");
- Input.addButton("Jump2","ENTREE");
- Input.addButton("Fire2","U");
- Input.addButton("Special2","O");
- 
- Input.addAxis("Horizontal3","4","6");
- Input.addAxis("Vertical3","8","5");
- Input.addButton("Jump3","0");
- Input.addButton("Fire3","7");
- Input.addButton("Special3","9");
->>>>>>> origin/master
+  titleBackground = ImageManager.getImage("Misc/title_WhereWolf.png");
+  //titleBackground.resize(0,displayHeight);
+  titleScale = height* 1.0f /titleBackground.height;
+  title = ImageManager.getImage("Misc/title.png");
 
   // Load game sprite sheets  
   tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
@@ -204,12 +136,12 @@ void setup(){
 
   globalEnv = this;
   //Time.setTimeScale(0);
-<<<<<<< HEAD
-=======
   
   Updatables.start();
   GUI.start(this);
->>>>>>> origin/master
+  
+  
+  adaptDisplayVariablesToResolution();
 }
 
 
@@ -219,28 +151,16 @@ void draw() {
   background(100);
 
   Input.update();
-<<<<<<< HEAD
-
-=======
   Updatables.update();
   
->>>>>>> origin/master
   messageHandler.update();
 
-  fill(0);
-<<<<<<< HEAD
+  fill(255);
   text(ipAdress, width - textWidth(ipAdress), 32);
 
   switch(scene) {
 
-  case MainMenu :
-
-
-
-=======
-  //text(ipAdress, width - textWidth(ipAdress), 32);
     
-  switch(scene){
     
    case Title :
      pushMatrix();
@@ -289,7 +209,6 @@ void draw() {
       
       image(title,width/2-title.width/2,title.height/2);
     
->>>>>>> origin/master
     fill(255);
     launchButton.draw();   
 
@@ -405,5 +324,18 @@ public void launchGame() {
   scene = SceneState.Loading;
   thread("initGame");
   fill(0);
+}
+
+public void adaptDisplayVariablesToResolution(){
+  globalScale = ((height < width)?height:width)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
+  resolutionStripSize = ((width - (4*height)/3)/2)/globalScale;
+  if(resolutionStripSize < 0) resolutionStripSize = 0;
+  pixelResolutionStripSize = resolutionStripSize * globalScale;
+  
+  cameraWidth = (width - (2*resolutionStripSize)) / globalScale;
+  cameraHeight = height / globalScale;
+  cameraResolutionOffsetX = width/(2*globalScale);
+  cameraResolutionOffsetY = height/(2*globalScale);
+  if(map != null) map.DefineMiniMapSize();
 }
 
