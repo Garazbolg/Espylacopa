@@ -43,6 +43,10 @@ public class Trap extends Component {
 
   public void init(){
     
+    
+    gameObject.addComponent(new NetworkView());
+    this.addRPC("activateTrap", new DelegateActivateTrap(this));
+    
     Parameters trapParams = new Parameters();
     trapParams.setBool("Close", false);
     
@@ -82,7 +86,8 @@ public class Trap extends Component {
        }
      }
   }
-     
+  
+  /*
   public void onTriggerEnter(Collider other){
     if(millis() - creationTime > delayBeforePossibleActivation){
       if(other.gameObject.getComponent(Trap.class) == null){
@@ -92,7 +97,18 @@ public class Trap extends Component {
       }
     }
   }
-   
+  */
+  
+  public boolean canBeActivated(){
+    return(millis() - creationTime > delayBeforePossibleActivation);
+  }
+  
+  public void activate(){
+    activate = true;
+    animatorController.parameters.setBool("Close",true);
+    activationChrono = millis();
+  }
+  
   public void setAnimatorController(AnimatorController newAnimatorController){
     animatorController = newAnimatorController; 
   }

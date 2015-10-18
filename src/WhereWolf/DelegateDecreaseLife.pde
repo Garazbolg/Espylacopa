@@ -1,4 +1,3 @@
-
 // Delegate used to init player specifc for each clients
 public class DelegateDecreaseLife extends Delegate{
  

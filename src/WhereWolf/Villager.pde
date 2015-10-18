@@ -32,7 +32,7 @@ public class Villager extends GameCharacter {
   Villager(){
     super();
     
-    SetLife(30);
+    SetLife(3);
     
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     
@@ -54,7 +54,6 @@ public class Villager extends GameCharacter {
     animator.parameters.setBool("Visible", true);
     
     
-    activateBlinkOfInvulnerability(takeDamageCooldown); 
     availableTraps = maxTrapsNumber; 
     
   }
@@ -70,6 +69,7 @@ public class Villager extends GameCharacter {
     leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
     leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
     leftShotAttackCollider.isTrigger = true;
+    leftShotAttackCollider.forceDebugDraw = true;
     
     
     rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
@@ -114,7 +114,7 @@ public class Villager extends GameCharacter {
           animator.parameters.setFloat("SpeedX",0);
         }
         
-        if(Input.getButtonDown("Fire")){
+        if(Input.getButtonDown(fireInput)){
           fire();
           Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId() + " fire#");    
           PVector rigidVelocity = rigid.getVelocity();
@@ -134,7 +134,7 @@ public class Villager extends GameCharacter {
         if(canMove){
           
           if (rigid.grounded){
-            if(Input.getButtonDown("Special") && availableTraps > 0) {
+            if(Input.getButtonDown(specialInput) && availableTraps > 0) {
               availableTraps--;
               placingTrap = true;
               placingTrapChrono = immobileChrono = millis();
@@ -174,20 +174,7 @@ public class Villager extends GameCharacter {
           placingTrap = false;
         }
        
-        if(invulnerable){
-          if(millis() - blinkChrono > blinkDelay){
-            blinkNumber++;
-            visible = !visible;
-            animator.parameters.setBool("Visible", visible);
-            
-            if(blinkNumber == maxBlinkNumber){
-              invulnerable = false; 
-            }
-            
-            blinkChrono = millis();
-            
-          }
-        }
+
       }
     }
     
@@ -213,28 +200,33 @@ public class Villager extends GameCharacter {
     }
     
   }
-  
+
   private void DamageClosestCollider(Collider collider, int damage, boolean rightDirection){
     ArrayList<Collider> allColliders = collider.getCurrentTriggers();
     int  closestColliderIndex = -1;
     float closestPositionX = (float)Double.POSITIVE_INFINITY;
+    GameObject gameObjectIterator = null;
     GameCharacter character = null;
     
     for(int i=0 ; i<allColliders.size() ; i++){
 
-      character = (GameCharacter)(allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
-      println(this + " " + character);
+      gameObjectIterator = allColliders.get(i).gameObject;
       
-      if(character!= null && character != this && character.isAlive()){
-       if(abs(character.gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
+      if(!allColliders.get(i).isTrigger && gameObjectIterator!= null && gameObjectIterator != this.gameObject){
+       if(abs(gameObjectIterator.position.x - collider.gameObject.position.x) < closestPositionX){
            closestColliderIndex = i;
-           closestPositionX = abs(character.gameObject.position.x - collider.gameObject.position.x);
+           closestPositionX = abs(gameObjectIterator.position.x - collider.gameObject.position.x);
         }
       }
     }
     
+    println(Network.isServer + " " + closestColliderIndex);
     if(closestColliderIndex > -1){
-      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponentIncludingSubclasses(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position); 
+      println(Network.isServer + " " + allColliders.get(closestColliderIndex).gameObject.name);
+      character = (GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
+      if(character!= null && character != this && character.isAlive() && !character.isInvulnerable()){
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(allColliders.get(closestColliderIndex).gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + (int)(damage*damageMultiplicator) + " " + gameObject.position.x + " " + gameObject.position.y +"#");    
+      }
     }
   } 
   
@@ -262,7 +254,12 @@ public class Villager extends GameCharacter {
 
 
   public void placeTrap(){
-    new TrapPrefab(gameObject.position);
+    
+    if(Network.isServer) {
+      Network.Instantiate(globalEnv, "WhereWolf$TrapPrefab", gameObject.position, null);      
+    }
+    
+    else Network.Instantiate(globalEnv, "WhereWolf$TrapPrefab", gameObject.position, null);
   }
   
   public void flipFireSprite(boolean barrelIsFacingRight){

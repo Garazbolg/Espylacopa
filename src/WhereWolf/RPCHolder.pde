@@ -31,8 +31,9 @@ public class RPCHolder{
   }
   
   public void addRPC(String s,Delegate r){
-    if(!isInit)
+    if(!isInit){
       init();
+    }
     delegates.put(s,r);
   }
   

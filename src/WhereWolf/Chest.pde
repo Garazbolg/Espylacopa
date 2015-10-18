@@ -31,10 +31,16 @@ public class Chest extends Component {
   private float effectDuration = 0; 
   private float effectChrono; 
   
+  private int invincibilityPowerUpDuration = 5000;
+  
   Chest(){
     DefineContent();
   }
-
+  
+  public void addRPC(){
+    this.addRPC("openChest", new DelegateOpenChest(this));
+  }
+  
   public void update(){
     if(contentScaleAnimation){
       
@@ -95,13 +101,8 @@ public class Chest extends Component {
     chestContent = ChestContent.fromInteger((int)(random(numberOfPossibilities)));
   } 
   
-  public void openChest(GameCharacter owner){
+  public void getChestContent(GameCharacter owner){
     
-    ((Sprite)(gameObject.getComponent(Sprite.class))).setSprite(mapTilesSpriteSheetPath + "openChest.png");
-          
-    if(!opened){
-
-      
       String spriteName = null;
     
       switch(chestContent){
@@ -121,7 +122,6 @@ public class Chest extends Component {
           break;
       }
       
-      opened = true;
       characterOwner = owner;
       
       contentScaleAnimation = true;
@@ -143,7 +143,11 @@ public class Chest extends Component {
       
       contentHeightPosition = contentGameObject.position.y;
       finalHeightPosition = contentHeightPosition - totalHeightAnimation;
-    }
+  }
+  
+  public void openChest(){
+    ((Sprite)(gameObject.getComponent(Sprite.class))).setSprite(mapTilesSpriteSheetPath + "openChest.png");
+    opened = true;    
   }
   
   public void ApplyContentEffect(){
@@ -153,8 +157,8 @@ public class Chest extends Component {
         characterOwner.IncreaseArmorLife(1);
         break;
       case Invincibility :
-        characterOwner.activateBlinkOfInvulnerability(5000);
-        characterOwner.activateInvincibilityFeedback();
+        characterOwner.applyInvincibilityPowerUp(invincibilityPowerUpDuration);
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " applyInvincibilityPowerUp " + invincibilityPowerUpDuration +"#");    
         break;
       case SpeedBoost :
         effectDuration = 5000;
@@ -163,7 +167,7 @@ public class Chest extends Component {
       case PowerBoost :
         effectDuration = 5000;
         characterOwner.setDamageMultiplicator(2);
-        characterOwner.getPowerEffect().setActive(true);
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setDamageMultiplicator " + 2 + "#");    
         break;
         
     }
@@ -183,7 +187,7 @@ public class Chest extends Component {
         break;
        case PowerBoost :
          characterOwner.setDamageMultiplicator(1);
-        characterOwner.getPowerEffect().setActive(false);
+         Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setDamageMultiplicator " + 1 + "#");  
          break;
         
     }

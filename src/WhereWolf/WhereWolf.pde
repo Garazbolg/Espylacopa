@@ -18,6 +18,9 @@ Rect playButton;
 
 int textSize = 32;
 
+boolean playGameWithOneComptuer = true; // Used to attributes differents inputs for each player using same keyboard
+int maxPlayerNumberOnOneComputer = 3; // Depands of the number of differents inputs established
+
 
 PVector cameraPosition;
 float cameraWidth;
@@ -41,6 +44,9 @@ MessageHandler messageHandler;
 
 int clientId = (int)random(2,255);
 String ipAdress = "127.0.0."+clientId;
+
+int globalPlayerNumber = 0;
+boolean playerNumberAssigned = false;
 
 static WhereWolf globalEnv;
 
@@ -86,7 +92,15 @@ void setup(){
  
  Input.addAxis("Horizontal2","J","L");
  Input.addAxis("Vertical2","I","K");
- Input.addButton("Jump2","O");
+ Input.addButton("Jump2","ENTREE");
+ Input.addButton("Fire2","U");
+ Input.addButton("Special2","O");
+ 
+ Input.addAxis("Horizontal3","4","6");
+ Input.addAxis("Vertical3","8","5");
+ Input.addButton("Jump3","0");
+ Input.addButton("Fire3","7");
+ Input.addButton("Special3","9");
 
   // Load game sprite sheets  
   tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
@@ -225,8 +239,14 @@ void draw(){
   
   case ClientWaitingForLaunch :
     fill(0);
+    if(!playerNumberAssigned){
+      if(globalPlayerNumber > 0){
+        waitingPlayerString = "You are the client number " + globalPlayerNumber +".\nWaiting for player connexion...";
+        playerNumberAssigned = true;
+      }
+    }
     text(waitingPlayerString, width/2-textWidth(playString),height/2-textSize);
-    //Network.read();
+    
     messageHandler.update();
   break;
     
@@ -265,9 +285,12 @@ public void connectToServer(){
     Network.connectServer(this, 12345); 
     waitingPlayerString = "You are the host.\nWaiting for player connexion...";
     scene = SceneState.ServerWaitingForLaunch;
+    globalPlayerNumber = 0;
+    playerNumberAssigned = true;
   } else {
     println("Client ip = " + ipAdress);
-    waitingPlayerString = "You are a client.\nWaiting for player connexion...";
+    Network.write("ClientAskHisClientNumber " + ipAdress + "#");
+    waitingPlayerString = "You are the client number ?\nWaiting for player connexion...";
     scene = SceneState.ClientWaitingForLaunch;
   }
   

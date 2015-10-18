@@ -54,14 +54,15 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
   rpcHolder = new RPCHolder();
  }
  
- GameObject(String n, PVector pos,GameObject newParent){
+ GameObject(String n, PVector pos, GameObject newParent){
    position = pos;
    name = n;
   components = new ArrayList<Component>(); 
   children = new ArrayList<GameObject>();
   parent = null;
-  if(newParent != null)
-    newParent.addChildren(this);
+  if(newParent != null) newParent.addChildren(this);
+  
+  rpcHolder = new RPCHolder();
  }
  
  

@@ -679,6 +679,8 @@ public class MapManager {
         chest.addComponent(new Sprite(mapTilesSpriteSheetPath + "chest.png"));
         chest.addComponent(new Chest());
         tile.addComponent(new Sprite(mapTilesSpriteSheetPath + "brick.png"));
+        chest.addComponent(new NetworkView());
+        ((Chest)(chest.getComponent(Chest.class))).addRPC();
         
         chest.addComponent(new Collider(new Rect(0, 4, 8, 16)));
         ((Collider)chest.getComponent(Collider.class)).layer = CollisionLayer.CharacterBody;

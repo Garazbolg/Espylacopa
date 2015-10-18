@@ -19,6 +19,8 @@ public static class Network{
   public static Server server;
   public static Client client;
   
+  public static int clientNumber = 0;
+  
   
   public static int sendRate = 15;
   
@@ -63,7 +65,6 @@ public static class Network{
    }
  }
  
- 
  public static boolean write(String message){
    if(!isConnected) return false;
    if(isServer){
@@ -98,16 +99,24 @@ public static class Network{
    return null;
  }
  
+ public static int getClientNumber(){
+   clientNumber++;
+   return(clientNumber); 
+ }
+ 
  public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String rpcIpAdress){
    if(!isServer)
      write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + rpcIpAdress + "#");
    else{
      try{
+             //println("Server Instantiate - env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position + " rpcIpAdress = " + rpcIpAdress);
              Class<?> clazz = Class.forName(classToInstantiate);
+             // WARNING : CONSTRUCTOR MUST BE PUBLIC
              java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
             
              String gameObjectName = classToInstantiate;
-             if(rpcIpAdress != null) gameObjectName = "clientPlayer";
+             if(rpcIpAdress != null) gameObjectName = "clientPlayer"+position;
+             
              GameObject instance = (GameObject)constructor.newInstance(globalEnv, gameObjectName, position);
              //instance.setActive(false);
              int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
