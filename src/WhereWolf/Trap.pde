@@ -16,6 +16,8 @@ public class Trap extends Component {
   private GameObject blockLocation;
   private boolean display = true;
   
+  private boolean applyDamage = false;
+  
   Trap(){
     
     super();
@@ -46,6 +48,7 @@ public class Trap extends Component {
     
     gameObject.addComponent(new NetworkView());
     this.addRPC("activateTrap", new DelegateActivateTrap(this));
+    this.addRPC("destroy", new DelegateDestroy(this));
     
     Parameters trapParams = new Parameters();
     trapParams.setBool("Close", false);
@@ -82,7 +85,9 @@ public class Trap extends Component {
      if(activate && !damageApplied){
        if(millis() - activationChrono > damageDelay){
          damageApplied = true;
-         damageAllCharactersInEffectZone();
+         if(applyDamage){
+           damageAllCharactersInEffectZone();
+         }
        }
      }
   }
@@ -103,7 +108,8 @@ public class Trap extends Component {
     return(millis() - creationTime > delayBeforePossibleActivation);
   }
   
-  public void activate(){
+  public void activate(boolean haveToApplyDamage){
+    applyDamage = haveToApplyDamage;
     activate = true;
     animatorController.parameters.setBool("Close",true);
     activationChrono = millis();
@@ -115,11 +121,14 @@ public class Trap extends Component {
   
   public void damageAllCharactersInEffectZone(){
     ArrayList<Collider> allColliders = ((Collider)(gameObject.getComponent(Collider.class))).getCurrentTriggers();
-     
     
     for(int i=0 ; i<allColliders.size() ; i++){
-      GameCharacter gameCharacter = (GameCharacter)allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class);
-      if(gameCharacter != null) gameCharacter.DecreaseLife(damage, gameObject.position);
+      if(allColliders.get(i).isTrigger) continue;
+      GameCharacter character = (GameCharacter)allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class);
+      if(character != null && character.isAlive){
+        character.DecreaseLife(damage, gameObject.position);
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(character.gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + damage + " " + gameObject.position.x + " " + gameObject.position.y +"#");    
+      }
     }
     
     trapsContainer.addChildren(gameObject);

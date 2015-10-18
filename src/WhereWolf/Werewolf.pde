@@ -60,10 +60,9 @@ public class Werewolf extends GameCharacter {
 
   Werewolf() {
 
-
     super();
 
-    SetLife(3);
+    SetLife(30);
 
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png", 8, 4);
 
@@ -97,12 +96,14 @@ public class Werewolf extends GameCharacter {
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png");    
     
-    
   }
 
   
   public void init(){
     super.init();
+    
+    this.addRPC("transformToWerewolf", new DelegateTransformToWerewolf(this));
+    this.addRPC("transformToHuman", new DelegateTransformToHuman(this));
     
     leftHumanAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     leftHumanAttack.addComponent(new Collider(new Rect(3, 0, 15, 20)));
@@ -142,10 +143,12 @@ public class Werewolf extends GameCharacter {
   
   public void update() {
 
+    super.update();
+      
     if(isAlive){
-      super.update();
   
 
+      if(!playerInitialized || !myCharacter) return;
       
       if (Input.getButtonDown(fireInput)) {
         attack();
@@ -160,6 +163,7 @@ public class Werewolf extends GameCharacter {
           if (powerBar <= 0) {
             powerBar = 0;
             transformToHuman();
+            Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " transformToHuman#");    
           }
         }
       } else {
@@ -175,6 +179,7 @@ public class Werewolf extends GameCharacter {
         } else {
           if (Input.getButtonDown(specialInput)) {
             transformToWerewolf();
+            Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " transformToWerewolf#");    
           }
         }
       }
@@ -193,8 +198,11 @@ public class Werewolf extends GameCharacter {
 
     ((Collider)gameObject.getComponent(Collider.class)).setArea(new Rect(0, 0, walkAndIdle.getSpriteWidth(), walkAndIdle.getSpriteHeight()));
     gameObject.position.add(new PVector(0, -7)); 
-
-    AddArmorLife(2);
+    
+    if(myCharacter){
+      AddArmorLife(2);
+    }
+    
     AdaptCollidersWithTransformation();
     
     transformationEffectAnimatorController.parameters.setBool("Visible", true);
@@ -241,9 +249,12 @@ public class Werewolf extends GameCharacter {
     ArrayList<Collider> allColliders = collider.getCurrentTriggers();
         
     for(int i=0 ; i<allColliders.size() ; i++){
-      if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
-        if(allColliders.get(i).gameObject != gameObject){
-          ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position);
+      
+      if(!allColliders.get(i).isTrigger){
+        GameCharacter character = (GameCharacter)(allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
+        if(character != null && character.isAlive && character.gameObject != this.gameObject){
+          //((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position);
+          Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(character.gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + (int)(damage*damageMultiplicator) + " " + gameObject.position.x + " " + gameObject.position.y +"#");    
         }
       }
     }

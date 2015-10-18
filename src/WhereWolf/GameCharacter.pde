@@ -481,8 +481,8 @@ public abstract class GameCharacter extends Component{
     if(myCharacter){
       Trap trapComponent = (Trap)(other.gameObject.getComponent(Trap.class));
       if(trapComponent != null && trapComponent.canBeActivated()){
-        trapComponent.activate();
-        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(other.gameObject.getComponent(NetworkView.class))).getId() + " activateTrap#");   
+        trapComponent.activate(true);
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(other.gameObject.getComponent(NetworkView.class))).getId() + " activateTrap " + false + "#");   
       }
     }
   }
@@ -514,15 +514,14 @@ public abstract class GameCharacter extends Component{
   
   public void initPlayer(){
     player = this.gameObject;
-    playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
+    //playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
+    playerCharacterComponent = this;
     spawnPosition = new PVector(player.position.x, player.position.y);
     
     playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
   
-    cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+    cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
   
-    cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
-    cameraHeight = displayHeight / globalScale;
     
     Updatables.start();
   
@@ -531,16 +530,12 @@ public abstract class GameCharacter extends Component{
     playerInitialized = true; 
     playerId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
     
-    gameObject.printAllComponents();
-    gameObject.printGameObjectParents();
-    
     gameObject.setActive(true);
     rigid.isKinematic = false;
     
     characterCollider.forceDebugDraw = true;
     
     myCharacter = true;
-    //println("STOP STOP STOP INIT PLAYER LOG - isServer = " + Network.isServer + " ipAdress = " + ipAdress + " gameObject = " + gameObject + " gameObject.name = " + gameObject.name + " this = " + this + " myCharacter = " + myCharacter);
   }
   
   
@@ -577,7 +572,7 @@ public abstract class GameCharacter extends Component{
   
   // TODO : Define inputs for more than two players
   public void DefineInputs(){
-    println(globalPlayerNumber);
+    println("DefineInputs - globalPlayerNumber = " + globalPlayerNumber + " ipAdress = " + ipAdress);
     if(playGameWithOneComptuer && globalPlayerNumber > 0 && globalPlayerNumber < maxPlayerNumberOnOneComputer){
       horizontalInput = "Horizontal"+(globalPlayerNumber+1);
       verticalInput = "Vertical"+(globalPlayerNumber+1);
@@ -591,13 +586,6 @@ public abstract class GameCharacter extends Component{
       fireInput = "Fire";
       specialInput = "Special";
     }
-    
-    println(horizontalInput);
-    println(verticalInput);
-    println(jumpInput);
-    println(fireInput);
-    println(specialInput);
-    
   }
   
   public void applyInvincibilityPowerUp(int invincibilityDuration){

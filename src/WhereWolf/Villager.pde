@@ -32,7 +32,7 @@ public class Villager extends GameCharacter {
   Villager(){
     super();
     
-    SetLife(3);
+    SetLife(30);
     
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     
@@ -83,23 +83,23 @@ public class Villager extends GameCharacter {
     
     //if(Network.isServer && gameObject.name == "clientPlayer")
     super.update();
+    
+    if(isAlive){
+      if(isFiring){
        
-    if(isFiring){
-     
-      if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
-        isFiring = false;
-      }
-     
-      else{
-        if(millis() - fireShotChrono > fireShotDelay){
-          barrelGun.setActive(false);
-          //canMove = false;
+        if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
+          isFiring = false;
+        }
+       
+        else{
+          if(millis() - fireShotChrono > fireShotDelay){
+            barrelGun.setActive(false);
+            //canMove = false;
+          }
         }
       }
-    }
     
-    if(!playerInitialized || !myCharacter) return;
-    if(isAlive){
+      if(!playerInitialized || !myCharacter) return;
       
       if(!placingTrap){
       
@@ -149,7 +149,7 @@ public class Villager extends GameCharacter {
             }
             
             // TODO : if animation for pickup trap, add delay  after pickup to avoid multiple traps pickup at once
-            if(availableTraps < maxTrapsNumber && Input.getAxisRaw("Vertical") < 0){
+            if(availableTraps < maxTrapsNumber && Input.getAxisRaw(verticalInput) < 0){
               ArrayList<Collider> allTriggers = characterCollider.getCurrentTriggers();
               boolean pickupTrap = false;
               int iterator = 0;
@@ -158,7 +158,8 @@ public class Villager extends GameCharacter {
                 if(trapComponent != null && trapComponent.getDamageApplied()){
                   pickupTrap = true;
                   availableTraps++;
-                  trapComponent.gameObject.destroy();
+                  Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(trapComponent.gameObject.getComponent(NetworkView.class))).getId() + " destroy#"); 
+                  trapComponent.gameObject.destroy(); 
                 }
                 
                 iterator++;
@@ -213,16 +214,20 @@ public class Villager extends GameCharacter {
       gameObjectIterator = allColliders.get(i).gameObject;
       
       if(!allColliders.get(i).isTrigger && gameObjectIterator!= null && gameObjectIterator != this.gameObject){
-       if(abs(gameObjectIterator.position.x - collider.gameObject.position.x) < closestPositionX){
-           closestColliderIndex = i;
-           closestPositionX = abs(gameObjectIterator.position.x - collider.gameObject.position.x);
+        character = (GameCharacter)(allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
+        if(character != null || !allColliders.get(i).passablePlatform){
+          if(abs(gameObjectIterator.position.x - collider.gameObject.position.x) < closestPositionX){
+              closestColliderIndex = i;
+              closestPositionX = abs(gameObjectIterator.position.x - collider.gameObject.position.x);
+           }
         }
       }
     }
     
-    println(Network.isServer + " " + closestColliderIndex);
     if(closestColliderIndex > -1){
-      println(Network.isServer + " " + allColliders.get(closestColliderIndex).gameObject.name);
+      println("DamageClosestCollider");
+      println("Target GO = " + allColliders.get(closestColliderIndex).gameObject);
+      println("Target GO name = " + allColliders.get(closestColliderIndex).gameObject.name);
       character = (GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
       if(character!= null && character != this && character.isAlive() && !character.isInvulnerable()){
         Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(allColliders.get(closestColliderIndex).gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + (int)(damage*damageMultiplicator) + " " + gameObject.position.x + " " + gameObject.position.y +"#");    

@@ -52,16 +52,22 @@ public class MessageHandler{
          if(!message.contains("SetCharacterPosition")) println("Client read this message : " + message);
        }
      }
+     
        String[] messages = message.split("#");
        for(int messageIterator=0 ; messageIterator<messages.length ; messageIterator++){
          String[] typeOfMessage = messages[messageIterator].split(" ",2);
          
-         if(typeOfMessage.length != 2) println("getMessage fail : " + message);
          
          //RPC
          // RPCMode.Specific + " " + ipAdress + " " + "newObjectId" +  + " initPlayer"
          // RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setXvelocity 
          if(typeOfMessage[0].compareTo("RPC") == 0){
+           
+           // Server receive messages from all client and rewrite them to allow communication from client to client
+           if(Network.isServer){
+             Network.write(messages[messageIterator]+"#"); 
+           }
+          
            println("GET RPC : " + typeOfMessage[1]);
            String[] rpcParams = typeOfMessage[1].split(" ");
            RPCMode target = RPCMode.valueOf(rpcParams[0]);
@@ -92,7 +98,6 @@ public class MessageHandler{
              callBackParams[paramsIterator] = rpcParams[indexOfCallbackName + 1 + paramsIterator];
            }
           
-           println(NetworkViews.get(nvID).gameObject);
            NetworkViews.get(nvID).gameObject.rpcHolder.callback(rpcParams[indexOfCallbackName],callBackParams);
 
          }

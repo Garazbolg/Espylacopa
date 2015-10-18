@@ -17,7 +17,6 @@ GameObject sawsTrailContainer;
 
 //enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
-private boolean cameradCentered = false;
 private float maxCameraForwardOffset = 20;
 private float cameraForwardOffset;
 
@@ -47,12 +46,7 @@ private boolean playerInitialized = false;
 void initGame() {
   
 
-  globalScale = ((displayHeight < displayWidth)?displayHeight:displayWidth)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
- 
 
-  
-  resolutionStripSize = (width - (globalScale*128))/14;
-  
   
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
   
@@ -86,10 +80,12 @@ void initGame() {
     
     player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), null)).gameObject;
     ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
+    //player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), null)).gameObject;
+    //((GameCharacter)(player.getComponent(Werewolf.class))).initPlayer();
     
   }
-  //else player = new VillagerPrefab("One", GetSpawnPosition());
-  else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  //else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+  else Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), ipAdress);
   
    
   //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
@@ -120,7 +116,7 @@ void initGame() {
 
   playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
 
-  cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+  cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
 
   cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
   cameraHeight = displayHeight / globalScale;
@@ -134,7 +130,6 @@ void initGame() {
 }
 
 void gameDraw() {
-  //println("GameScene - gameDraw");
   Updatables.update();
   
 //Move
@@ -184,7 +179,7 @@ void gameDraw() {
   if(! Constants.DEBUG_MODE){
     fill(0);
     rect(0, 0, globalScale*resolutionStripSize, height); // bande noire gauche
-    rect(globalScale*(resolutionStripSize+128), 0, globalScale*resolutionStripSize, height); // bande noire droite
+    rect(width - globalScale*resolutionStripSize, 0, globalScale*resolutionStripSize, height); // bande noire droite
   }
   
   
@@ -222,7 +217,7 @@ void gameDraw() {
 
 
 private void CameraManagement() {
-  if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
+  if(player.getPosition().x - 3*map.GetTilePixelSize() + playerColliderHalfDimensions.x < (map.GetBlockPixelSizeX()*xBlock)+resolutionStripSize){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock--;
@@ -230,7 +225,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x - map.GetTilePixelSize() + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
+  else if(player.getPosition().x - 3*map.GetTilePixelSize() + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock++;
@@ -255,26 +250,21 @@ private void CameraManagement() {
   }
   
   if(cameraScroll) {
-    if(cameradCentered){
-      cameraPosition = new PVector(player.getPosition().x-map.GetBlockPixelSizeX()+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
+
+    if(playerCharacterComponent.isFacingRight()){
+      if(cameraForwardOffset < 0) cameraLerpSpeed = 0.03; 
+      else cameraLerpSpeed = 0.05;
+      cameraForwardOffset = lerp(cameraForwardOffset, maxCameraForwardOffset, cameraLerpSpeed);
     }
     
     else{
-      
-      if(playerCharacterComponent.isFacingRight()){
-        if(cameraForwardOffset < 0) cameraLerpSpeed = 0.03; 
-        else cameraLerpSpeed = 0.05;
-        cameraForwardOffset = lerp(cameraForwardOffset, maxCameraForwardOffset, cameraLerpSpeed);
-        cameraPosition = new PVector(player.getPosition().x+cameraForwardOffset-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
-      }
-      
-      else{
-        if(cameraForwardOffset > 0) cameraLerpSpeed = 0.03; 
-        else cameraLerpSpeed = 0.05;
-        cameraForwardOffset = lerp(cameraForwardOffset, -maxCameraForwardOffset, cameraLerpSpeed);
-        cameraPosition = new PVector(player.getPosition().x+cameraForwardOffset-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
-      }
-    }
+      if(cameraForwardOffset > 0) cameraLerpSpeed = 0.03; 
+      else cameraLerpSpeed = 0.05;
+      cameraForwardOffset = lerp(cameraForwardOffset, -maxCameraForwardOffset, cameraLerpSpeed);
+   }
+   
+    cameraPosition = new PVector(player.getPosition().x+cameraForwardOffset-cameraResolutionOffsetX, player.getPosition().y-cameraResolutionOffsetY+playerColliderHalfDimensions.y);
+  
   }
 }
 
@@ -305,7 +295,7 @@ public void ResetToSpawnPosition(){
   
   player.position = new PVector(spawnPosition.x, spawnPosition.y);
   
-  cameraPosition = new PVector(player.getPosition().x-128+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y); 
+  cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y); 
 }
 
 public void manageCameraOrientation(){

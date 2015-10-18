@@ -1,6 +1,6 @@
 public class WerewolfPrefab extends GameObject {
   
-  WerewolfPrefab(String name, PVector position){
+  public WerewolfPrefab(String name, PVector position){
     super(name, position);
     Scene.addChildren(this);
     

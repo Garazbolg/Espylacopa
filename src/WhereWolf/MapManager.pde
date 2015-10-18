@@ -140,7 +140,7 @@ public class MapManager {
     BreakWalls();
     
     DefineTilesForAllBlock();
-    //DefineMiniMapSize();
+    DefineMiniMapSize();
   }
   
   public boolean canHaveNewNeighbor(int x, int y){
@@ -307,9 +307,9 @@ public class MapManager {
             fill(255);
   
             if (i==playerPositionX && j==playerPositionY) fill(255, 0, 0); // just to indicate where the player is
-            rect(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
+            rect(miniMapBlockSize*i, miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
             fill(0);
-            text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
+            //text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
             //text(i+" "+j, 50+60*i, 55+60*j);
           }
         }
@@ -327,22 +327,22 @@ public class MapManager {
 
             // bottom border
             if ((mapBlocks[i][j] & 1)==0) { 
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
+              line(miniMapBlockSize*i, miniMapBlockSize*j+miniMapBlockSize, miniMapBlockSize*i+miniMapBlockSize, miniMapBlockSize*j+miniMapBlockSize);
             }
   
             // right border
             if ((mapBlocks[i][j] & (1<<1))==0) {
-              line(30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j+miniMapBlockSize);
+              line(miniMapBlockSize*i+miniMapBlockSize, miniMapBlockSize*j, miniMapBlockSize*i+miniMapBlockSize, miniMapBlockSize*j+miniMapBlockSize);
             }
   
             // above border
             if ((mapBlocks[i][j] & (1<<2))==0) {
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i+miniMapBlockSize, 20+miniMapBlockSize*j);
+              line(miniMapBlockSize*i, miniMapBlockSize*j, miniMapBlockSize*i+miniMapBlockSize, miniMapBlockSize*j);
             }
   
             // left border
             if ((mapBlocks[i][j] & (1<<3))==0) {
-              line(30+miniMapBlockSize*i, 20+miniMapBlockSize*j, 30+miniMapBlockSize*i, 20+miniMapBlockSize*j+miniMapBlockSize);
+              line(miniMapBlockSize*i, miniMapBlockSize*j, miniMapBlockSize*i, miniMapBlockSize*j+miniMapBlockSize);
             }
           }
         }
@@ -1051,12 +1051,29 @@ public class MapManager {
     int mapWidth = maxBlockX + 1 - minBlockX;
     int mapHeight = maxBlockY + 1 -  minBlockY;
     
+    println("DefineMiniMapSize");
+    println("mapWidth = " + mapWidth);
+    println("mapHeight = " + mapHeight);
     
-    float pixelResolutionStripSize = resolutionStripSize * globalScale;
+    println("resolutionStripSize = " + resolutionStripSize);
+    println("globalScale = " + globalScale);
+    
     miniMapBlockSize = min(height/(2*mapHeight), (pixelResolutionStripSize-(pixelResolutionStripSize/8))/mapWidth);
+    if(miniMapBlockSize < 10){
+      miniMapBlockSize = min(width / (4*mapWidth), height / (4*mapHeight));
+    }
     
-    miniMapTranslatePositionX = -minBlockX*miniMapBlockSize;
+    println("min between " + height/(2*mapHeight) + " and " + (pixelResolutionStripSize-(pixelResolutionStripSize/8))/mapWidth);
+    
+    println("pixelResolutionStripSize = " + pixelResolutionStripSize);
+    println("miniMapBlockSize = " + miniMapBlockSize);
+    
+    
+    miniMapTranslatePositionX = -(minBlockX-0.5f)*miniMapBlockSize;
     miniMapTranslatePositionY = height - ((mapHeight+minBlockY+2)*miniMapBlockSize);
+    
+    //miniMapTranslatePositionX = 0;
+    //miniMapTranslatePositionY = 0;
     
   }
   
