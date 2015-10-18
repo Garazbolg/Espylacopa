@@ -1,0 +1,8 @@
+- Idle : tout à 0.3 s
+- Run : 0.1 - 0.15 - 0.15 - 0.1 - 0.15 - 0.15
+- Attack : 0.1 - 0.07 - 0.2 - 0.1 - 0.3
+- Jump up : les deux à 0.1 s
+- Jump down : les deux à 0.1s
+- Damage : 0.03 - 0.1
+- Death : 0.03 - 0.1 - 0.5 - 0.1 - 0.5
+- Transfo : tout à 0.1 s
