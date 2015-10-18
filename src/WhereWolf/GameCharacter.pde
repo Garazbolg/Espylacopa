@@ -474,7 +474,7 @@ public abstract class GameCharacter extends Component{
     cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
     cameraHeight = displayHeight / globalScale;
     
-    Updatables.start();
+    //Updatables.start();
   
     scene = SceneState.Game;    
     
