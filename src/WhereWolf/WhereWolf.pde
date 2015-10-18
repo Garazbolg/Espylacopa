@@ -7,6 +7,13 @@ String launchString = "Launch a game";
 String playString = "Play";
 String waitingPlayerString;
 
+PImage titleBackground;
+PImage title;
+float titleBackgroudOffset = 0;
+float titleScale = 1;
+boolean displayPressA = false;
+float displayPressATimer = 0;
+
 Rect mouse;
 Rect launchButton;
 Rect playButton;
@@ -49,13 +56,33 @@ float cameraResolutionOffsetY;
 
 static WhereWolf globalEnv;
 
+<<<<<<< HEAD
 void setup() {
+=======
+void setup(){
+  
+ //Init Programme
+ size(displayWidth,displayHeight, P2D);
+ frameRate(120);
+ noSmooth(); //To prevent antialiasing
+ ((PGraphicsOpenGL)g).textureSampling(3);
+ textSize(textSize);   
+ 
+ ImageManager.start(this);
+ Input.start(this);
+ messageHandler = new MessageHandler(this);
+ 
+ scene = SceneState.Title;
+ 
+ launchButton = new Rect(width/2, height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
+>>>>>>> origin/master
 
   //Init Programme
   //size(displayWidth/2, (displayWidth/2)*(4/3), P2D); // Test display with 4/3
   size(displayWidth/2,displayHeight/2, P2D);
   //size(displayWidth,displayHeight, P2D);
  
+<<<<<<< HEAD
   frameRate(120);
   noSmooth(); //To prevent antialiasing
   ((PGraphicsOpenGL)g).textureSampling(3);
@@ -129,6 +156,41 @@ void setup() {
   Input.addButton("Jump3", "0");
   Input.addButton("Fire3", "7");
   Input.addButton("Special3", "9");
+=======
+ mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
+ 
+ titleBackground = ImageManager.getImage("Misc/title_WhereWolf.png");
+ //titleBackground.resize(0,displayHeight);
+ titleScale = displayHeight* 1.0f /titleBackground.height;
+ title = ImageManager.getImage("Misc/title.png");
+ 
+ // Defines inputs
+ Input.addAxis("Horizontal","Q","D");
+ Input.addAxis("Horizontal","joystick Axe X");
+ Input.addAxis("Vertical","Z","S");
+ Input.addAxis("Vertical","joystick Axe Y");
+ Input.addButton("Jump","ESPACE"); // Warning : not working on mac... so I also add K button to jump
+ //Input.addButton("Jump","K");
+ Input.addButton("Jump","joystick Bouton 0");
+ Input.addButton("Fire","A");
+ Input.addButton("Fire","joystick Bouton 1");
+ Input.addButton("DebugGetDamage","P");
+ Input.addButton("ShowHideMiniMap","M");
+ Input.addButton("Special","joystick Bouton 2");
+ Input.addButton("Special","E");
+ 
+ Input.addAxis("Horizontal2","J","L");
+ Input.addAxis("Vertical2","I","K");
+ Input.addButton("Jump2","ENTREE");
+ Input.addButton("Fire2","U");
+ Input.addButton("Special2","O");
+ 
+ Input.addAxis("Horizontal3","4","6");
+ Input.addAxis("Vertical3","8","5");
+ Input.addButton("Jump3","0");
+ Input.addButton("Fire3","7");
+ Input.addButton("Special3","9");
+>>>>>>> origin/master
 
   // Load game sprite sheets  
   tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
@@ -142,6 +204,12 @@ void setup() {
 
   globalEnv = this;
   //Time.setTimeScale(0);
+<<<<<<< HEAD
+=======
+  
+  Updatables.start();
+  GUI.start(this);
+>>>>>>> origin/master
 }
 
 
@@ -151,10 +219,16 @@ void draw() {
   background(100);
 
   Input.update();
+<<<<<<< HEAD
 
+=======
+  Updatables.update();
+  
+>>>>>>> origin/master
   messageHandler.update();
 
   fill(0);
+<<<<<<< HEAD
   text(ipAdress, width - textWidth(ipAdress), 32);
 
   switch(scene) {
@@ -163,6 +237,59 @@ void draw() {
 
 
 
+=======
+  //text(ipAdress, width - textWidth(ipAdress), 32);
+    
+  switch(scene){
+    
+   case Title :
+     pushMatrix();
+     scale(titleScale);
+     image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
+     image(titleBackground,titleBackgroudOffset,0);
+     image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
+     
+     titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+     
+     if(titleBackgroudOffset > titleBackground.width)
+       titleBackgroudOffset -= titleBackground.width;
+     if(Input.getButtonDown("Jump"))
+       scene = SceneState.MainMenu;
+      popMatrix();
+      
+      image(title,width/2-title.width/2,title.height/2);
+      
+      if(displayPressA){
+        fill(255);
+        GUI.labelCenter(new PVector(width/2,height/3.0f*2),"Press A ...");
+        fill(0);
+      }
+      displayPressATimer += Time.unscaledDeltaTime()*1.5;
+      
+      if(displayPressATimer > 1){
+        displayPressA = ! displayPressA;
+        displayPressATimer -= 1;
+      }
+      
+   break;
+   
+   case MainMenu :
+    
+      pushMatrix();
+     scale(titleScale);
+     image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
+     image(titleBackground,titleBackgroudOffset,0);
+     image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
+     
+     titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+     
+     if(titleBackgroudOffset > titleBackground.width)
+       titleBackgroudOffset -= titleBackground.width;
+      popMatrix();
+      
+      image(title,width/2-title.width/2,title.height/2);
+    
+>>>>>>> origin/master
     fill(255);
     launchButton.draw();   
 

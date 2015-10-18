@@ -121,7 +121,7 @@ void initGame() {
   cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
   cameraHeight = displayHeight / globalScale;
   
-  Updatables.start();
+  //Updatables.start();
 
   scene = SceneState.Game;
   
@@ -130,7 +130,12 @@ void initGame() {
 }
 
 void gameDraw() {
+<<<<<<< HEAD
   Updatables.update();
+=======
+  //println("GameScene - gameDraw");
+  //Updatables.update();
+>>>>>>> origin/master
   
 //Move
 // Done in Villager class

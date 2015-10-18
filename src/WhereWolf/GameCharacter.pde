@@ -523,7 +523,7 @@ public abstract class GameCharacter extends Component{
     cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
   
     
-    Updatables.start();
+    //Updatables.start();
   
     scene = SceneState.Game;    
     
