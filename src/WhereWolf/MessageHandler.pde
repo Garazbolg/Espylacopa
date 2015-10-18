@@ -91,9 +91,27 @@ public class MessageHandler{
            for(int paramsIterator=0 ; paramsIterator<callBackParams.length ; paramsIterator++){
              callBackParams[paramsIterator] = rpcParams[indexOfCallbackName + 1 + paramsIterator];
            }
-
+          
+           println(NetworkViews.get(nvID).gameObject);
            NetworkViews.get(nvID).gameObject.rpcHolder.callback(rpcParams[indexOfCallbackName],callBackParams);
 
+         }
+         
+         // ClientAskHisClientNumber + clientIp
+         else if(typeOfMessage[0].compareTo("ClientAskHisClientNumber") == 0){
+           if(Network.isServer){
+             String[] messageParams = typeOfMessage[1].split(" ");
+             Network.write("AssignClientNumber " + messageParams[0] + " " + Network.getClientNumber() + "#");
+           }
+         }
+         
+         // AssignClientNumber + clientIp + playerNumber
+         else if(typeOfMessage[0].compareTo("AssignClientNumber") == 0){
+           if(!Network.isServer){
+             String[] messageParams = typeOfMessage[1].split(" ");
+             if(Network.localIP.compareTo(messageParams[0]) != 0) continue;
+             globalPlayerNumber = Integer.parseInt(messageParams[1]);
+           }
          }
          
          else if(typeOfMessage[0].compareTo("InstantiateOnServer") == 0){
@@ -198,8 +216,7 @@ public class MessageHandler{
 
          
        //}
-       
-       
+
        
        
        

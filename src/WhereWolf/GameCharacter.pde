@@ -31,7 +31,7 @@ public abstract class GameCharacter extends Component{
   protected State walkLeft,walkRight,idleRight,idleLeft, dead;
   
   protected boolean invulnerable = false;
-  protected float takeDamageCooldown = 1300;
+  protected int takeDamageCooldown = 1300;
   protected float blinkDelay = 100;
   protected float blinkChrono;
   protected float blinkNumber = 0;
@@ -74,11 +74,16 @@ public abstract class GameCharacter extends Component{
   protected boolean myCharacter = false;
   
   
-  private String horizontalInput;
-  private String verticalInput;
-  private String jumpInput;
+  protected String horizontalInput;
+  protected String verticalInput;
+  protected String jumpInput;
+  protected String fireInput;
+  protected String specialInput;
   
   protected float xVelocity;
+  
+  private float lastXposition = 0;
+  private float lastYposition = 0;
   
 
   GameCharacter(){
@@ -98,6 +103,11 @@ public abstract class GameCharacter extends Component{
     this.addRPC("initPlayer", new DelegateInitPlayer(this));
     this.addRPC("setXvelocity", new DelegateSetXvelocity(this));
     this.addRPC("decreaseLife", new DelegateDecreaseLife(this));
+    this.addRPC("activateBlinkOfInvulnerability", new DelegateBlink(this));
+    this.addRPC("makeMoveCausedByDamage", new DelegateDamageMove(this));
+    this.addRPC("applyInvincibilityPowerUp", new DelegateInvincibilityPowerUp(this));
+    this.addRPC("die", new DelegateDie(this));
+    this.addRPC("setDamageMultiplicator", new DelegateDamageMultiplicator(this));
     
     invincibilityEffect = new GameObject("invincibilityEffect", new PVector(-1,5), this.gameObject);
     
@@ -144,19 +154,21 @@ public abstract class GameCharacter extends Component{
     gameObject.addComponent(new Rigidbody());
     rigid = (Rigidbody)(gameObject.getComponent(Rigidbody.class));
     rigid.start();
+    rigid.isKinematic = true;
     
    
 
     //characterCollider.forceDebugDraw = true;
     
     gameObject.addComponent(animator);
+    activateBlinkOfInvulnerability(takeDamageCooldown);
   }
   
  
   public void update(){
     super.update();
     
-          // TODO : put this accesible via RPC + use a host timer reference 
+    // TODO : put this accesible via RPC + use a host timer reference 
     if(invulnerable){
       if(millis() - blinkChrono > blinkDelay){
         blinkNumber++;
@@ -175,11 +187,18 @@ public abstract class GameCharacter extends Component{
     
     if(!playerInitialized || !myCharacter) return;
     
+    /*
     if(rigid.getVelocity().x != 0 || rigid.getVelocity().y != 0){
       Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
     }
+    */
     
-    //println(isAlive);
+    if(lastXposition != gameObject.position.x || lastYposition != gameObject.position.y){
+      lastXposition = gameObject.position.x;
+      lastYposition = gameObject.position.y;
+      Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
+    }
+    
     if(isAlive){
       if(canMove) {
         rigid.setVelocity(new PVector(Input.getAxisRaw(horizontalInput)*movementSpeed, rigid.getVelocity().y));
@@ -223,10 +242,14 @@ public abstract class GameCharacter extends Component{
             
               float heightDelta = gameObject.getGlobalPosition().y - characterCollider.currentCollisions.get(i).gameObject.getGlobalPosition().y;
               if(heightDelta > -13 && heightDelta < -9){
-                chestComponent.openChest(this); 
-                canMove = false;
-                immobileDelay = openChestImmobileDelay;
-                immobileChrono = millis();
+                if(!chestComponent.getOpened()){
+                  Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(chestComponent.gameObject.getComponent(NetworkView.class))).getId() + " openChest#");    
+                  chestComponent.openChest(); 
+                  chestComponent.getChestContent(this); 
+                  canMove = false;
+                  immobileDelay = openChestImmobileDelay;
+                  immobileChrono = millis();
+                }
               }
             }
           }
@@ -254,10 +277,13 @@ public abstract class GameCharacter extends Component{
     life += n;
   }
   
+  public boolean isInvulnerable(){
+    return invulnerable;
+  }
+  
   public void DecreaseLife(int n, PVector aggressorPosition){
-    if(invulnerable) return;
+    if(!myCharacter || invulnerable) return;
     
-    Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + n + " " + aggressorPosition.x + " " + aggressorPosition.y +"#");    
     
     if(armorLife > 0){
       DecreaseArmorLife(n, aggressorPosition); 
@@ -269,12 +295,12 @@ public abstract class GameCharacter extends Component{
       
       if(life <=0){
         life = 0;
-        Die();
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " die#");   
+        die();
       }
       
       else{
-        activateBlinkOfInvulnerability(takeDamageCooldown); 
-        makeMoveCausedByDamage(aggressorPosition);
+        applyTakeDamageEffect(aggressorPosition);
       }
     }
   }
@@ -297,9 +323,15 @@ public abstract class GameCharacter extends Component{
     }
     
     else{
-      activateBlinkOfInvulnerability(takeDamageCooldown); 
-      makeMoveCausedByDamage(aggressorPosition);
+      applyTakeDamageEffect(aggressorPosition);
     }
+  }
+  
+  public void applyTakeDamageEffect(PVector aggressorPosition){        
+    Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " activateBlinkOfInvulnerability " + takeDamageCooldown +"#");   
+    Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " makeMoveCausedByDamage " + aggressorPosition.x + " " + aggressorPosition.y +"#");   
+    activateBlinkOfInvulnerability(takeDamageCooldown); 
+    makeMoveCausedByDamage(aggressorPosition);
   }
   
   public void SetLife(int n){
@@ -361,7 +393,7 @@ public abstract class GameCharacter extends Component{
     rigid.setVelocity(new PVector(rigid.getVelocity().x, direction.y * damageMovementFactor - 100));;
   }
   
-  public void activateBlinkOfInvulnerability(float duration){
+  public void activateBlinkOfInvulnerability(int duration){
     invulnerable = true;
     blinkChrono = millis();
     blinkNumber = 0;
@@ -377,11 +409,12 @@ public abstract class GameCharacter extends Component{
      invincibilityEffect.setActive(true);
   }
   
+  // TODO : OBSOLETE METHOD - DELETE IT
   public GameObject getPowerEffect(){
      return powerEffect;
   }
   
-  public void Die(){
+  public void die(){
     isAlive = false;
     animator.setCurrentState(dead);
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
@@ -410,14 +443,19 @@ public abstract class GameCharacter extends Component{
   }
   
   public void onCollisionEnter(Collider other){
+    if(!myCharacter) return;
     CheckIfPassThroughtPlatform(other);
   }
    
   public void onCollisionStay(Collider other){
+    if(!myCharacter) return;
     CheckIfPassThroughtPlatform(other);
   }
    
   public void CheckIfPassThroughtPlatform(Collider other){
+    
+    if(!myCharacter) return;
+    
     // TODO : too much checks in this if condition, not really optimized but more safe, check rigid.velocity inizialited is essential for sure
     if(rigid == null || rigid.velocity == null || characterCollider == null || other == null || gameObject == null) return; // if condition to avoid error at launch when initialization is not finish
     if(other.passablePlatform && !characterCollider.getOverlookColliders().contains(other)){
@@ -433,8 +471,19 @@ public abstract class GameCharacter extends Component{
   }
   
   public void onCollisionExit(Collider other){
+    if(!myCharacter) return;
     if(characterCollider.getOverlookColliders().contains(other)){
       characterCollider.getOverlookColliders().remove(other);
+    }
+  }
+  
+  public void onTriggerEnter(Collider other){
+    if(myCharacter){
+      Trap trapComponent = (Trap)(other.gameObject.getComponent(Trap.class));
+      if(trapComponent != null && trapComponent.canBeActivated()){
+        trapComponent.activate();
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(other.gameObject.getComponent(NetworkView.class))).getId() + " activateTrap#");   
+      }
     }
   }
   
@@ -460,6 +509,7 @@ public abstract class GameCharacter extends Component{
   
   public void setDamageMultiplicator(float newMultiplicator){
     damageMultiplicator = newMultiplicator; 
+    powerEffect.setActive(newMultiplicator > 1);
   }
   
   public void initPlayer(){
@@ -490,6 +540,7 @@ public abstract class GameCharacter extends Component{
     characterCollider.forceDebugDraw = true;
     
     myCharacter = true;
+    //println("STOP STOP STOP INIT PLAYER LOG - isServer = " + Network.isServer + " ipAdress = " + ipAdress + " gameObject = " + gameObject + " gameObject.name = " + gameObject.name + " this = " + this + " myCharacter = " + myCharacter);
   }
   
   
@@ -526,16 +577,32 @@ public abstract class GameCharacter extends Component{
   
   // TODO : Define inputs for more than two players
   public void DefineInputs(){
-            
-      if(Network.isServer){
-        horizontalInput = "Horizontal";
-        verticalInput = "Vertical";
-        jumpInput = "Jump";
-      } else{
-        horizontalInput = "Horizontal2";
-        verticalInput = "Vertical2";
-        jumpInput = "Jump2";
-      }
+    println(globalPlayerNumber);
+    if(playGameWithOneComptuer && globalPlayerNumber > 0 && globalPlayerNumber < maxPlayerNumberOnOneComputer){
+      horizontalInput = "Horizontal"+(globalPlayerNumber+1);
+      verticalInput = "Vertical"+(globalPlayerNumber+1);
+      jumpInput = "Jump"+(globalPlayerNumber+1);
+      fireInput = "Fire"+(globalPlayerNumber+1);
+      specialInput = "Special"+(globalPlayerNumber+1);
+    } else{
+      horizontalInput = "Horizontal";
+      verticalInput = "Vertical";
+      jumpInput = "Jump";
+      fireInput = "Fire";
+      specialInput = "Special";
+    }
+    
+    println(horizontalInput);
+    println(verticalInput);
+    println(jumpInput);
+    println(fireInput);
+    println(specialInput);
+    
+  }
+  
+  public void applyInvincibilityPowerUp(int invincibilityDuration){
+    activateBlinkOfInvulnerability(invincibilityDuration);
+    activateInvincibilityFeedback();
   }
   
   

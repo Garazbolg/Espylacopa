@@ -7,7 +7,6 @@ public class DelegateSetXvelocity extends Delegate{
  }
   
  public void call(String [] argv){
-   println(argv);
    ((GameCharacter)(thisComponent)).setXvelocity(Float.parseFloat(argv[0])); 
  }
 }

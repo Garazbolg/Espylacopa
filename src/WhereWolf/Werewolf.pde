@@ -97,7 +97,6 @@ public class Werewolf extends GameCharacter {
     moonSprite = new Sprite(spritesPath + "fullMoon.png");
     moonMaskSprite = new Sprite(spritesPath + "fullMoonMask.png");    
     
-    activateBlinkOfInvulnerability(takeDamageCooldown); 
     
   }
 
@@ -148,7 +147,7 @@ public class Werewolf extends GameCharacter {
   
 
       
-      if (Input.getButtonDown("Fire")) {
+      if (Input.getButtonDown(fireInput)) {
         attack();
       }
   
@@ -174,7 +173,7 @@ public class Werewolf extends GameCharacter {
             }
           }
         } else {
-          if (Input.getButtonDown("Special")) {
+          if (Input.getButtonDown(specialInput)) {
             transformToWerewolf();
           }
         }
