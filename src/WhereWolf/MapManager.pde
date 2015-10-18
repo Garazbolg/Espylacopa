@@ -1077,7 +1077,6 @@ public class MapManager {
   // TODO : use one method to remplace three methods used to write arrays on server (use argument)
   public void writeMapOnServer(int playerNumber){
     String mapComposition = "GeneratedMap " + playerNumber + " ";
-    println("writeMapOnServer, playerNumber = " + playerNumber + " mapSize = " + mapSize);
     for(int j = 0 ; j<mapSize ; j++){
       for(int i = 0 ; i<mapSize ; i++){
         if(mapBlocks[i][j] == 0) mapComposition += "   ";
@@ -1088,7 +1087,7 @@ public class MapManager {
       mapComposition += " \n";
     }
     
-    Network.write(mapComposition+"endMessage");
+    Network.write(mapComposition+"#");
   }
   
   public void writeSelectedBlocksOnServer(){
@@ -1105,7 +1104,7 @@ public class MapManager {
         mapComposition += " \n";
       }
       
-      Network.write(mapComposition+"endMessage");
+      Network.write(mapComposition+"#");
   }
  
  public void writeSpawnPositionsOnServer(){
@@ -1115,7 +1114,7 @@ public class MapManager {
         mapComposition += xSpawnPoints[i] + " " + ySpawnPoints[i] + " ";
       }
       
-      Network.write(mapComposition+"endMessage");
+      Network.write(mapComposition+"#");
  }
  
  public void CopySpawnPositionsFromModel(String dataString){
@@ -1127,17 +1126,11 @@ public class MapManager {
  }
   
   private void GenerateMapFromModel(String mapModel){
-    println("Begin of GenerateMapFromModel");
-    println("Map model :");
-    println(mapModel);
-    println("Map model ended");
     
     String[] mapLines = mapModel.split("\n",mapSize);
     
-    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
     
     for(int i=0 ; i<mapSize ; i++){
-      println(mapLines[i]);
       for(int j=0 ; j<mapSize ; j++){
         
         //String blockValue = "";  
@@ -1169,21 +1162,13 @@ public class MapManager {
       }
     }
     
-    println("end of GenerateMapFromModel");
   }
   
   public void CopySelectedBlocksFromModel(String model){
-    println("Begin of CopySelectedBlocksFromModel");
-    println("Selected block model :");
-    println(model);
-    println("Selected block ended");
-    
+
     String[] mapLines = model.split("\n",mapSize);
-    println("mapLines.length = " + mapLines.length + " mapSize = " + mapSize); 
     
     for(int i=0 ; i<mapSize ; i++){
-      println("mapLines["+i+"].length = " + mapLines[i].length());
-      println(mapLines[i]);
       for(int j=0 ; j<mapSize ; j++){
         
           String blockValue = "";  

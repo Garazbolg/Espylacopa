@@ -34,7 +34,7 @@ public class AnimatorController extends Renderer{
   }
   
   public void draw(){
-
+    
     if(parameters.getBool("Visible")) {
       if(gameObject != null){
         PVector checkPosition;
@@ -232,7 +232,7 @@ public class State{
  }
  
  public void draw(){
-   
+       
      if(visibleByCamera){
        PImage source = animation.getImage(((int)(currentFrame*framePerSecond)));
        pushMatrix();

@@ -30,7 +30,6 @@ public class Villager extends GameCharacter {
   
   
   Villager(){
-    
     super();
     
     SetLife(30);
@@ -64,34 +63,50 @@ public class Villager extends GameCharacter {
   public void init(){
     super.init();
     
+    this.addRPC("fire", new DelegateFire(this));
+    this.addRPC("flipFireSprite", new DelegateFlipFireSprite(this));
+    
     leftShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
-    Collider leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
+    leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
     leftShotAttackCollider.isTrigger = true;
     
     
     rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     rightShotAttack.addComponent(new Collider(new Rect(53, 0, 88, 10)));
-    Collider rightShotAttackCollider = (Collider)rightShotAttack.getComponent(Collider.class);
+    rightShotAttackCollider = (Collider)rightShotAttack.getComponent(Collider.class);
     rightShotAttackCollider.isTrigger = true;  
  
   }
   
   public void update(){
-    if(!playerInitialized) return;
+    
+    //if(Network.isServer && gameObject.name == "clientPlayer")
+    super.update();
+       
+    if(isFiring){
+     
+      if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
+        isFiring = false;
+      }
+     
+      else{
+        if(millis() - fireShotChrono > fireShotDelay){
+          barrelGun.setActive(false);
+          //canMove = false;
+        }
+      }
+    }
+    
+    if(!playerInitialized || !myCharacter) return;
     if(isAlive){
       
       if(!placingTrap){
       
-      
-        super.update();
-        //println("update");
         if(showWeapon && fireShotFacingRight != facingRight){
-           fireShotFacingRight = facingRight;
-           Sprite fire = (Sprite)barrelGun.getComponent(Sprite.class);
-           fire.flip();
-           if(fireShotFacingRight) barrelGun.position = new PVector(10,2);
-           else barrelGun.position = new PVector(-10,2);
+          fireShotFacingRight = facingRight;
+          flipFireSprite(fireShotFacingRight);
+          Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId() + " flipFireSprite " + fireShotFacingRight +"#");    
         }
         
         if(isFiring){
@@ -101,34 +116,36 @@ public class Villager extends GameCharacter {
         
         if(Input.getButtonDown("Fire")){
           fire();
+          Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId() + " fire#");    
           PVector rigidVelocity = rigid.getVelocity();
           rigidVelocity.x = 0;
           rigid.setVelocity(new PVector(0,rigidVelocity.y));
+          
+          immobileDelay = 300;
+          immobileChrono = millis();
+          
+          xVelocity = 0;
+          setXvelocity(xVelocity);
+          Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setXvelocity " + xVelocity +"#");   
         }
         
-       
-        if(isFiring){
-         
-          if(millis() - fireShotChrono - stopXmovementDelay > fireShotDelay){
-            isFiring = false;
-          }
-         
-          else{
-            if(millis() - fireShotChrono > fireShotDelay){
-              barrelGun.setActive(false);
-            }
-          }
-        }
+
       
-        else{
+        if(canMove){
           
           if (rigid.grounded){
             if(Input.getButtonDown("Special") && availableTraps > 0) {
               availableTraps--;
               placingTrap = true;
-              placingTrapChrono = millis();
+              placingTrapChrono = immobileChrono = millis();
+              immobileDelay = placingTrapDelay;
               rigid.setVelocity(new PVector(0,0));
-              animator.parameters.setFloat("SpeedX",0);
+              canMove = false;
+              
+              xVelocity = 0;
+              setXvelocity(xVelocity);
+              Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setXvelocity " + xVelocity +"#");   
+              //animator.parameters.setFloat("SpeedX",0);
             }
             
             // TODO : if animation for pickup trap, add delay  after pickup to avoid multiple traps pickup at once
@@ -173,19 +190,27 @@ public class Villager extends GameCharacter {
         }
       }
     }
+    
+   
   }
   
   
   public void fire(){
-    if(!showWeapon) ShowWeapon();
+    
+    
+    if(!showWeapon) showWeapon();
     // Waiting for raycast implementation
     isFiring = true;
+    canMove = false;
     animator.getCurrentState().startState(); // To have a fixed height for the weapon
     barrelGun.setActive(true);
     fireShotChrono = millis();
     println("Fire - " + rightShotAttackCollider + " " + leftShotAttackCollider);
-    if(facingRight) DamageClosestCollider(rightShotAttackCollider, 1, true);
-    else DamageClosestCollider(leftShotAttackCollider, 1, false);
+    
+    if(myCharacter){
+      if(facingRight) DamageClosestCollider(rightShotAttackCollider, 1, true);
+      else DamageClosestCollider(leftShotAttackCollider, 1, false);
+    }
     
   }
   
@@ -193,26 +218,29 @@ public class Villager extends GameCharacter {
     ArrayList<Collider> allColliders = collider.getCurrentTriggers();
     int  closestColliderIndex = -1;
     float closestPositionX = (float)Double.POSITIVE_INFINITY;
-   println("size + " + allColliders.size());
+    GameCharacter character = null;
+    
     for(int i=0 ; i<allColliders.size() ; i++){
-      println(allColliders.get(i).gameObject.getComponent(GameCharacter.class));
-      if(allColliders.get(i).gameObject.getClass().getSuperclass() == GameCharacter.class){
-        if(allColliders.get(i).gameObject != this.gameObject && ((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).isAlive()){
-          if(abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
-             closestColliderIndex = i;
-             closestPositionX = abs(allColliders.get(i).gameObject.position.x - collider.gameObject.position.x);
-          }
+
+      character = (GameCharacter)(allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
+      println(this + " " + character);
+      
+      if(character!= null && character != this && character.isAlive()){
+       if(abs(character.gameObject.position.x - collider.gameObject.position.x) < closestPositionX){
+           closestColliderIndex = i;
+           closestPositionX = abs(character.gameObject.position.x - collider.gameObject.position.x);
         }
       }
     }
     
     if(closestColliderIndex > -1){
-      println("check");
-      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position); 
+      ((GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponentIncludingSubclasses(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position); 
     }
   } 
   
-  public void ShowWeapon(){
+  public void showWeapon(){
+    
+    
     showWeapon = true;
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "ChasseurSpriteSheet.png",8,4);
     
@@ -235,6 +263,13 @@ public class Villager extends GameCharacter {
 
   public void placeTrap(){
     new TrapPrefab(gameObject.position);
+  }
+  
+  public void flipFireSprite(boolean barrelIsFacingRight){
+    Sprite fireSprite = (Sprite)barrelGun.getComponent(Sprite.class);
+    fireSprite.flip();
+    if(barrelIsFacingRight) barrelGun.position = new PVector(10,2);
+    else barrelGun.position = new PVector(-10,2);
   }
   
   /*

@@ -63,7 +63,7 @@ void setup(){
  Input.addAxis("Vertical","Z","S");
  Input.addAxis("Vertical","joystick Axe Y");
  Input.addButton("Jump","ESPACE"); // Warning : not working on mac... so I also add K button to jump
- Input.addButton("Jump","K");
+ //Input.addButton("Jump","K");
  Input.addButton("Jump","joystick Bouton 0");
  Input.addButton("Fire","A");
  Input.addButton("Fire","joystick Bouton 1");
@@ -71,6 +71,10 @@ void setup(){
  Input.addButton("ShowHideMiniMap","M");
  Input.addButton("Special","joystick Bouton 2");
  Input.addButton("Special","E");
+ 
+ Input.addAxis("Horizontal2","J","L");
+ Input.addAxis("Vertical2","I","K");
+ Input.addButton("Jump2","O");
 
   // Load game sprite sheets  
   tilesSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "tilesSpriteSheet.png", 24, 20);
@@ -204,11 +208,12 @@ public void connectToServer(){
     waitingPlayerString = "You are the host.\nWaiting for player connexion...";
     scene = SceneState.ServerWaitingForLaunch;
   } else {
+    println("Client ip = " + ipAdress);
     waitingPlayerString = "You are a client.\nWaiting for player connexion...";
     scene = SceneState.ClientWaitingForLaunch;
   }
   
- playButton = new Rect(width/2 + textWidth(waitingPlayerString), height/2 + 3*textSize, 1.5f*textWidth(playString), 1.5f*textSize);
+ playButton = new Rect(width/2, height/2 + 3*textSize, 1.5f*textWidth(playString), 1.5f*textSize);
 }
 
 public void launchGame(){

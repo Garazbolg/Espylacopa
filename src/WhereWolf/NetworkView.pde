@@ -62,8 +62,6 @@ public class NetworkView extends Component{
     
     NetworkView(){
       id = NetworkViews.add(this); 
-      println("NetworkView add new id in NetworkViews, this id is = " + id);
-      println("NetworkView.gameObject = " + gameObject);
     }
     
     public int getId(){
@@ -80,7 +78,7 @@ public class NetworkView extends Component{
    String buffer = "";
    for(int i = 0; i< arg.length ; i++)
      buffer += " "+ arg[i];
-   Network.write("RPC "+ target.name() + " " + Network.localIP + " " + id + " " + callbackName + buffer + "endMessage");
+   Network.write("RPC "+ target.name() + " " + Network.localIP + " " + id + " " + callbackName + buffer + "#");
  }
  
 }

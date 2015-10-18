@@ -107,22 +107,22 @@ public class Werewolf extends GameCharacter {
     
     leftHumanAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
     leftHumanAttack.addComponent(new Collider(new Rect(3, 0, 15, 20)));
-    Collider leftHumanAttackCollider = (Collider)leftHumanAttack.getComponent(Collider.class);
+    leftHumanAttackCollider = (Collider)leftHumanAttack.getComponent(Collider.class);
     leftHumanAttackCollider.isTrigger = true;
     
     GameObject rightHumanAttack = new GameObject("RigtHumanAttack", new PVector(-10,2), gameObject);
     rightHumanAttack.addComponent(new Collider(new Rect(15, 0, 15, 20)));
-    Collider rightHumanAttackCollider = (Collider)rightHumanAttack.getComponent(Collider.class);
+    rightHumanAttackCollider = (Collider)rightHumanAttack.getComponent(Collider.class);
     rightHumanAttackCollider.isTrigger = true;
     
     leftWerewolfAttack = new GameObject("LeftWerewolfAttack", new PVector(-10,2), gameObject);
     leftWerewolfAttack.addComponent(new Collider(new Rect(0, 5, 22, 30)));
-    Collider leftWerewolfAttackCollider = (Collider)leftWerewolfAttack.getComponent(Collider.class);
+    leftWerewolfAttackCollider = (Collider)leftWerewolfAttack.getComponent(Collider.class);
     leftWerewolfAttackCollider.isTrigger = true;
         
      rightWerewolfAttack = new GameObject("RigtWerewolfAttack", new PVector(-10,2), gameObject);
     rightWerewolfAttack.addComponent(new Collider(new Rect(22, 5, 22, 30)));
-    Collider rightWerewolfAttackCollider = (Collider)rightWerewolfAttack.getComponent(Collider.class);
+    rightWerewolfAttackCollider = (Collider)rightWerewolfAttack.getComponent(Collider.class);
     rightWerewolfAttackCollider.isTrigger = true;
    
     

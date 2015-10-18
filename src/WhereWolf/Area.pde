@@ -63,16 +63,17 @@ public class Rect extends Area{
  public boolean intersect(Area other){
   if(other instanceof Rect){
     Rect o = (Rect)other;
+
     return (position.x-halfDimension.x < o.position.x+o.halfDimension.x && position.x+halfDimension.x > o.position.x-o.halfDimension.x &&
             position.y-halfDimension.y < o.position.y+o.halfDimension.y && position.y+halfDimension.y > o.position.y-o.halfDimension.y);
   }
   if(other instanceof Circle){
     Circle o = (Circle)other;
-    
     PVector rectCornerUpRight = new PVector(position.x - halfDimension.x, position.y - halfDimension.y);
     PVector rectCornerUpLeft = new PVector(position.x + halfDimension.x, position.y - halfDimension.y);
     PVector rectCornerDownRight = new PVector(position.x - halfDimension.x, position.y + halfDimension.y);
     PVector rectCornerDownLeft = new PVector(position.x + halfDimension.x, position.y + halfDimension.y);
+    //println("check " + millis());
     
     return (PVector.dist(o.position, rectCornerUpRight) < o.halfRay || PVector.dist(o.position, rectCornerUpLeft) < o.halfRay || PVector.dist(o.position, rectCornerDownRight) < o.halfRay || PVector.dist(o.position, rectCornerDownLeft) < o.halfRay);
 

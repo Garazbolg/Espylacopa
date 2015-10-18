@@ -82,11 +82,9 @@ void initGame() {
   
   //player = new VillagerPrefab("One", GetSpawnPosition());
   
-  println("GameScene - isServer = " + Network.isServer + " and call Network.Instantiate and ipAdress = " + ipAdress);
   if(Network.isServer) {
     
-    player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress)).gameObject;
-    println("Server play = " + player);
+    player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), null)).gameObject;
     ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
     
   }
@@ -94,6 +92,7 @@ void initGame() {
   else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
   
    
+  //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
   //Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
   
 /*
@@ -103,7 +102,6 @@ void initGame() {
   playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
   
   
-  //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
   
   spawnPosition = new PVector(player.position.x, player.position.y);
   
@@ -172,8 +170,8 @@ void gameDraw() {
   //Debug Draw
   
   if (!Constants.DEBUG_MODE){
-    cameraDrawDebug();
-    Scene.debugDraw();
+    //cameraDrawDebug();
+    //Scene.debugDraw();
   }
 
 
@@ -232,7 +230,7 @@ private void CameraManagement() {
     map.UpdateMap(xBlock, yBlock, previousXblock, previousYblock);
   }
   
-  else if(player.getPosition().x - map.GetTilePixelSize()/2 + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
+  else if(player.getPosition().x - map.GetTilePixelSize() + playerColliderHalfDimensions.x  > resolutionStripSize+(map.GetBlockPixelSizeX()*(xBlock+1))){
     previousXblock = xBlock;
     previousYblock = yBlock;
     xBlock++;

@@ -6,6 +6,7 @@
 
 import processing.net.*;
 
+
 /*
   Static class to handle Networking
 */
@@ -45,8 +46,6 @@ public static class Network{
    if(isConnected) return false;
    
    client = new Client(env,serverIP,port);
-
-   println("fail");
    
    if(!client.active()){
     client = null;
@@ -69,13 +68,13 @@ public static class Network{
    if(!isConnected) return false;
    if(isServer){
      server.write(message);
-     println("server write : " + message);
+     //println("server write : " + message);
      return true; 
    }
    
    if(!isServer && client.active()){
      client.write(message);
-     println("client write : " + message);
+     //println("client write : " + message);
      return true; 
    }
    
@@ -99,31 +98,26 @@ public static class Network{
    return null;
  }
  
- public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String ipAdress){
+ public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String rpcIpAdress){
    if(!isServer)
-     write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + ipAdress + "endMessage");
+     write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + rpcIpAdress + "#");
    else{
      try{
-             println("Network.Instantiate : env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position + " ipAdress = " + ipAdress);
              Class<?> clazz = Class.forName(classToInstantiate);
              java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
-println("global Chech : " + constructor + " " + env + " " + classToInstantiate + " " + position);
-// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
-// global Chech : public WhereWolf$VillagerPrefab(WhereWolf,java.lang.String,processing.core.PVector) WhereWolf[panel0,0,0,1920x1080,invalid,layout=java.awt.BorderLayout] WhereWolf$VillagerPrefab [ 1280.0, 960.0, 0.0 ]
-
-             println("Server Going to create intance");
-             println("Server - env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position);
-             GameObject instance = (GameObject)constructor.newInstance(globalEnv, classToInstantiate, position);
-             println("Server created intance");
-             instance.setActive(false);
-             println("Server instance set active to false");
-              println("after instance");
-              println("instance = " + instance);
-              println("net component = " + (NetworkView)instance.getComponent(NetworkView.class));
+            
+             String gameObjectName = classToInstantiate;
+             if(rpcIpAdress != null) gameObjectName = "clientPlayer";
+             GameObject instance = (GameObject)constructor.newInstance(globalEnv, gameObjectName, position);
+             //instance.setActive(false);
              int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
              
-             Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
-             Network.write("RPC " + RPCMode.Specific + " " + ipAdress + " " + newObjectId + " initPlayerendMessage");                          
+             println("Server just created instance");
+             println("Server write message : " + "InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "#");
+             if(rpcIpAdress != null) println("Server write message : " + "RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");
+               
+             Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "#");
+             if(rpcIpAdress != null) Network.write("RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");                          
              return newObjectId;
            }
     catch(Exception e){

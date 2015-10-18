@@ -53,9 +53,9 @@ public abstract class GameCharacter extends Component{
   
   protected boolean staticGrave = false;
   
-  private boolean canMove = true; 
-  private float immobileChrono;
-  private float immobileDelay;
+  protected boolean canMove = true; 
+  protected float immobileChrono;
+  protected float immobileDelay;
   
   private float openChestImmobileDelay = 1000;
   
@@ -71,8 +71,20 @@ public abstract class GameCharacter extends Component{
   
   protected float damageMultiplicator = 1;
   
+  protected boolean myCharacter = false;
+  
+  
+  private String horizontalInput;
+  private String verticalInput;
+  private String jumpInput;
+  
+  protected float xVelocity;
+  
 
   GameCharacter(){
+    
+    DefineInputs();
+    
     deadSpriteSheet = new SpriteSheet(characterSpriteSheetPath + "grave.png", 1, 1);
     dead = new State(new Animation(deadSpriteSheet, 0, false), 1);
 
@@ -84,7 +96,8 @@ public abstract class GameCharacter extends Component{
 
     gameObject.addComponent(new NetworkView());
     this.addRPC("initPlayer", new DelegateInitPlayer(this));
-    
+    this.addRPC("setXvelocity", new DelegateSetXvelocity(this));
+    this.addRPC("decreaseLife", new DelegateDecreaseLife(this));
     
     invincibilityEffect = new GameObject("invincibilityEffect", new PVector(-1,5), this.gameObject);
     
@@ -141,17 +154,35 @@ public abstract class GameCharacter extends Component{
   
  
   public void update(){
-    if(!playerInitialized) return;
     super.update();
     
+          // TODO : put this accesible via RPC + use a host timer reference 
+    if(invulnerable){
+      if(millis() - blinkChrono > blinkDelay){
+        blinkNumber++;
+        visible = !visible;
+        animator.parameters.setBool("Visible", visible);
+        
+        if(blinkNumber == maxBlinkNumber){
+          invulnerable = false; 
+          invincibilityEffect.setActive(false);
+        }
+        
+        blinkChrono = millis();
+        
+      }
+    }
+    
+    if(!playerInitialized || !myCharacter) return;
+    
     if(rigid.getVelocity().x != 0 || rigid.getVelocity().y != 0){
-      //Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "endMessage");
+      Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
     }
     
     //println(isAlive);
     if(isAlive){
       if(canMove) {
-        rigid.setVelocity(new PVector(Input.getAxisRaw("Horizontal")*movementSpeed, rigid.getVelocity().y));
+        rigid.setVelocity(new PVector(Input.getAxisRaw(horizontalInput)*movementSpeed, rigid.getVelocity().y));
       } else {
         rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
         if(millis() - immobileChrono > immobileDelay) canMove = true;
@@ -169,9 +200,9 @@ public abstract class GameCharacter extends Component{
         if(xMovementCausedByDamage < 0) xMovementCausedByDamage = 0;
       }
         
-        if(Input.getButtonDown("Jump") && canMove && (rigid.grounded || airJumpForDebug)) {
+        if(Input.getButtonDown(jumpInput) && canMove && (rigid.grounded || airJumpForDebug)) {
 
-          if(Input.getAxisRaw("Vertical") > 0){            
+          if(Input.getAxisRaw(verticalInput) > 0){            
             for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
               if(characterCollider.currentCollisions.get(i).passablePlatform){
                 characterCollider.getOverlookColliders().add(characterCollider.currentCollisions.get(i));
@@ -185,7 +216,7 @@ public abstract class GameCharacter extends Component{
           }
         }
         
-        else if(Input.getAxisRaw("Vertical") < 0 && rigid.getVelocity().x == 0){   
+        else if(Input.getAxisRaw(verticalInput) < 0 && rigid.getVelocity().x == 0){   
           for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
             Chest chestComponent = (Chest)(characterCollider.currentCollisions.get(i).gameObject.getComponent(Chest.class));
             if(chestComponent != null){ // if collider is a chest and chest is closed
@@ -200,49 +231,17 @@ public abstract class GameCharacter extends Component{
             }
           }
         }
-        
 
-      //float xVelocity = (float)rigid.getVelocity().x;
-      float xVelocity = Input.getAxisRaw("Horizontal")*movementSpeed;
-      if(!canMove) xVelocity = 0;
-      animator.parameters.setFloat("SpeedX",xVelocity);
-      if(xVelocity > 0) {
-        if(!isRunning){
-          isRunning = true;
-          characterCollider.setArea(runningColliderRect); 
-        }
-        facingRight = true;
+      float newXvelocity = Input.getAxisRaw(horizontalInput)*movementSpeed;
+      if(!canMove) newXvelocity = 0;
+      if(xVelocity != newXvelocity){
+        xVelocity = newXvelocity;
+        setXvelocity(xVelocity);
+        Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setXvelocity " + xVelocity +"#");    
       }
-      else if(xVelocity < 0) {
-        if(!isRunning){
-          isRunning = true;
-          characterCollider.setArea(runningColliderRect); 
-        }
-        facingRight = false;
-      }
+
       
-      else{
-        if(isRunning){
-          isRunning = false;
-          characterCollider.setArea(staticColliderRect); 
-        } 
-      }
-      
-      if(invulnerable){
-        if(millis() - blinkChrono > blinkDelay){
-          blinkNumber++;
-          visible = !visible;
-          animator.parameters.setBool("Visible", visible);
-          
-          if(blinkNumber == maxBlinkNumber){
-            invulnerable = false; 
-            invincibilityEffect.setActive(false);
-          }
-          
-          blinkChrono = millis();
-          
-        }
-      }
+
     }
     
   }
@@ -257,6 +256,8 @@ public abstract class GameCharacter extends Component{
   
   public void DecreaseLife(int n, PVector aggressorPosition){
     if(invulnerable) return;
+    
+    Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + n + " " + aggressorPosition.x + " " + aggressorPosition.y +"#");    
     
     if(armorLife > 0){
       DecreaseArmorLife(n, aggressorPosition); 
@@ -485,11 +486,56 @@ public abstract class GameCharacter extends Component{
     
     gameObject.setActive(true);
     rigid.isKinematic = false;
+    
+    characterCollider.forceDebugDraw = true;
+    
+    myCharacter = true;
   }
   
   
   public void Debug(){
      
+  }
+  
+  // Method called in update if playerCharacter, else by RPC
+  public void setXvelocity(float xVelocity){
+    animator.parameters.setFloat("SpeedX",xVelocity);
+    if(xVelocity > 0) {
+      if(!isRunning){
+        isRunning = true;
+        characterCollider.setArea(runningColliderRect); 
+      }
+      facingRight = true;
+    }
+    else if(xVelocity < 0) {
+      if(!isRunning){
+        isRunning = true;
+        characterCollider.setArea(runningColliderRect); 
+      }
+      facingRight = false;
+    }
+    
+    else{
+      if(isRunning){
+        isRunning = false;
+        characterCollider.setArea(staticColliderRect); 
+      } 
+    }
+     
+  }
+  
+  // TODO : Define inputs for more than two players
+  public void DefineInputs(){
+            
+      if(Network.isServer){
+        horizontalInput = "Horizontal";
+        verticalInput = "Vertical";
+        jumpInput = "Jump";
+      } else{
+        horizontalInput = "Horizontal2";
+        verticalInput = "Vertical2";
+        jumpInput = "Jump2";
+      }
   }
   
   

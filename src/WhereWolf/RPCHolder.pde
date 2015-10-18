@@ -5,6 +5,12 @@
 */
 
 
+// Process to create new RCP :
+// 1) Create new Delegate class which Extends from Delegate and define his specific call method (which converts string args to good type)
+// 2) Add RPC to the component which contains the method, example : this.addRPC("decreaseLife", new DelegateDecreaseLife(this));
+// 3) Write the RPC call to network, message format : RPCMode.? + " " + ipAdress (only if useful for RPCMode specified) + " " + objectNetworkId (object on which the method will be called) + " " + name of delegate + #
+// Don't forget all messages must finish with # symbol !
+
 /*
   Holder for the callbacks of the components in a GameObject
 */
@@ -31,9 +37,7 @@ public class RPCHolder{
   }
   
   public void callback(String name,String [] argv){
-    println("RPCHolder - Callback with name = " + name + " and argv = " + argv); 
     Delegate func = delegates.get(name);
-    println("RPCHolder - Callback, func = " + func);
     if(func != null)
       func.call(argv);
   }
