@@ -1,42 +1,21 @@
 
 /* KNOWN BUGS :
 - Saws collision not working if player is static
-- Player can play if his spawn position is inside a collider
+- Player can't play if his spawn position is inside a collider
 
 */
 
 import java.awt.event.*;
 
-SceneState scene;
+SceneState scene; // Enum used to  determine what to display on the screen
 
+// UI String dislayed on screen
 String launchString = "Launch a game";
 String playString = "Play";
-String waitingPlayerString;
 
-PImage titleBackground;
-PImage title;
-float titleBackgroudOffset = 0;
-float titleScale = 1;
-boolean displayPressA = false;
-float displayPressATimer = 0;
+String waitingPlayerString; // Runtime determination (depands if player is host or not and this string will contains his client number)
 
-Rect mouse;
-Rect launchButton;
-Rect playButton;
-
-
-Rect fogOfWarButton;
-Rect lowPerfButton;
-Rect autoMapSizeButton;
-Rect smallMapSizeButton;
-Rect mediumMapSizeButton;
-Rect bigMapSizeButton;
-
-
-Rect hunterButton;
-Rect werewolfButton;
-
-
+// String game options
 String fogOfWarString = "Fog of War";
 String lowPerfString =  "Low Performances";
 
@@ -51,13 +30,41 @@ String chooseClassString = "Choose you're class : ";
 String hunterString = "Hunter";
 String werewolfString = "Wherewolf";
 
+// Title variables
+PImage titleBackground;
+PImage title;
+float titleBackgroudOffset = 0;
+float titleScale = 1;
+
+
+boolean displayPressA = false;
+float displayPressATimer = 0;
+
+
+Rect mouse; // Used to display mouse position feedback, manly useful in fullscreen
+
+// Buttons variables
+Rect launchButton;
+Rect playButton;
+
+Rect fogOfWarButton;
+Rect lowPerfButton;
+Rect autoMapSizeButton;
+Rect smallMapSizeButton;
+Rect mediumMapSizeButton;
+Rect bigMapSizeButton;
+
+Rect hunterButton;
+Rect werewolfButton;
+
+
 int textSize = 32;
 int optionsTextSize = 25;
 
 boolean playGameWithOneComptuer = true; // Used to attributes differents inputs for each player using same keyboard
 int maxPlayerNumberOnOneComputer = 3; // Depands of the number of differents inputs established
 
-
+// Camera variables
 PVector cameraPosition;
 float cameraWidth;
 float cameraHeight;
@@ -67,6 +74,7 @@ String characterSpriteSheetPath = "data/Characters/";
 String mapTilesSpriteSheetPath = "data/Sprites/";
 String spritesPath = "data/Sprites/";
 
+// Spritesheet variables
 private SpriteSheet tilesSpriteSheet;
 private SpriteSheet torchSpriteSheet;
 private SpriteSheet lavaSpriteSheet;
@@ -76,11 +84,16 @@ private SpriteSheet transformationEffectSpriteSheet;
 private SpriteSheet invincibilityEffectSpriteSheet;
 private SpriteSheet powerEffectSpriteSheet;
 
+
 MessageHandler messageHandler;
 
+// Like all tests have been realized with only one computer, we simulate differents clients by assigning a random ip
+// Note : ip for host is useless because all code will identify him using static variable Network.isServer
+// WARNING : game would be broken if random return similar number for two differents clients, be careful
 int clientId = (int)random(2, 255);
 String ipAdress = "127.0.0."+clientId;
 
+// Attribuated by server
 int globalPlayerNumber = 0;
 boolean playerNumberAssigned = false;
 
@@ -88,18 +101,19 @@ float pixelResolutionStripSize;
 float cameraResolutionOffsetX;
 float cameraResolutionOffsetY;
 
+// If false, saws movements are realized on each client and, despite a message from the server indicating the start signal, clients are not really synchronized, so it's really more safer to let the network synchronize the saws positions
 boolean sawsManagedByNetwork = true;
 
-boolean fogOfWar = false;
-boolean lowPerf = false;
+// Options variables
+boolean fogOfWar = false; // fog of war reduces the vision of the minimap to the rooms already visited
+boolean lowPerf = false; // due to very bad optimizations from processing concerning the image display, it can be interesting to activate this option which suppresses the display of background tiles 
 
-int mapSizeOption = 0; // 0 : auto, 1 : small, 2 : mediuem, 3 : big
-int choosenClass = 0; // 0 : hunter,  1 : werewolf
+int mapSizeOption = 0; // affect the size of the map (0 = auto, 1 = small, 2 = mediuem, 3 = big)
+int choosenClass = 0; // (0 = hunter,  1 = werewolf)
 
-boolean gameLaunched = false;
+boolean gameLaunched = false; // used to filter unwanted clicks on the button which is launching the game 
 
-
-static WhereWolf globalEnv;
+static WhereWolf globalEnv; // usef for reflection in network instantiate methods (it is a specific constraint from processing)
 
 void setup(){
   
@@ -110,6 +124,7 @@ void setup(){
   frameRate(120);
   noSmooth(); //To prevent antialiasing
   ((PGraphicsOpenGL)g).textureSampling(3);
+  
   textSize(textSize);   
  
   ImageManager.start(this);
@@ -118,42 +133,41 @@ void setup(){
  
   scene = SceneState.Title;
  
-
-  frame.setResizable(true);
+  frame.setResizable(true); // Allow the window to be resized
   
+  // Listener which is activate when window is resized
   frame.addComponentListener(new ComponentAdapter() { 
     public void componentResized(ComponentEvent e) { 
       if(e.getSource()==frame) { 
-        adaptDisplayVariablesToResolution();
+        adaptDisplayVariablesToResolution(); // some variables affecting game display are depandant of the window size
       } 
     } 
   });
-
-  //scene = SceneState.MainMenu;
-
-
-  mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
 
   // Defines inputs
   Input.addAxis("Horizontal", "Q", "D");
   Input.addAxis("Horizontal", "joystick Axe X");
   Input.addAxis("Vertical", "Z", "S");
   Input.addAxis("Vertical", "joystick Axe Y");
-  Input.addButton("Jump", "ESPACE"); // Warning : not working on mac... so I also add K button to jump
-  //Input.addButton("Jump","K");
+  Input.addButton("Jump", "ESPACE"); 
   Input.addButton("Jump", "joystick Bouton 0");
+  
+  //Input.addButton("Jump","K"); // Warning : not working on mac... so I also add K button to jump
+  
   Input.addButton("Fire", "A");
   Input.addButton("Fire", "joystick Bouton 1");
   Input.addButton("ShowHideMiniMap", "M");
   Input.addButton("Special", "joystick Bouton 2");
   Input.addButton("Special", "E");
 
+  // Inputs for player 2 on keyboard
   Input.addAxis("Horizontal2", "J", "L");
   Input.addAxis("Vertical2", "I", "K");
   Input.addButton("Jump2", "ENTREE");
   Input.addButton("Fire2", "U");
   Input.addButton("Special2", "O");
 
+  // Inputs for player 3 on keyboard
   Input.addAxis("Horizontal3", "4", "6");
   Input.addAxis("Vertical3", "8", "5");
   Input.addButton("Jump3", "0");
@@ -162,6 +176,7 @@ void setup(){
   
   mouse = new Rect(mouseX, mouseY, 32, 32); // To represent the mouse on the screen
  
+  // Title variables initialization
   titleBackground = ImageManager.getImage("Misc/title_WhereWolf.png");
   //titleBackground.resize(0,displayHeight);
   titleScale = height* 1.0f /titleBackground.height;
@@ -184,18 +199,16 @@ void setup(){
   
   launchButton = new Rect(width/2, height/2 + title.height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
   
-  
 }
 
 
 
 void draw() {
 
-  background(100);
+  background(100); // Be careful, very CPU intensive method
 
   Input.update();
   Updatables.update();
-  
   messageHandler.update();
 
   fill(255);
@@ -285,9 +298,8 @@ void draw() {
           fill(0);
       }
       
-      if (!gameLaunched && mouse.intersect(playButton) && mousePressed) {          
+      if (!gameLaunched && mouse.intersect(playButton) && mousePressed) {
         gameLaunched = true;
-        
         
         Network.write("SetFogOfWar " + fogOfWar + "#");        
         Scene.startScene(new GameObject("Scene", new PVector(), null));
@@ -356,13 +368,15 @@ boolean sketchFullScreen() {
 
 public void connectToServer() {
   
-    lowPerfButton = new Rect(1.5f*textWidth(fogOfWarString)/2, 3*optionsTextSize + 4*optionsTextSize, 0.65f*textWidth(lowPerfString), 1.5f*optionsTextSize);
+  
+  // Buttons options initialization
+  lowPerfButton = new Rect(1.5f*textWidth(fogOfWarString)/2, 3*optionsTextSize + 4*optionsTextSize, 0.65f*textWidth(lowPerfString), 1.5f*optionsTextSize);
     
-    float maxClassTextWidth = max(textWidth(hunterString), textWidth(werewolfString));
+  float maxClassTextWidth = max(textWidth(hunterString), textWidth(werewolfString));
+  hunterButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 1.5f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
+  werewolfButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 3.2f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
     
-    hunterButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 1.5f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
-    werewolfButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 3.2f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
-    
+  // Try to connect as a client, if it is ossible, server is not accessible so you become host
   if (!Network.connectClient(this, "127.0.0.1", 12345, ipAdress)) {
     Network.connectServer(this, 12345); 
     waitingPlayerString = "You are the host.\nWaiting for player connexion...";
@@ -370,6 +384,7 @@ public void connectToServer() {
     globalPlayerNumber = 0;
     playerNumberAssigned = true;
     
+    // Host buttons options initialization
     playButton = new Rect(width/2, height/2 + 3*textSize, 1.5f*textWidth(playString), 1.5f*textSize);
     fogOfWarButton = new Rect(1.5f*textWidth(fogOfWarString)/2, lowPerfButton.position.y - 4*optionsTextSize, 0.65f*textWidth(fogOfWarString), 1.5f*optionsTextSize);
     lowPerfButton = new Rect(1.5f*textWidth(fogOfWarString)/2, fogOfWarButton.position.y + 2*fogOfWarButton.halfDimension.y + optionsTextSize, 0.65f*textWidth(lowPerfString), 1.5f*optionsTextSize);
@@ -379,14 +394,11 @@ public void connectToServer() {
     bigMapSizeButton = new Rect(mediumMapSizeButton.position.x + (textWidth(bigMapSizeString) - textWidth(mediumMapSizeString))/2 + 2*mediumMapSizeButton.halfDimension.x + 26, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(bigMapSizeString), 1.5f*optionsTextSize);
 
   } else {
-    println("Client ip = " + ipAdress);
+    println("Client ip = " + ipAdress); 
     Network.write("ClientAskHisClientNumber " + ipAdress + "#");
     waitingPlayerString = "You are the client number ?\nWaiting for player connexion...";
     scene = SceneState.ClientWaitingForLaunch;
   }
-  
-  
-    //fogOfWarButton = new Rect(1.5f*textWidth(fogOfWarString)/2, lowPerfButton.position.y - 4*optionsTextSize, 0.65f*textWidth(fogOfWarString), 1.5f*optionsTextSize);
 
 }
 
@@ -396,6 +408,7 @@ public void launchGame() {
   fill(0);
 }
 
+// Set or update variables influencing display of the game. These variables depend of the window size.
 public void adaptDisplayVariablesToResolution(){
   globalScale = ((height < width)?height:width)/128;// 128 => Taille de la room (Tile = 16x16 pixels ; block = 8x8 tiles) donc affichage = 8*16 = 128 pixels
   resolutionStripSize = ((width - (4*height)/3)/2)/globalScale;
@@ -409,11 +422,13 @@ public void adaptDisplayVariablesToResolution(){
   if(map != null) map.DefineMiniMapSize();
 }
 
+// Method called from a message written by the server after all the clients had terminiated game initialization
 public void startGame(){
   Time.timeScale = 1;
   scene = SceneState.Game;  
 }
 
+// Draw host and clients options
 public void drawOptions(){
   textSize(optionsTextSize);
   if(Network.isServer){

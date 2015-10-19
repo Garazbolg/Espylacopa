@@ -38,9 +38,9 @@ public static class Network{
    }
    catch(RuntimeException e){
      server = null;
-    lastSocketFailed = true;
-    isConnected = false; 
-    return false;
+     lastSocketFailed = true;
+     isConnected = false; 
+     return false;
    }
    
  }
@@ -48,21 +48,25 @@ public static class Network{
  public static boolean connectClient(processing.core.PApplet env,String serverIP,int port, String ipAdress){
    if(isConnected) return false;
    
-   client = new Client(env,serverIP,port);
-   
-   if(!client.active()){
-    client = null;
-    lastSocketFailed = true;
-   isConnected = false; 
-   return false;
-   }
-   else{
-    isConnected = true;
-    isServer = false;
-    server = null;
-    localIP = ipAdress;
-    println("new client connected");
-    return true;
+   try{
+     client = new Client(env,serverIP,port); // Note : constructor print an error if server is not already connected. This is not blocking execution of code and there is not possibility to catch this message to avoid his display.
+     
+     if(!client.active()){
+      client = null;
+      lastSocketFailed = true;
+     isConnected = false; 
+     return false;
+     }
+     else{
+      isConnected = true;
+      isServer = false;
+      server = null;
+      localIP = ipAdress;
+      println("new client connected");
+      return true;
+     }
+   } catch(RuntimeException e){
+     return false;
    }
  }
  

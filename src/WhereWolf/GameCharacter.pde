@@ -256,6 +256,25 @@ public abstract class GameCharacter extends Component{
 
     }
     
+    // TODO : Reformat code to avoid repetition (DRY)
+    else if(!staticGrave){
+      rigid.setVelocity(new PVector(Input.getAxisRaw(horizontalInput)*movementSpeed, rigid.getVelocity().y));
+      if(Input.getButtonDown(jumpInput) && canMove && (rigid.grounded || airJumpForDebug)) {
+        if(Input.getAxisRaw(verticalInput) > 0){            
+          for(int i=0 ; i<characterCollider.currentCollisions.size() ; i++){
+            if(characterCollider.currentCollisions.get(i).passablePlatform){
+              characterCollider.getOverlookColliders().add(characterCollider.currentCollisions.get(i));
+            }
+          } 
+
+        }
+        
+        else{
+          rigid.setVelocity(new PVector(rigid.getVelocity().x,-160.0f));
+        }
+      }
+    }
+    
   }
   
   public int GetLife(){

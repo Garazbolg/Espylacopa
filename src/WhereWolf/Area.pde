@@ -68,19 +68,9 @@ public class Rect extends Area{
             position.y-halfDimension.y < o.position.y+o.halfDimension.y && position.y+halfDimension.y > o.position.y-o.halfDimension.y);
   }
   if(other instanceof Circle){
+    
     Circle o = (Circle)other;
-    PVector rectCornerUpRight = new PVector(position.x - halfDimension.x, position.y - halfDimension.y);
-    PVector rectCornerUpLeft = new PVector(position.x + halfDimension.x, position.y - halfDimension.y);
-    PVector rectCornerDownRight = new PVector(position.x - halfDimension.x, position.y + halfDimension.y);
-    PVector rectCornerDownLeft = new PVector(position.x + halfDimension.x, position.y + halfDimension.y);
-    //println("check " + millis());
     
-    return (PVector.dist(o.position, rectCornerUpRight) < o.halfRay || PVector.dist(o.position, rectCornerUpLeft) < o.halfRay || PVector.dist(o.position, rectCornerDownRight) < o.halfRay || PVector.dist(o.position, rectCornerDownLeft) < o.halfRay);
-
-
-    // Code below was maybe more optimized but it was not working and detect false collisions
-    
-    /*
     //Check the four corners of the rectangle, if either one of them is in the circle then they intersect
     if(o.inBounds(PVector.sub(position,halfDimension)) || o.inBounds(position.x-halfDimension.y,position.y+halfDimension.y) || o.inBounds(position.x+halfDimension.x,position.y-halfDimension.y) || o.inBounds(PVector.add(position,halfDimension)))
       return true;
@@ -89,7 +79,7 @@ public class Rect extends Area{
     if(inBounds(o.position) || inBounds(o.position.x+o.halfRay,o.position.y) || inBounds(o.position.x,o.position.y+o.halfRay) || inBounds(o.position.x-o.halfRay,o.position.y) || inBounds(o.position.x,o.position.y-o.halfRay))
       return true;
       
-    return false;*/
+    return false;
   }
   
   return false;
