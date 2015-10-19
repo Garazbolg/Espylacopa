@@ -155,11 +155,7 @@ public abstract class GameCharacter extends Component{
     rigid = (Rigidbody)(gameObject.getComponent(Rigidbody.class));
     rigid.start();
     rigid.isKinematic = true;
-    
-   
-
-    //characterCollider.forceDebugDraw = true;
-    
+       
     gameObject.addComponent(animator);
     activateBlinkOfInvulnerability(takeDamageCooldown);
   }
@@ -168,7 +164,6 @@ public abstract class GameCharacter extends Component{
   public void update(){
     super.update();
     
-    // TODO : put this accesible via RPC + use a host timer reference 
     if(invulnerable){
       if(millis() - blinkChrono > blinkDelay){
         blinkNumber++;
@@ -187,16 +182,10 @@ public abstract class GameCharacter extends Component{
     
     if(!playerInitialized || !myCharacter) return;
     
-    /*
-    if(rigid.getVelocity().x != 0 || rigid.getVelocity().y != 0){
-      Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
-    }
-    */
-    
     if(lastXposition != gameObject.position.x || lastYposition != gameObject.position.y){
       lastXposition = gameObject.position.x;
       lastYposition = gameObject.position.y;
-      Network.write("SetCharacterPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
+      Network.write("SetPosition " +  playerId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
     }
     
     if(isAlive){
@@ -409,11 +398,6 @@ public abstract class GameCharacter extends Component{
      invincibilityEffect.setActive(true);
   }
   
-  // TODO : OBSOLETE METHOD - DELETE IT
-  public GameObject getPowerEffect(){
-     return powerEffect;
-  }
-  
   public void die(){
     isAlive = false;
     animator.setCurrentState(dead);
@@ -513,6 +497,7 @@ public abstract class GameCharacter extends Component{
   }
   
   public void initPlayer(){
+    
     player = this.gameObject;
     //playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
     playerCharacterComponent = this;
@@ -523,9 +508,9 @@ public abstract class GameCharacter extends Component{
     cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
   
     
-    //Updatables.start();
+    Updatables.start();
   
-    scene = SceneState.Game;    
+    //scene = SceneState.Game;    
     
     playerInitialized = true; 
     playerId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
@@ -536,6 +521,9 @@ public abstract class GameCharacter extends Component{
     characterCollider.forceDebugDraw = true;
     
     myCharacter = true;
+    
+    if(!Network.isServer) Network.write("ClientReady#");
+    else if(Network.numberOfClients == 0) startGame();
   }
   
   
@@ -570,7 +558,7 @@ public abstract class GameCharacter extends Component{
      
   }
   
-  // TODO : Define inputs for more than two players
+  // TODO : Define inputs for more than three players
   public void DefineInputs(){
     println("DefineInputs - globalPlayerNumber = " + globalPlayerNumber + " ipAdress = " + ipAdress);
     if(playGameWithOneComptuer && globalPlayerNumber > 0 && globalPlayerNumber < maxPlayerNumberOnOneComputer){

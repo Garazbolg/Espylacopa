@@ -16,11 +16,21 @@ public class Saw extends Component {
   private GameObject blockLocation;
   private boolean display = true;
   
+  private int networkId;
+  
   Saw(GameObject sawTrailGameObject){
     currentSawTrail = sawTrailGameObject;
   }
   
   public void init(){
+    
+    /*
+    if(sawsManagedByNetwork){
+      gameObject.addComponent(new NetworkView());
+      networkId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
+    }
+    */
+    
     gameObject.addComponent(new DamageCollider(new Circle(0, 0, 12), 1));
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layer = CollisionLayer.CharacterBody;
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layerManagement = LayerManagement.OnlyMyLayer;
@@ -54,18 +64,24 @@ public class Saw extends Component {
         }
       }
       
-     PVector movement = new PVector(distanceBetweenTwoSails.x, distanceBetweenTwoSails.y); 
-      
-      movement.mult(speed*Time.deltaTime());
-      
-      //gameObject.position.add(movement);
-      gameObject.position = PVector.add(gameObject.position, movement);
-      
-      //println(PVector.dist(currentSawTrail.position, gameObject.position) + " " + PVector.dist(currentSawTrail.position, nextSawTrail.position));
-      if(PVector.dist(currentSawTrail.position, gameObject.position) > PVector.dist(currentSawTrail.position, nextSawTrail.position)){
-         gameObject.position = nextSawTrail.position;
-         defineNextSail();
-      }
+     if(!sawsManagedByNetwork ||Network.isServer){ 
+       PVector movement = new PVector(distanceBetweenTwoSails.x, distanceBetweenTwoSails.y); 
+        
+       movement.mult(speed*Time.deltaTime());
+        
+       //gameObject.position.add(movement);
+       gameObject.position = PVector.add(gameObject.position, movement);
+        
+       //println(PVector.dist(currentSawTrail.position, gameObject.position) + " " + PVector.dist(currentSawTrail.position, nextSawTrail.position));
+       if(PVector.dist(currentSawTrail.position, gameObject.position) > PVector.dist(currentSawTrail.position, nextSawTrail.position)){
+          gameObject.position = nextSawTrail.position;
+          defineNextSail();
+       }
+       
+       if(Network.isServer){
+         Network.write("SetPosition " + networkId + " " + gameObject.position.x + " " + gameObject.position.y + "#");
+       }
+     }
       
       
     }
@@ -92,6 +108,11 @@ public class Saw extends Component {
   
   public void setBlockLocation(GameObject go){
      blockLocation = go;
+  }
+  
+  public void addOnNetwork(){
+    gameObject.addComponent(new NetworkView());
+    networkId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId(); 
   }
   
   

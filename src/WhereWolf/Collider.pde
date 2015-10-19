@@ -172,11 +172,20 @@ public class Collider extends Component implements DebugDrawable{
  
  //Does this collider and an other collider intersect  (Overlap) ?
  public boolean intersect(Collider other){
+   
    Area myArea = (Area)area.clone();
    Area otherArea = (Area)other.area.clone();
    
-   myArea.position.add(getGameObject().getPosition());
-   otherArea.position.add(other.getGameObject().getPosition());
+   if(getGameObject() != null) myArea.position.add(getGameObject().getPosition());
+   else{
+     println("ERROR ERROR ERROR - Intersect crash avoided because getGameObject() is null"); 
+   }
+   if(other.getGameObject() != null) otherArea.position.add(other.getGameObject().getPosition());
+   else{
+     println("ERROR ERROR ERROR - Intersect crash avoided because other.getGameObject() is null, getGameObject() = " + getGameObject());
+     println("And gameObject.name = " + getGameObject().name);
+     
+   }
    
   return myArea.intersect(otherArea);
  }

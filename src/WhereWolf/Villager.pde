@@ -145,10 +145,8 @@ public class Villager extends GameCharacter {
               xVelocity = 0;
               setXvelocity(xVelocity);
               Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + playerId + " setXvelocity " + xVelocity +"#");   
-              //animator.parameters.setFloat("SpeedX",0);
             }
             
-            // TODO : if animation for pickup trap, add delay  after pickup to avoid multiple traps pickup at once
             if(availableTraps < maxTrapsNumber && Input.getAxisRaw(verticalInput) < 0){
               ArrayList<Collider> allTriggers = characterCollider.getCurrentTriggers();
               boolean pickupTrap = false;

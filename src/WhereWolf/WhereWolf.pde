@@ -54,6 +54,8 @@ float pixelResolutionStripSize;
 float cameraResolutionOffsetX;
 float cameraResolutionOffsetY;
 
+boolean sawsManagedByNetwork = true;
+
 static WhereWolf globalEnv;
 
 void setup(){
@@ -100,7 +102,6 @@ void setup(){
   Input.addButton("Jump", "joystick Bouton 0");
   Input.addButton("Fire", "A");
   Input.addButton("Fire", "joystick Bouton 1");
-  Input.addButton("DebugGetDamage", "P");
   Input.addButton("ShowHideMiniMap", "M");
   Input.addButton("Special", "joystick Bouton 2");
   Input.addButton("Special", "E");
@@ -135,13 +136,12 @@ void setup(){
   powerEffectSpriteSheet = new SpriteSheet(mapTilesSpriteSheetPath + "powerEffectSpriteSheet.png", 3, 1);
 
   globalEnv = this;
-  //Time.setTimeScale(0);
   
-  Updatables.start();
+  //Updatables.start();
   GUI.start(this);
   
   
-  adaptDisplayVariablesToResolution();
+  
 }
 
 
@@ -160,21 +160,22 @@ void draw() {
 
   switch(scene) {
 
-    
-    
-   case Title :
-     pushMatrix();
-     scale(titleScale);
-     image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
-     image(titleBackground,titleBackgroudOffset,0);
-     image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
+    case Title :
+      pushMatrix();
+      scale(titleScale);
+      image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
+      image(titleBackground,titleBackgroudOffset,0);
+      image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
      
-     titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
      
-     if(titleBackgroudOffset > titleBackground.width)
-       titleBackgroudOffset -= titleBackground.width;
-     if(Input.getButtonDown("Jump"))
-       scene = SceneState.MainMenu;
+      if(titleBackgroudOffset > titleBackground.width){
+        titleBackgroudOffset -= titleBackground.width;
+      }
+      if(Input.getButtonDown("Jump")){
+        scene = SceneState.MainMenu;
+      }
+     
       popMatrix();
       
       image(title,width/2-title.width/2,title.height/2);
@@ -184,6 +185,7 @@ void draw() {
         GUI.labelCenter(new PVector(width/2,height/3.0f*2),"Press A ...");
         fill(0);
       }
+     
       displayPressATimer += Time.unscaledDeltaTime()*1.5;
       
       if(displayPressATimer > 1){
@@ -191,103 +193,101 @@ void draw() {
         displayPressATimer -= 1;
       }
       
-   break;
+    break;
    
-   case MainMenu :
+    case MainMenu :
     
       pushMatrix();
-     scale(titleScale);
-     image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
-     image(titleBackground,titleBackgroudOffset,0);
-     image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
+      scale(titleScale);
+      image(titleBackground,titleBackgroudOffset-titleBackground.width,0);
+      image(titleBackground,titleBackgroudOffset,0);
+      image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
      
-     titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
      
-     if(titleBackgroudOffset > titleBackground.width)
-       titleBackgroudOffset -= titleBackground.width;
+      if(titleBackgroudOffset > titleBackground.width){
+        titleBackgroudOffset -= titleBackground.width;
+      }
+      
       popMatrix();
       
       image(title,width/2-title.width/2,title.height/2);
     
-    fill(255);
-    launchButton.draw();   
+      fill(255);
+      launchButton.draw();   
 
-    fill(0);
-    text(launchString, launchButton.position.x - textWidth(launchString)/2, launchButton.position.y + textSize/4);
-
-    if (Input.getButtonDown("Jump")) {
-      connectToServer();
-    } else {
-      if (mouse.intersect(launchButton)) {
-        fill(255, 0, 0);
-        if (mousePressed) {
-          connectToServer();
-        }
+      fill(0);
+      text(launchString, launchButton.position.x - textWidth(launchString)/2, launchButton.position.y + textSize/4);
+  
+      if (Input.getButtonDown("Jump")) {
+        connectToServer();
       } else {
-        fill(0);
-      }
-    }
-
-
-    //rect(mouse.position.x, mouse.position.y, 2*mouse.halfDimension.x, 2*mouse.halfDimension.y);
-    break;
-
-  case ServerWaitingForLaunch :
-    fill(255);
-    playButton.draw();
-    fill(0);
-    text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
-    text(playString, playButton.position.x - textWidth(playString)/2, playButton.position.y + textSize/4);
-
-    if (Input.getButtonDown("Jump")) {          
-      Scene.startScene(new GameObject("Scene", new PVector(), null));
-      map = new MapManager(8, ""); 
-      launchGame();
-    } else {  
-      if (mouse.intersect(playButton)) {
-        fill(255, 0, 0);
-        if (mousePressed) {
-          Scene.startScene(new GameObject("Scene", new PVector(), null));
-          map = new MapManager(8, ""); 
-          launchGame();
+        if (mouse.intersect(launchButton)) {
+          fill(255, 0, 0);
+          if (mousePressed) {
+            connectToServer();
+          }
+        } else {
+          fill(0);
         }
-      } else {
-        fill(0);
       }
-    }
 
+  
+      //rect(mouse.position.x, mouse.position.y, 2*mouse.halfDimension.x, 2*mouse.halfDimension.y);
+      break;
 
-
-
-
-    break;
-
-  case ClientWaitingForLaunch :
-    fill(0);
-    if (!playerNumberAssigned) {
-      if (globalPlayerNumber > 0) {
-        waitingPlayerString = "You are the client number " + globalPlayerNumber +".\nWaiting for player connexion...";
-        playerNumberAssigned = true;
+    case ServerWaitingForLaunch :
+      fill(255);
+      playButton.draw();
+      fill(0);
+      text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
+      text(playString, playButton.position.x - textWidth(playString)/2, playButton.position.y + textSize/4);
+    
+      if (Input.getButtonDown("Jump")) {          
+        Scene.startScene(new GameObject("Scene", new PVector(), null));
+        map = new MapManager(8, ""); 
+        launchGame();
+      } else {  
+        if (mouse.intersect(playButton)) {
+          fill(255, 0, 0);
+          if (mousePressed) {
+            Scene.startScene(new GameObject("Scene", new PVector(), null));
+            map = new MapManager(8, ""); 
+            launchGame();
+          }
+        } else {
+          fill(0);
+        }
       }
-    }
-    text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
 
-    messageHandler.update();
     break;
 
-  case Loading :
-    text("Loading...", width/2-textWidth(playString), height/2-textSize);
-    break;
-
-  case Game :
-    gameDraw();
-    break;
-
-  default :
-    println("ERROR ERROR CASE NOT MANAGED");
-    break;
+    case ClientWaitingForLaunch :
+      fill(0);
+      if (!playerNumberAssigned) {
+        if (globalPlayerNumber > 0) {
+          waitingPlayerString = "You are the client number " + globalPlayerNumber +".\nWaiting for player connexion...";
+          playerNumberAssigned = true;
+        }
+      }
+      text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
+  
+      messageHandler.update();
+      break;
+  
+    case Loading :
+      text("Loading...", width/2-textWidth(playString), height/2-textSize);
+      break;
+  
+    case Game :
+      gameDraw();
+      break;
+  
+    default :
+      println("ERROR ERROR CASE NOT MANAGED");
+      break;
   }
-
+  
   if (scene != SceneState.Game) {
     mouse.position.x = mouseX;
     mouse.position.y = mouseY;
@@ -337,5 +337,10 @@ public void adaptDisplayVariablesToResolution(){
   cameraResolutionOffsetX = width/(2*globalScale);
   cameraResolutionOffsetY = height/(2*globalScale);
   if(map != null) map.DefineMiniMapSize();
+}
+
+public void startGame(){
+  Time.timeScale = 1;
+  scene = SceneState.Game;  
 }
 

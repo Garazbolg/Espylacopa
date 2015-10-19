@@ -262,7 +262,7 @@ public class Werewolf extends GameCharacter {
 
 
   public void changeCharacterSpriteSheet(String spriteSheetName, int widthS, int heightS) {
-    walkAndIdle = new SpriteSheet(spriteSheetName, widthS, heightS); // TODO : changer parameters to match with finalized sprite sheet
+    walkAndIdle = new SpriteSheet(spriteSheetName, widthS, heightS);
 
     walkRight.animation.source = walkAndIdle;
     walkLeft.animation.source = walkAndIdle;

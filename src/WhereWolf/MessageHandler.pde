@@ -34,7 +34,7 @@ public class MessageHandler{
         if(lastEndMessageIndex == -1) return;
         message = buffer.substring(0, lastEndMessageIndex);
         buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetCharacterPosition"))  println("Server read this message : " + message);
+         if(!message.contains("SetPosition"))  println("Server read this message : " + message);
        } else return;
      } else{
        if (Network.client.available() > 0) {
@@ -43,13 +43,13 @@ public class MessageHandler{
          if(lastEndMessageIndex == -1) return;
          message = buffer.substring(0, lastEndMessageIndex);
          buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetCharacterPosition")) println("Client read this message : " + message);
+         if(!message.contains("SetPosition")) println("Client read this message : " + message);
        } else {
          int lastEndMessageIndex = buffer.lastIndexOf("#");
          if(lastEndMessageIndex == -1) return;
          message = buffer.substring(0, lastEndMessageIndex);
          buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetCharacterPosition")) println("Client read this message : " + message);
+         if(!message.contains("SetPosition")) println("Client read this message : " + message);
        }
      }
      
@@ -110,6 +110,37 @@ public class MessageHandler{
            }
          }
          
+         // ClientAskHisClientNumber + clientIp
+         else if(typeOfMessage[0].compareTo("ClientReady") == 0){
+           if(Network.isServer){
+             Network.numberOfInitializedClients++;
+             if(Network.numberOfInitializedClients == Network.numberOfClients){
+               if(!sawsManagedByNetwork){
+                 Network.write("StartGame#");
+                 startGame();
+               } else{
+                 Network.write("AddSawsOnNetwork#");
+                 map.addSawsOnNetwork();
+                 startGame();
+               }
+             }
+           }
+         }
+         
+         else if(typeOfMessage[0].compareTo("AddSawsOnNetwork") == 0){
+           if(!Network.isServer){
+             println("Client get AddSawsOnNetwork");
+             map.addSawsOnNetwork();
+             startGame();
+           }
+         }
+         
+         else if(typeOfMessage[0].compareTo("StartGame") == 0){
+           if(!Network.isServer){
+             startGame();
+           }
+         }
+         
          // AssignClientNumber + clientIp + playerNumber
          else if(typeOfMessage[0].compareTo("AssignClientNumber") == 0){
            if(!Network.isServer){
@@ -136,15 +167,10 @@ public class MessageHandler{
                java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
   
                GameObject instance = (GameObject)constructor.newInstance(globalEnv, instantiateParams[0], new PVector(Float.parseFloat(instantiateParams[1]), Float.parseFloat(instantiateParams[2])));
-               println("InstantiateOnClients debug");
                instance.printGameObjectParents();
-               //instance.setActive(false);
                
                int newObjectId = Integer.parseInt(instantiateParams[3]);
-               
-               //Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "endMessage");
-               //Network.write("RPC " + RPCMode.Specific + " " + ipAdress + " " + newObjectId + " " + "InitPlayer" + "endMessage");                          
-
+                                    
              }
              catch(Exception e){
                println("Client side, Instantiate exception ; " + e);
@@ -210,8 +236,8 @@ public class MessageHandler{
            }
          }
          
-         // SetCharacterPosition playerId gameObject.position.x gameObject.position.y
-         else if(typeOfMessage[0].compareTo("SetCharacterPosition") == 0){
+         // SetPosition playerId gameObject.position.x gameObject.position.y
+         else if(typeOfMessage[0].compareTo("SetPosition") == 0){
             String[] messageParams = typeOfMessage[1].split(" ", 3);
             if(playerId != Integer.parseInt(messageParams[0])){
               NetworkViews.get(Integer.parseInt(messageParams[0])).gameObject.setPosition(new PVector(Float.parseFloat(messageParams[1]),Float.parseFloat(messageParams[2])));

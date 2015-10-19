@@ -19,7 +19,8 @@ public static class Network{
   public static Server server;
   public static Client client;
   
-  public static int clientNumber = 0;
+  public static int numberOfClients = 0;
+  public static int numberOfInitializedClients = 0;
   
   
   public static int sendRate = 15;
@@ -100,8 +101,8 @@ public static class Network{
  }
  
  public static int getClientNumber(){
-   clientNumber++;
-   return(clientNumber); 
+   numberOfClients++;
+   return(numberOfClients); 
  }
  
  public static int Instantiate(WhereWolf env, String classToInstantiate, PVector position, String rpcIpAdress){
@@ -126,7 +127,11 @@ public static class Network{
              if(rpcIpAdress != null) println("Server write message : " + "RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");
                
              Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "#");
-             if(rpcIpAdress != null) Network.write("RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");                          
+             if(rpcIpAdress != null) {
+               Network.write("RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");
+             }    
+
+             
              return newObjectId;
            }
     catch(Exception e){

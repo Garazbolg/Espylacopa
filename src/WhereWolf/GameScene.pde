@@ -45,22 +45,11 @@ private boolean playerInitialized = false;
 
 void initGame() {
   
-
-
+  Time.setTimeScale(0);
   
+  adaptDisplayVariablesToResolution();
   delay(2000); // Wait the end of the map generation to avoid low frame rate at start
-  
-  
-  /*
-  player = new WerewolfPrefab("One", GetSpawnPosition());
-  playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  */
-  
-  /*
-  sawsTrailsContainer = new GameObject("SawsTrailsContainer", new PVector());
-  Scene.addChildren(sawsTrailsContainer);
-  */
-  
+
   sawsContainer = new GameObject("SawsContainer", new PVector());
   Scene.addChildren(sawsContainer);
   
@@ -68,13 +57,6 @@ void initGame() {
   
   trapsContainer = new GameObject("TrapsContainer", new PVector());
   Scene.addChildren(trapsContainer);
-  
-  
-  
-  //int idTest = Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition());
-  //println("GameScene idTest = " + idTest);
-  
-  //player = new VillagerPrefab("One", GetSpawnPosition());
   
   if(Network.isServer) {
     
@@ -87,61 +69,10 @@ void initGame() {
   //else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
   else Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), ipAdress);
   
-   
-  //new VillagerPrefab("Two",  PVector.add(GetSpawnPosition(), new PVector(20,0)));
-  //Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
-  
-/*
-  
-  println("GameScene check et player = " + player);
- 
-  playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
-  
-  
-  
-  spawnPosition = new PVector(player.position.x, player.position.y);
-  
-  
-  
-  
-  //Network.Instantiate("WhereWolf$GameObject", spawnPosition);
-  
-  // Player = werewolf
-  //player = new WerewolfPrefab("One", GetSpawnPosition());
-  //playerCharacterComponent = (GameCharacter)(player.getComponent(Werewolf.class));
-  
-  
-  
-    
-
-  playerColliderHalfDimensions = ((Rect)(((Collider)player.getComponent(Collider.class)).area)).halfDimension;
-
-  cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
-
-  cameraWidth = (displayWidth - (2*resolutionStripSize)) / globalScale;
-  cameraHeight = displayHeight / globalScale;
-  
-  //Updatables.start();
-
-  scene = SceneState.Game;
-  
-*/
-
 }
 
 void gameDraw() {
-  
-  //println("GameScene - gameDraw");
-  //Updatables.update();
-  
-//Move
-// Done in Villager class
-  //((Rigidbody) player.getComponent(Rigidbody.class)).setVelocity(new PVector(Input.getAxisRaw("Horizontal")*70.0f,((Rigidbody) player.getComponent(Rigidbody.class)).getVelocity().y));
-  
-  
-  // DEBUG
-  if(Network.isServer && Input.getButtonDown("DebugGetDamage")) playerCharacterComponent.DecreaseLife(1, player.position);
-
+    
   if(! Constants.DEBUG_MODE)
   //Draw
   scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
@@ -172,8 +103,6 @@ void gameDraw() {
   }
 
 
-  // TODO : activate this line to have the draw of the map
-  //map.DrawMap(xBlock, yBlock);
 
   //GUI
   resetMatrix();    
@@ -187,8 +116,6 @@ void gameDraw() {
   
   playerCharacterComponent.drawLife();
 
-
-  //TODO : display a proper minimap
   
   if(Input.getButtonDown("ShowHideMiniMap")){
     showMiniMap = !showMiniMap; 
