@@ -42,12 +42,10 @@ public class MapManager {
   private float miniMapTranslatePositionX;
   private float miniMapTranslatePositionY;
   
-  private boolean fogOfWar = false;
   private boolean[][] visitedBlocks;
   
   private int brokeProbability = 50;
   
-  public boolean lowPerf = false;
   
   public MapManager(){
      
@@ -280,17 +278,17 @@ public class MapManager {
     }
   }
 
-  public int GetSpawnIndexX() {
-    return xSpawnPoints[0];
+  public int GetSpawnIndexX(int index) {
+    return xSpawnPoints[index];
   }
 
-  public int GetSpawnIndexY() {
-    return ySpawnPoints[0];
+  public int GetSpawnIndexY(int index) {
+    return ySpawnPoints[index];
   }
 
-  public PVector GetSpawnPosition() {
+  public PVector GetSpawnPosition(int index) {
     // TODO : manage returned spawn position index
-    return(new PVector(xSpawnPoints[0]*blockPixelSizeX+ blockPixelSizeX, ySpawnPoints[0]*blockPixelSizeY + blockPixelSizeY/2));
+    return(new PVector(xSpawnPoints[index]*blockPixelSizeX+ blockPixelSizeX, ySpawnPoints[index]*blockPixelSizeY + blockPixelSizeY/2));
   }
 
   public void DrawMiniMap(int playerPositionX, int playerPositionY) {

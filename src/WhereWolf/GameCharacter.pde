@@ -62,7 +62,7 @@ public abstract class GameCharacter extends Component{
   private float movementSpeed = 70.0f;
   //private float movementSpeed = 170.0f;
   
-  private boolean airJumpForDebug = true;
+  private boolean airJumpForDebug = false;
   
   private float invinciblityDuration;
   
@@ -532,16 +532,16 @@ public abstract class GameCharacter extends Component{
   }
   
   // Method called in update if playerCharacter, else by RPC
-  public void setXvelocity(float xVelocity){
-    animator.parameters.setFloat("SpeedX",xVelocity);
-    if(xVelocity > 0) {
+  public void setXvelocity(float newXvelocity){
+    animator.parameters.setFloat("SpeedX",newXvelocity);
+    if(newXvelocity > 0) {
       if(!isRunning){
         isRunning = true;
         characterCollider.setArea(runningColliderRect); 
       }
       facingRight = true;
     }
-    else if(xVelocity < 0) {
+    else if(newXvelocity < 0) {
       if(!isRunning){
         isRunning = true;
         characterCollider.setArea(runningColliderRect); 

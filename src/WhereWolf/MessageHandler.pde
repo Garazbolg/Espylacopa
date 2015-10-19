@@ -102,6 +102,17 @@ public class MessageHandler{
 
          }
          
+         // SetFogOfWar + fogOfWar
+         else if(typeOfMessage[0].compareTo("SetFogOfWar") == 0){
+           if(!Network.isServer){
+             println("Client catch SetFogOfWar message");
+             String[] messageParams = typeOfMessage[1].split(" ");
+             println("fogOfWar before = " + fogOfWar);
+             fogOfWar =  boolean(messageParams[0]);
+             println("fogOfWar after = " + fogOfWar);
+           }
+         }
+         
          // ClientAskHisClientNumber + clientIp
          else if(typeOfMessage[0].compareTo("ClientAskHisClientNumber") == 0){
            if(Network.isServer){

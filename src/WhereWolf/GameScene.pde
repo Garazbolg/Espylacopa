@@ -60,14 +60,26 @@ void initGame() {
   
   if(Network.isServer) {
     
-    player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), null)).gameObject;
-    ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
-    //player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), null)).gameObject;
-    //((GameCharacter)(player.getComponent(Werewolf.class))).initPlayer();
+    if(choosenClass == 0){
+      player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), null)).gameObject;
+      ((GameCharacter)(player.getComponent(Villager.class))).initPlayer();
+    } else if(choosenClass == 1){
+      player = NetworkViews.get(Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), null)).gameObject;
+      ((GameCharacter)(player.getComponent(Werewolf.class))).initPlayer();
+    }
+
+
     
   }
-  //else Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
-  else Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), ipAdress);
+  
+  else {
+    if(choosenClass == 0){
+      Network.Instantiate(this, "WhereWolf$VillagerPrefab", GetSpawnPosition(), ipAdress);
+    }
+    else if(choosenClass == 1){
+      Network.Instantiate(this, "WhereWolf$WerewolfPrefab", GetSpawnPosition(), ipAdress);
+    }
+  }
   
 }
 
@@ -204,8 +216,8 @@ public void cameraDrawDebug(){
 }
 
 public PVector GetSpawnPosition(){
-  xBlock = map.GetSpawnIndexX();
-  yBlock = map.GetSpawnIndexY();
+  xBlock = map.GetSpawnIndexX(globalPlayerNumber);
+  yBlock = map.GetSpawnIndexY(globalPlayerNumber);
   
   spawnXblock = xBlock;
   spawnYblock = yBlock;
@@ -213,7 +225,7 @@ public PVector GetSpawnPosition(){
   
   map.UpdateMap(xBlock, yBlock, xBlock, yBlock);
   
-  return map.GetSpawnPosition();
+  return map.GetSpawnPosition(globalPlayerNumber);
 }
 
 public void ResetToSpawnPosition(){

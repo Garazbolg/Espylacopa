@@ -32,7 +32,7 @@ public class Villager extends GameCharacter {
   Villager(){
     super();
     
-    SetLife(30);
+    SetLife(3);
     
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png",8,4);
     

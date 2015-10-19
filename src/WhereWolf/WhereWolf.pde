@@ -1,4 +1,10 @@
 
+/* KNOWN BUGS :
+- Saws collision not working if player is static
+- Player can play if his spawn position is inside a collider
+
+*/
+
 import java.awt.event.*;
 
 SceneState scene;
@@ -18,7 +24,35 @@ Rect mouse;
 Rect launchButton;
 Rect playButton;
 
+
+Rect fogOfWarButton;
+Rect lowPerfButton;
+Rect autoMapSizeButton;
+Rect smallMapSizeButton;
+Rect mediumMapSizeButton;
+Rect bigMapSizeButton;
+
+
+Rect hunterButton;
+Rect werewolfButton;
+
+
+String fogOfWarString = "Fog of War";
+String lowPerfString =  "Low Performances";
+
+String labelMapSizeString = "Map Size :";
+
+String autoMapSizeString = "Auto";
+String smallMapSizeString = "Small";
+String mediumMapSizeString = "Medium";
+String bigMapSizeString = "Big";
+
+String chooseClassString = "Choose you're class : ";
+String hunterString = "Hunter";
+String werewolfString = "Wherewolf";
+
 int textSize = 32;
+int optionsTextSize = 25;
 
 boolean playGameWithOneComptuer = true; // Used to attributes differents inputs for each player using same keyboard
 int maxPlayerNumberOnOneComputer = 3; // Depands of the number of differents inputs established
@@ -56,6 +90,15 @@ float cameraResolutionOffsetY;
 
 boolean sawsManagedByNetwork = true;
 
+boolean fogOfWar = false;
+boolean lowPerf = false;
+
+int mapSizeOption = 0; // 0 : auto, 1 : small, 2 : mediuem, 3 : big
+int choosenClass = 0; // 0 : hunter,  1 : werewolf
+
+boolean gameLaunched = false;
+
+
 static WhereWolf globalEnv;
 
 void setup(){
@@ -75,7 +118,6 @@ void setup(){
  
   scene = SceneState.Title;
  
-  launchButton = new Rect(width/2, height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
 
   frame.setResizable(true);
   
@@ -140,6 +182,7 @@ void setup(){
   //Updatables.start();
   GUI.start(this);
   
+  launchButton = new Rect(width/2, height/2 + title.height/2, 1.5f*textWidth(launchString), 1.5f*textSize);
   
   
 }
@@ -167,7 +210,7 @@ void draw() {
       image(titleBackground,titleBackgroudOffset,0);
       image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
      
-      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.03f;
      
       if(titleBackgroudOffset > titleBackground.width){
         titleBackgroudOffset -= titleBackground.width;
@@ -203,7 +246,7 @@ void draw() {
       image(titleBackground,titleBackgroudOffset,0);
       image(titleBackground,titleBackgroudOffset+titleBackground.width,0);
      
-      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.3f;
+      titleBackgroudOffset += Time.unscaledDeltaTime() * titleBackground.width * 0.03f;
      
       if(titleBackgroudOffset > titleBackground.width){
         titleBackgroudOffset -= titleBackground.width;
@@ -219,50 +262,58 @@ void draw() {
       fill(0);
       text(launchString, launchButton.position.x - textWidth(launchString)/2, launchButton.position.y + textSize/4);
   
-      if (Input.getButtonDown("Jump")) {
-        connectToServer();
+      if (mouse.intersect(launchButton)) {
+        fill(255, 0, 0);
       } else {
-        if (mouse.intersect(launchButton)) {
-          fill(255, 0, 0);
-          if (mousePressed) {
-            connectToServer();
-          }
-        } else {
-          fill(0);
-        }
+        fill(0);
       }
 
   
-      //rect(mouse.position.x, mouse.position.y, 2*mouse.halfDimension.x, 2*mouse.halfDimension.y);
       break;
 
     case ServerWaitingForLaunch :
       fill(255);
       playButton.draw();
+      drawOptions();
+      
       fill(0);
-      text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
+      text(waitingPlayerString, width/2-(textWidth(waitingPlayerString)/2), height/2-textSize);
       text(playString, playButton.position.x - textWidth(playString)/2, playButton.position.y + textSize/4);
-    
-      if (Input.getButtonDown("Jump")) {          
-        Scene.startScene(new GameObject("Scene", new PVector(), null));
-        map = new MapManager(8, ""); 
-        launchGame();
-      } else {  
-        if (mouse.intersect(playButton)) {
+      if (mouse.intersect(playButton)) {
           fill(255, 0, 0);
-          if (mousePressed) {
-            Scene.startScene(new GameObject("Scene", new PVector(), null));
-            map = new MapManager(8, ""); 
-            launchGame();
-          }
-        } else {
+      } else {
           fill(0);
+      }
+      
+      if (!gameLaunched && mouse.intersect(playButton) && mousePressed) {          
+        gameLaunched = true;
+        
+        
+        Network.write("SetFogOfWar " + fogOfWar + "#");        
+        Scene.startScene(new GameObject("Scene", new PVector(), null));
+        switch(mapSizeOption){
+          case 0 : // Auto
+            map = new MapManager(Network.numberOfClients+1, ""); 
+            break;
+          case 1 : // SmalL
+            map = new MapManager(3, ""); 
+          break;
+          case 2 : // Medium
+            map = new MapManager(7, ""); 
+          break;
+          case 3 : // BIg
+            map = new MapManager(11, ""); 
+          break;
         }
+        
+        launchGame();
       }
 
     break;
 
     case ClientWaitingForLaunch :
+    
+      drawOptions();
       fill(0);
       if (!playerNumberAssigned) {
         if (globalPlayerNumber > 0) {
@@ -270,7 +321,7 @@ void draw() {
           playerNumberAssigned = true;
         }
       }
-      text(waitingPlayerString, width/2-textWidth(playString), height/2-textSize);
+      text(waitingPlayerString, width/2-(textWidth(waitingPlayerString)/2), height/2-textSize);
   
       messageHandler.update();
       break;
@@ -304,20 +355,39 @@ boolean sketchFullScreen() {
 }
 
 public void connectToServer() {
+  
+    lowPerfButton = new Rect(1.5f*textWidth(fogOfWarString)/2, 3*optionsTextSize + 4*optionsTextSize, 0.65f*textWidth(lowPerfString), 1.5f*optionsTextSize);
+    
+    float maxClassTextWidth = max(textWidth(hunterString), textWidth(werewolfString));
+    
+    hunterButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 1.5f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
+    werewolfButton = new Rect(width - 1.5f*maxClassTextWidth/2, (2*height)/3 + 3.2f*optionsTextSize, maxClassTextWidth, 1.5f*optionsTextSize);
+    
   if (!Network.connectClient(this, "127.0.0.1", 12345, ipAdress)) {
     Network.connectServer(this, 12345); 
     waitingPlayerString = "You are the host.\nWaiting for player connexion...";
     scene = SceneState.ServerWaitingForLaunch;
     globalPlayerNumber = 0;
     playerNumberAssigned = true;
+    
+    playButton = new Rect(width/2, height/2 + 3*textSize, 1.5f*textWidth(playString), 1.5f*textSize);
+    fogOfWarButton = new Rect(1.5f*textWidth(fogOfWarString)/2, lowPerfButton.position.y - 4*optionsTextSize, 0.65f*textWidth(fogOfWarString), 1.5f*optionsTextSize);
+    lowPerfButton = new Rect(1.5f*textWidth(fogOfWarString)/2, fogOfWarButton.position.y + 2*fogOfWarButton.halfDimension.y + optionsTextSize, 0.65f*textWidth(lowPerfString), 1.5f*optionsTextSize);
+    autoMapSizeButton = new Rect(lowPerfButton.position.x + textWidth(labelMapSizeString)/2, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(autoMapSizeString), 1.5f*optionsTextSize);
+    smallMapSizeButton = new Rect(autoMapSizeButton.position.x + (textWidth(smallMapSizeString) - textWidth(autoMapSizeString))/2 + 2*autoMapSizeButton.halfDimension.x + 20, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(smallMapSizeString), 1.5f*optionsTextSize);
+    mediumMapSizeButton = new Rect(smallMapSizeButton.position.x + (textWidth(mediumMapSizeString) - textWidth(smallMapSizeString))/2 + 2*smallMapSizeButton.halfDimension.x + 20, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(mediumMapSizeString), 1.5f*optionsTextSize);
+    bigMapSizeButton = new Rect(mediumMapSizeButton.position.x + (textWidth(bigMapSizeString) - textWidth(mediumMapSizeString))/2 + 2*mediumMapSizeButton.halfDimension.x + 26, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(bigMapSizeString), 1.5f*optionsTextSize);
+
   } else {
     println("Client ip = " + ipAdress);
     Network.write("ClientAskHisClientNumber " + ipAdress + "#");
     waitingPlayerString = "You are the client number ?\nWaiting for player connexion...";
     scene = SceneState.ClientWaitingForLaunch;
   }
+  
+  
+    //fogOfWarButton = new Rect(1.5f*textWidth(fogOfWarString)/2, lowPerfButton.position.y - 4*optionsTextSize, 0.65f*textWidth(fogOfWarString), 1.5f*optionsTextSize);
 
-  playButton = new Rect(width/2, height/2 + 3*textSize, 1.5f*textWidth(playString), 1.5f*textSize);
 }
 
 public void launchGame() {
@@ -342,5 +412,75 @@ public void adaptDisplayVariablesToResolution(){
 public void startGame(){
   Time.timeScale = 1;
   scene = SceneState.Game;  
+}
+
+public void drawOptions(){
+  textSize(optionsTextSize);
+  if(Network.isServer){
+    if(fogOfWar) fill(0,255,0); 
+    else fill(255,0,0); 
+    fogOfWarButton.draw();
+    
+    if(mapSizeOption == 0) fill(0,255,0); 
+    else fill(255,0,0); 
+    autoMapSizeButton.draw();
+    
+    if(mapSizeOption == 1) fill(0,255,0); 
+    else fill(255,0,0); 
+    smallMapSizeButton.draw();
+    
+    if(mapSizeOption == 2) fill(0,255,0); 
+    else fill(255,0,0); 
+    mediumMapSizeButton.draw();
+    
+    if(mapSizeOption == 3) fill(0,255,0); 
+    else fill(255,0,0); 
+    bigMapSizeButton.draw();
+    
+    fill(0);
+    text(fogOfWarString, fogOfWarButton.position.x - textWidth(fogOfWarString)/2, fogOfWarButton.position.y + optionsTextSize/4);
+    text(labelMapSizeString, lowPerfButton.position.x - textWidth(labelMapSizeString)/2, height - optionsTextSize*2);
+    text(autoMapSizeString, autoMapSizeButton.position.x - textWidth(autoMapSizeString)/2, autoMapSizeButton.position.y + optionsTextSize/4);
+    text(smallMapSizeString, smallMapSizeButton.position.x - textWidth(smallMapSizeString)/2, smallMapSizeButton.position.y + optionsTextSize/4);
+    text(mediumMapSizeString, mediumMapSizeButton.position.x - textWidth(mediumMapSizeString)/2, mediumMapSizeButton.position.y + optionsTextSize/4);
+    text(bigMapSizeString, bigMapSizeButton.position.x - textWidth(bigMapSizeString)/2, bigMapSizeButton.position.y + optionsTextSize/4);
+  }
+  
+  if(lowPerf) fill(0,255,0); 
+  else fill(255,0,0); 
+  lowPerfButton.draw();
+  
+  if(choosenClass == 0) fill(0,255,0); 
+  else fill(255,0,0); 
+  hunterButton.draw();
+  
+  if(choosenClass == 1) fill(0,255,0); 
+  else fill(255,0,0); 
+  werewolfButton.draw();
+  
+  fill(0);
+  text(lowPerfString, lowPerfButton.position.x - textWidth(lowPerfString)/2, lowPerfButton.position.y + optionsTextSize/4);
+  text(chooseClassString, width - 1.2f*textWidth(chooseClassString), (2*height)/3);
+
+  text(hunterString, hunterButton.position.x - textWidth(hunterString)/2, hunterButton.position.y + optionsTextSize/4);
+  text(werewolfString, werewolfButton.position.x - textWidth(werewolfString)/2, werewolfButton.position.y + optionsTextSize/4);
+  
+  
+  textSize(textSize);
+}
+
+void mouseClicked() {
+  if (mouse.intersect(fogOfWarButton)) fogOfWar = !fogOfWar;
+  if (mouse.intersect(lowPerfButton)) lowPerf = !lowPerf;
+  
+  if (mouse.intersect(autoMapSizeButton)) mapSizeOption = 0;
+  if (mouse.intersect(smallMapSizeButton)) mapSizeOption = 1;
+  if (mouse.intersect(mediumMapSizeButton)) mapSizeOption = 2;
+  if (mouse.intersect(bigMapSizeButton)) mapSizeOption = 3;
+  
+  if (mouse.intersect(hunterButton)) choosenClass = 0;
+  if (mouse.intersect(werewolfButton)) choosenClass = 1;
+  
+  if(scene == SceneState.MainMenu && mouse.intersect(launchButton)) connectToServer();
 }
 

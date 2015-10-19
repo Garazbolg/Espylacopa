@@ -5,20 +5,15 @@ public class Werewolf extends GameCharacter {
   private boolean canTransform = false;
 
   private float powerBar = 0;
-  private float maxPowerBar = 1000;
+  private float maxPowerBar = 10000;
 
   private float powerBarChrono;
 
-  private float powerBarIncreaseSpeed = 100;
-  private float powerBarIncreaseDelay = 10;
+  private float powerBarIncreaseSpeed = 10;
+  private float powerBarIncreaseDelay = 100;
 
   private float powerBarDecreaseSpeed = 10;
   private float powerBarDecreaseDelay = 10;
-
-  /*
-  private float transformationChrono;
-   private float transformationDelay = 3000;
-   */
 
   private float vulnerabilityChrono;
   private float vulnerabilityDelay = 10000;
@@ -62,7 +57,7 @@ public class Werewolf extends GameCharacter {
 
     super();
 
-    SetLife(30);
+    SetLife(3);
 
     walkAndIdle = new SpriteSheet(characterSpriteSheetPath + "VillageoisSpriteSheet.png", 8, 4);
 
