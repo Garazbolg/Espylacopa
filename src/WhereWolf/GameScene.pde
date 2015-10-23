@@ -100,7 +100,7 @@ void gameDraw() {
   else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
  }
  
- //manageCameraOrientation();
+ manageCameraOrientation();
   Scene.draw();
  // popMatrix();
 
@@ -127,7 +127,6 @@ void gameDraw() {
   
   
   playerCharacterComponent.drawLife();
-
   
   if(Input.getButtonDown("ShowHideMiniMap")){
     showMiniMap = !showMiniMap; 

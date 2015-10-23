@@ -2,7 +2,10 @@
 
 
 enum TileType{
-  Empty, Opened, Closed, EmptyPot, FirePot, FlowerPot, Bookcase, Chest, Lava, PlatformLeft, PlatformMid, PlatformRight, Canvas, Saw, SawTrail, Chair, Couch, Furniture, Statue, Vase, DownSpikes, UpSpikes, LeftSpikes, RightSpikes;
+  Empty, Opened, Closed, EmptyPot, FirePot, FlowerPot, Bookcase, 
+  Chest, Lava, PlatformLeft, PlatformMid, PlatformRight, Canvas,
+  Saw, SawTrail, Chair, Couch, Furniture, Statue, Vase, DownSpikes, 
+  UpSpikes, LeftSpikes, RightSpikes;
 
   public static TileType fromInteger(int x) {
         switch(x) {
