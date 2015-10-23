@@ -7,7 +7,6 @@ public class DelegateFire extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateFire - Call");
    ((Villager)(thisComponent)).fire(); 
  }
 }

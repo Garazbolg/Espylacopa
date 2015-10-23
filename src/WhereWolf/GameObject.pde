@@ -41,7 +41,6 @@ public class GameObject extends Updatable implements Drawable,DebugDrawable{
 
  
  public GameObject(){
-    println("GO bad constructor called");  
   }
   
  public GameObject(String n, PVector pos){

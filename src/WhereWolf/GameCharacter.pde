@@ -579,7 +579,6 @@ public abstract class GameCharacter extends Component{
   
   // TODO : Define inputs for more than three players
   public void DefineInputs(){
-    println("DefineInputs - globalPlayerNumber = " + globalPlayerNumber + " ipAdress = " + ipAdress);
     if(playGameWithOneComptuer && globalPlayerNumber > 0 && globalPlayerNumber < maxPlayerNumberOnOneComputer){
       horizontalInput = "Horizontal"+(globalPlayerNumber+1);
       verticalInput = "Vertical"+(globalPlayerNumber+1);

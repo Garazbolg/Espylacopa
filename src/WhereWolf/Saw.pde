@@ -70,10 +70,8 @@ public class Saw extends Component {
         
        movement.mult(speed*Time.deltaTime());
         
-       //gameObject.position.add(movement);
        gameObject.position = PVector.add(gameObject.position, movement);
         
-       //println(PVector.dist(currentSawTrail.position, gameObject.position) + " " + PVector.dist(currentSawTrail.position, nextSawTrail.position));
        if(PVector.dist(currentSawTrail.position, gameObject.position) > PVector.dist(currentSawTrail.position, nextSawTrail.position)){
           gameObject.position = nextSawTrail.position;
           defineNextSail();

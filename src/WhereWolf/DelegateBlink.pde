@@ -7,7 +7,6 @@ public class DelegateBlink extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateBlink - Call");
    ((GameCharacter)(thisComponent)).activateBlinkOfInvulnerability(Integer.parseInt(argv[0])); 
  }
 }

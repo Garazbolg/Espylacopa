@@ -6,7 +6,6 @@ public class DelegateDestroy extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateDestroy - Call");
    thisComponent.gameObject.destroy(); 
  }
 }

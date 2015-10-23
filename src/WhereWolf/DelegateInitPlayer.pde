@@ -7,7 +7,6 @@ public class DelegateInitPlayer extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateInitPlayer - Call");
    ((GameCharacter)(thisComponent)).initPlayer(); 
  }
 }

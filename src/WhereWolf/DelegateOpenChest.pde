@@ -7,7 +7,6 @@ public class DelegateOpenChest extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateOpenChest - Call");
    ((Chest)(thisComponent)).openChest(); 
  }
 }

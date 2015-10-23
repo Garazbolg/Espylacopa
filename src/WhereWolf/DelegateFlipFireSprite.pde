@@ -7,7 +7,6 @@ public class DelegateFlipFireSprite extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateFlipFireSprite - Call");
    ((Villager)(thisComponent)).flipFireSprite(boolean(argv[0])); 
  }
 }

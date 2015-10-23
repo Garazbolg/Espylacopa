@@ -7,7 +7,6 @@ public class DelegateDamageMultiplicator extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateDamageMultiplicator - Call");
    ((GameCharacter)(thisComponent)).setDamageMultiplicator(Float.parseFloat(argv[0])); 
  }
 }

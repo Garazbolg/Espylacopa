@@ -394,7 +394,6 @@ public void connectToServer() {
     bigMapSizeButton = new Rect(mediumMapSizeButton.position.x + (textWidth(bigMapSizeString) - textWidth(mediumMapSizeString))/2 + 2*mediumMapSizeButton.halfDimension.x + 26, height - optionsTextSize*2 - (1.5f*optionsTextSize)/4, 0.85f*textWidth(bigMapSizeString), 1.5f*optionsTextSize);
 
   } else {
-    println("Client ip = " + ipAdress); 
     Network.write("ClientAskHisClientNumber " + ipAdress + "#");
     waitingPlayerString = "You are the client number ?\nWaiting for player connexion...";
     scene = SceneState.ClientWaitingForLaunch;

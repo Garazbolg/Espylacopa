@@ -7,7 +7,6 @@ public class DelegateDie extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateDie - Call");
    ((GameCharacter)(thisComponent)).die(); 
  }
 }

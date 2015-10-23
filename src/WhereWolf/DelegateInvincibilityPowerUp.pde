@@ -7,7 +7,6 @@ public class DelegateInvincibilityPowerUp extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateInvincibilityPowerUp - Call");
    ((GameCharacter)(thisComponent)).applyInvincibilityPowerUp(Integer.parseInt(argv[0])); 
  }
 }

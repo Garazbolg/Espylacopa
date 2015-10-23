@@ -7,7 +7,6 @@ public class DelegateDamageMove extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateDamageMove - Call");
    ((GameCharacter)(thisComponent)).makeMoveCausedByDamage(new PVector(Float.parseFloat(argv[0]), Float.parseFloat(argv[1]))); 
  }
 }

@@ -34,7 +34,6 @@ public class MessageHandler{
         if(lastEndMessageIndex == -1) return;
         message = buffer.substring(0, lastEndMessageIndex);
         buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetPosition"))  println("Server read this message : " + message);
        } else return;
      } else{
        if (Network.client.available() > 0) {
@@ -43,13 +42,11 @@ public class MessageHandler{
          if(lastEndMessageIndex == -1) return;
          message = buffer.substring(0, lastEndMessageIndex);
          buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetPosition")) println("Client read this message : " + message);
        } else {
          int lastEndMessageIndex = buffer.lastIndexOf("#");
          if(lastEndMessageIndex == -1) return;
          message = buffer.substring(0, lastEndMessageIndex);
          buffer = buffer.substring(lastEndMessageIndex+1, buffer.length());
-         if(!message.contains("SetPosition")) println("Client read this message : " + message);
        }
      }
      
@@ -68,7 +65,6 @@ public class MessageHandler{
              Network.write(messages[messageIterator]+"#"); 
            }
           
-           println("GET RPC : " + typeOfMessage[1]);
            String[] rpcParams = typeOfMessage[1].split(" ");
            RPCMode target = RPCMode.valueOf(rpcParams[0]);
            
@@ -105,11 +101,8 @@ public class MessageHandler{
          // SetFogOfWar + fogOfWar
          else if(typeOfMessage[0].compareTo("SetFogOfWar") == 0){
            if(!Network.isServer){
-             println("Client catch SetFogOfWar message");
              String[] messageParams = typeOfMessage[1].split(" ");
-             println("fogOfWar before = " + fogOfWar);
              fogOfWar =  boolean(messageParams[0]);
-             println("fogOfWar after = " + fogOfWar);
            }
          }
          
@@ -140,7 +133,6 @@ public class MessageHandler{
          
          else if(typeOfMessage[0].compareTo("AddSawsOnNetwork") == 0){
            if(!Network.isServer){
-             println("Client get AddSawsOnNetwork");
              map.addSawsOnNetwork();
              startGame();
            }
@@ -178,7 +170,6 @@ public class MessageHandler{
                java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
   
                GameObject instance = (GameObject)constructor.newInstance(globalEnv, instantiateParams[0], new PVector(Float.parseFloat(instantiateParams[1]), Float.parseFloat(instantiateParams[2])));
-               instance.printGameObjectParents();
                
                int newObjectId = Integer.parseInt(instantiateParams[3]);
                                     
@@ -187,40 +178,6 @@ public class MessageHandler{
                println("Client side, Instantiate exception ; " + e);
              }
            }
-         }
-         
-         /*
-           Instantiate
-         */
-         else if(typeOfMessage[0].compareTo("Instantiate") == 0){
-           
-           /*
-           if(Network.isServer){
-             String[] instantiateParams = typeOfMessage[1].split(" ",3);
-             
-             try{
-               Class<?> clazz = Class.forName(instantiateParams[0]);
-               java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
-               GameObject instance = (GameObject)constructor.newInstance(instantiateParams[0], new PVector(Float.parseFloat(instantiateParams[1]),Float.parseFloat(instantiateParams[2])));
-               Network.write(message + " " + ((NetworkView)instance.getComponent(NetworkView.class)).id +"endMessage");
-             }
-             catch (Exception e){
-               //TODO Error message for class not found and other exceptions 
-             }
-           }
-           else{
-             String[] instantiateParams = typeOfMessage[1].split(" ",4);
-             
-             try{
-               Class<?> clazz = Class.forName(instantiateParams[0]);
-               java.lang.reflect.Constructor constructor = clazz.getConstructor(String.class, PVector.class);
-               GameObject instance = (GameObject)constructor.newInstance(instantiateParams[0], new PVector(Float.parseFloat(instantiateParams[1]),Float.parseFloat(instantiateParams[2])));
-               ((NetworkView)instance.getComponent(NetworkView.class)).id = Integer.parseInt(instantiateParams[3]);
-             }
-             catch (Exception e){
-               //TODO Error message for class not found and other exceptions 
-             }
-           }*/
          }
          
          else if(typeOfMessage[0].compareTo("GeneratedMap") == 0){
@@ -249,6 +206,11 @@ public class MessageHandler{
          
          // SetPosition playerId gameObject.position.x gameObject.position.y
          else if(typeOfMessage[0].compareTo("SetPosition") == 0){
+           
+           if(Network.isServer){
+             Network.write(messages[messageIterator] + "#"); 
+           }
+           
             String[] messageParams = typeOfMessage[1].split(" ", 3);
             if(playerId != Integer.parseInt(messageParams[0])){
               NetworkViews.get(Integer.parseInt(messageParams[0])).gameObject.setPosition(new PVector(Float.parseFloat(messageParams[1]),Float.parseFloat(messageParams[2])));

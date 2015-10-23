@@ -33,7 +33,6 @@ public static class Network{
    isConnected = true;
     isServer = true;
     client = null;
-    println("server connected");
     return true;
    }
    catch(RuntimeException e){
@@ -62,7 +61,6 @@ public static class Network{
       isServer = false;
       server = null;
       localIP = ipAdress;
-      println("new client connected");
       return true;
      }
    } catch(RuntimeException e){
@@ -74,13 +72,11 @@ public static class Network{
    if(!isConnected) return false;
    if(isServer){
      server.write(message);
-     //println("server write : " + message);
      return true; 
    }
    
    if(!isServer && client.active()){
      client.write(message);
-     //println("client write : " + message);
      return true; 
    }
    
@@ -114,7 +110,6 @@ public static class Network{
      write("InstantiateOnServer " + classToInstantiate + " " + position.x + " " + position.y + " " + rpcIpAdress + "#");
    else{
      try{
-             //println("Server Instantiate - env = " + env + " classToInstantiate = " + classToInstantiate + " position = " + position + " rpcIpAdress = " + rpcIpAdress);
              Class<?> clazz = Class.forName(classToInstantiate);
              // WARNING : CONSTRUCTOR MUST BE PUBLIC
              java.lang.reflect.Constructor constructor = clazz.getConstructor(WhereWolf.class, String.class, PVector.class);
@@ -123,12 +118,7 @@ public static class Network{
              if(rpcIpAdress != null) gameObjectName = "clientPlayer"+position;
              
              GameObject instance = (GameObject)constructor.newInstance(globalEnv, gameObjectName, position);
-             //instance.setActive(false);
              int newObjectId = ((NetworkView)instance.getComponent(NetworkView.class)).id;
-             
-             println("Server just created instance");
-             println("Server write message : " + "InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "#");
-             if(rpcIpAdress != null) println("Server write message : " + "RPC " + RPCMode.Specific + " " + rpcIpAdress + " " + newObjectId + " initPlayer#");
                
              Network.write("InstantiateOnClients " + classToInstantiate + " " + position.x + " " + position.y + " " + newObjectId + "#");
              if(rpcIpAdress != null) {
@@ -139,7 +129,6 @@ public static class Network{
              return newObjectId;
            }
     catch(Exception e){
-             //TODO Error message for class not found and other exceptions 
              println("Server Instantiate exception ; " + e.getCause());
            }
    }

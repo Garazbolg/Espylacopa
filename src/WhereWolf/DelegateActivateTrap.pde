@@ -7,7 +7,6 @@ public class DelegateActivateTrap extends Delegate{
  }
   
  public void call(String [] argv){
-   println("DelegateActivateTrap - Call");
    ((Trap)(thisComponent)).activate(boolean(argv[0])); 
  }
 }

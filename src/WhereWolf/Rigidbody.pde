@@ -55,8 +55,6 @@ public class Rigidbody extends Component implements DebugDrawable{
       {
         grounded = false;
         coll = collider.getOppositeVelocity();
-        
-        //println("coll : (" + coll.x +"," + coll.y +")\n");
                        
         if((coll.y >0.05 && velocity.y < 0) || (coll.y <-0.05 && velocity.y > 0)){
             velocity.y = 0;
@@ -83,13 +81,6 @@ public class Rigidbody extends Component implements DebugDrawable{
       
       //temporary vector for calculation
       PVector vecteur = PVector.mult(velocity,Time.deltaTime());
-      
-      //println("absOpposite : (" + collider.absOppositeVecteur.x +","+collider.absOppositeVecteur.y+")");
-      /*
-      println("velocity : (" + velocity.x +"," + velocity.y +")");
-      println("vecteur : (" + vecteur.x +"," + vecteur.y +")");
-      println("coll : (" + coll.x +"," + coll.y +")\n");
-      */
       
       //Then apply the processed vector to the gameObject
       gameObject.position.add(vecteur);

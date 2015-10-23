@@ -191,7 +191,6 @@ public class Villager extends GameCharacter {
     animator.getCurrentState().startState(); // To have a fixed height for the weapon
     barrelGun.setActive(true);
     fireShotChrono = millis();
-    println("Fire - " + rightShotAttackCollider + " " + leftShotAttackCollider);
     
     if(myCharacter){
       if(facingRight) DamageClosestCollider(rightShotAttackCollider, 1, true);
@@ -223,9 +222,6 @@ public class Villager extends GameCharacter {
     }
     
     if(closestColliderIndex > -1){
-      println("DamageClosestCollider");
-      println("Target GO = " + allColliders.get(closestColliderIndex).gameObject);
-      println("Target GO name = " + allColliders.get(closestColliderIndex).gameObject.name);
       character = (GameCharacter)(allColliders.get(closestColliderIndex).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
       if(character!= null && character != this && character.isAlive() && !character.isInvulnerable()){
         Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(allColliders.get(closestColliderIndex).gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + (int)(damage*damageMultiplicator) + " " + gameObject.position.x + " " + gameObject.position.y +"#");    
