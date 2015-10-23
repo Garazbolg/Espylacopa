@@ -24,14 +24,10 @@ public static class NetworkViews{
     for(int i = 0; i<items.size() ; i++){
      if(items.get(i) == null)
        return(add(nv, i));
-       //return i;
     }
     
     items.add(nv);
-    return items.size()-1;
-    
-    //return -1;
-    
+    return items.size()-1;    
   }
   
   public static int add(NetworkView nv, int index){
@@ -83,6 +79,3 @@ public class NetworkView extends Component{
  
 }
 
-/*
-  nv.RPC("RPCMyfunction",RPCMode.Others,"Papa Maman 5 Faim");
-*/

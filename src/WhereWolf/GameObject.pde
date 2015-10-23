@@ -25,8 +25,6 @@ public static class Scene{
 }
 
 
-/**/
-
 public class GameObject extends Updatable implements Drawable,DebugDrawable{
   
  public String name;

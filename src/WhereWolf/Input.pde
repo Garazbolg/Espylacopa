@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.Map;
 
 
-/*
-*/
 public static class Input{
   
   private static /*processing.core.PApplet*/WhereWolf env;
@@ -50,6 +48,7 @@ public static class Input{
      
     } 
     
+    // Decomment next line to know all the keyboard inputs name managed by library. Useful when adding new managed input.
     //keyboard.printButtons();
   }
   

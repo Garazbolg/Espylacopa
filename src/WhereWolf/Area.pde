@@ -9,7 +9,7 @@
   Define an Area
   to know if they area overlapping
   Is used for managing collision and triggers
-  */
+*/
 public abstract class Area implements Cloneable,Drawable{
  public PVector position;
  

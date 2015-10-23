@@ -11,9 +11,9 @@
 
 public enum RPCMode{
 
-Server,	//Sends to the server only.
-Others,	//Sends to everyone except the sender.
-OtherClients,//Sends to every clients except the sender.
-All,	        //Sends to everyone.
+Server,	//Send to the server only.
+Others,	//Send to everyone except the sender.
+OtherClients, //Send to every clients except the sender.
+All, //Send to everyone.
 Specific // Send to only one ip
 }

@@ -6,8 +6,6 @@
 
 import java.util.Map;
 
-/*
-*/
 public class AnimatorController extends Renderer{
   
   public Parameters parameters;
@@ -81,9 +79,6 @@ public class AnimatorController extends Renderer{
 }
 
 
-
-/*
-*/
 public class Transition{
   public State from,to;
   
@@ -198,9 +193,6 @@ public class Transition{
 
 
 
-
-/*
-*/
 public class State{
   protected Animation animation;
   private float framePerSecond;
@@ -286,9 +278,6 @@ public class State{
 }
 
 
-
-/*
-*/
 public class Parameters{
   private HashMap<String,Boolean> parametersBool;
   private HashMap<String,Integer> parametersInt;

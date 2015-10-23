@@ -24,16 +24,9 @@ public static class Updatables{
  
  //Updatables.start() to put at the end of the start function of the main 
   public static void start(){
-    /*
-    // Can create java.util.ConcurrentModificationException sometimes
-    for(Updatable u : items)
-       u.start(); 
-    */
-    
     for(int i=0 ; i<items.size() ; i++){
       items.get(i).start();
     }
-   
     
     alreadyStarted = true;
  }

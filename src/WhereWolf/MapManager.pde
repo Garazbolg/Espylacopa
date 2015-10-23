@@ -287,7 +287,6 @@ public class MapManager {
   }
 
   public PVector GetSpawnPosition(int index) {
-    // TODO : manage returned spawn position index
     return(new PVector(xSpawnPoints[index]*blockPixelSizeX+ blockPixelSizeX, ySpawnPoints[index]*blockPixelSizeY + blockPixelSizeY/2));
   }
 
@@ -306,13 +305,10 @@ public class MapManager {
             if (i==playerPositionX && j==playerPositionY) fill(255, 0, 0); // just to indicate where the player is
             rect(miniMapBlockSize*i, miniMapBlockSize*j, miniMapBlockSize, miniMapBlockSize);
             fill(0);
-            //text(mapBlocks[i][j], 50+miniMapBlockSize*i, 55+miniMapBlockSize*j);
-            //text(i+" "+j, 50+60*i, 55+60*j);
           }
         }
       }
     }
-
 
     // this code will draw the borders of each Blocks, no border = link door, border = wall
     strokeWeight(3);
@@ -362,7 +358,6 @@ public class MapManager {
       break;
     } 
 
-    //fill(0,0,255);
     rect(posX, posY, tilePixelSize, tilePixelSize);
   }
 
@@ -405,8 +400,8 @@ public class MapManager {
     if(fogOfWar){
       visitedBlocks[xCurrentBlock][yCurrentBlock] = true; 
     }
-    // TODO : optimization please
-
+    
+    // TODO : optimization
     if (HaveNeighborInDirection(xPreviousBlock, yPreviousBlock, Direction.Left)) {
       mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock].setActive(false);
       if (HaveNeighborInDirection(xPreviousBlock-1, yPreviousBlock, Direction.Up)) mapBlocksGameObjects[xPreviousBlock-1][yPreviousBlock-1].setActive(false);
@@ -494,8 +489,8 @@ public class MapManager {
           
           else choosenBlock =  selectedBlocks[i][j];
           
-          
-          //choosenBlock = numberOfBlocksPossibilities-1; // WARNING : line of code used to facilitate tests of level design, don't forget to comment this
+          // WARNING : next line of code is used to facilitate tests of new added blocks for level design. Don't forget to comment this after level design test.
+          //choosenBlock = numberOfBlocksPossibilities-1; 
           
           folderPath += "/"; // WARNING : this line must be done before the loadStrings
 
@@ -893,7 +888,6 @@ public class MapManager {
         ((Sprite)(upSpikes.getComponent(Sprite.class))).setScale(0.5f, 0.5f);
               
         tile.addComponent(new DamageCollider(new Rect(0, 4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
-        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
       
@@ -907,7 +901,6 @@ public class MapManager {
         ((Sprite)(downSpikes.getComponent(Sprite.class))).setScale(0.5f, -0.5f);
               
         tile.addComponent(new DamageCollider(new Rect(0, -4, (tilePixelSize - 3), (tilePixelSize/2 - 1)), 1));
-        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
         
@@ -921,7 +914,6 @@ public class MapManager {
         ((Sprite)(leftSpikes.getComponent(Sprite.class))).setScale(-0.5f, 0.5f);
               
         tile.addComponent(new DamageCollider(new Rect(4, 0, (tilePixelSize/2 - 1), (tilePixelSize -3)), 1));
-        ((DamageCollider)(tile.getComponent(DamageCollider.class))).forceDebugDraw = true;
         
         break;
            

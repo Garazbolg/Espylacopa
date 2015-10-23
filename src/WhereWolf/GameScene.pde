@@ -15,7 +15,6 @@ GameObject trapsContainer;
 GameObject sawsContainer;
 GameObject sawsTrailContainer;
 
-//enum Camera{Canvas,CenteredScroll,ForwardOffsetScroll};
 private boolean cameraScroll = true;
 private float maxCameraForwardOffset = 20;
 private float cameraForwardOffset;
@@ -24,7 +23,7 @@ private float cameraLerpSpeed;
 
 private PVector playerColliderHalfDimensions;
 
-private float resolutionStripSize; // taille des bandes noires
+private float resolutionStripSize; // black strip size
 
 private PVector spawnPosition;
 private int spawnXblock;
@@ -87,14 +86,8 @@ void gameDraw() {
     
   if(! Constants.DEBUG_MODE)
   //Draw
-  scale(globalScale); //Mise à l'échelle par rapport à la taille de l'écran (faudra penser à mettre les bords en noirs)
+  scale(globalScale); //Scaling relative to the screen size
 
-  //fill(255);
-  //rect(resolutionStripSize, 0, 128, 128); // fond blanc central en attendant le design des niveaux
-
-
- // pushMatrix();
- 
  if(! Constants.DEBUG_MODE){
   if(cameraScroll) translate(-cameraPosition.x, -cameraPosition.y);
   else translate(-xBlock*map.GetBlockPixelSizeX(),-yBlock*map.GetBlockPixelSizeY());
@@ -102,27 +95,13 @@ void gameDraw() {
  
  manageCameraOrientation();
   Scene.draw();
- // popMatrix();
-
-
-  
-
-  //Debug Draw
-  
-  if (!Constants.DEBUG_MODE){
-    //cameraDrawDebug();
-    //Scene.debugDraw();
-  }
-
-
 
   //GUI
   resetMatrix();    
-  //TODO : GUI part
   if(! Constants.DEBUG_MODE){
     fill(0);
-    rect(0, 0, globalScale*resolutionStripSize, height); // bande noire gauche
-    rect(width - globalScale*resolutionStripSize, 0, globalScale*resolutionStripSize, height); // bande noire droite
+    rect(0, 0, globalScale*resolutionStripSize, height); // left black strip
+    rect(width - globalScale*resolutionStripSize, 0, globalScale*resolutionStripSize, height); // right black strip
   }
   
   
@@ -134,10 +113,8 @@ void gameDraw() {
   
   if(showMiniMap) map.DrawMiniMap(xBlock, yBlock);
   
-
-  // Matrix to manage the
-
   if (!cameraScroll) {
+    // Matrix to manage the camera scrolling
     pushMatrix();
     CameraManagement();
     popMatrix();

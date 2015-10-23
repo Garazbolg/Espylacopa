@@ -43,9 +43,3 @@ public class RPCHolder{
       func.call(argv);
   }
 }
-/*
-RPC.addRPC("RPCMyRPCFunction",new Delegate(){public void call(String [] argv){
-
-}});
-
-*/

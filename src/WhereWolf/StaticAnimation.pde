@@ -5,8 +5,6 @@
 */
 
 
-/*
-*/
 public class StaticAnimation extends Renderer{
   
   Animation animation;
@@ -22,7 +20,6 @@ public class StaticAnimation extends Renderer{
   
   public void draw(){
     pushMatrix();
-     //scale(scaleX,scaleY);
      frame = ((int)(currentFrame*framePerSecond));
      PImage source = animation.getImage(frame);
      image(source,-source.width/2,-source.height/2); 

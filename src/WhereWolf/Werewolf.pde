@@ -248,7 +248,6 @@ public class Werewolf extends GameCharacter {
       if(!allColliders.get(i).isTrigger){
         GameCharacter character = (GameCharacter)(allColliders.get(i).gameObject.getComponentIncludingSubclasses(GameCharacter.class));
         if(character != null && character.isAlive && character.gameObject != this.gameObject){
-          //((GameCharacter)(allColliders.get(i).gameObject.getComponent(GameCharacter.class))).DecreaseLife((int)(damage*damageMultiplicator), gameObject.position);
           Network.write("RPC " + RPCMode.Others + " " + ipAdress + " " + ((NetworkView)(character.gameObject.getComponent(NetworkView.class))).getId() + " decreaseLife " + (int)(damage*damageMultiplicator) + " " + gameObject.position.x + " " + gameObject.position.y +"#");    
         }
       }

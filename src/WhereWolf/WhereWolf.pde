@@ -1,8 +1,8 @@
 
 /* KNOWN BUGS :
-- Saws collision not working if player is static
 - Player can't play if his spawn position is inside a collider
-
+- Game broken if client deconnecting before game launch
+- Sometimes, host player animations not working
 */
 
 import java.awt.event.*;
@@ -307,15 +307,27 @@ void draw() {
           case 0 : // Auto
             map = new MapManager(Network.numberOfClients+1, ""); 
             break;
-          case 1 : // SmalL
-            map = new MapManager(3, ""); 
-          break;
+          case 1 : // Small
+            if(Network.numberOfClients+1 < 3){
+              map = new MapManager(3, ""); 
+            } else{
+              map = new MapManager(Network.numberOfClients+1, ""); 
+            }
+            break;
           case 2 : // Medium
-            map = new MapManager(7, ""); 
-          break;
+            if(Network.numberOfClients+1 < 7){
+              map = new MapManager(7, ""); 
+            } else{
+              map = new MapManager(Network.numberOfClients+1, ""); 
+            }
+            break;
           case 3 : // BIg
-            map = new MapManager(11, ""); 
-          break;
+            if(Network.numberOfClients+1 < 11){
+              map = new MapManager(11, ""); 
+            } else{
+              map = new MapManager(Network.numberOfClients+1, ""); 
+            }
+            break;
         }
         
         launchGame();

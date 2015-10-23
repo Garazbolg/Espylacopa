@@ -4,9 +4,6 @@
         Last Modified : 26/04/2015
 */
 
-
-/*
-*/
 public class Animation{
  private int index;
  protected SpriteSheet source;

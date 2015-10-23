@@ -31,22 +31,7 @@ public static class Colliders{
    for(int j = i+1;j< everyColliders.size();j++){
      if(!everyColliders.get(j).isActive())
        continue;
-     
-     /*
-     if(everyColliders.get(i).layerManagement != LayerManagement.All && everyColliders.get(j).layerManagement != LayerManagement.All){
-       if(everyColliders.get(i).layerManagement == LayerManagement.AllExceptMyLayer || everyColliders.get(j).layerManagement == LayerManagement.AllExceptMyLayer){
-         if(everyColliders.get(i).layer == everyColliders.get(j).layer)
-           continue;
-       }
-       
-       else{
-         if(everyColliders.get(i).layer != everyColliders.get(j).layer)
-           continue;
-       }
-     }
-     */
-          
-     
+
     if(everyColliders.get(i).layerManagement == LayerManagement.OnlyMyLayer || everyColliders.get(j).layerManagement == LayerManagement.OnlyMyLayer){
       if(everyColliders.get(i).layer != everyColliders.get(j).layer)
         continue;
@@ -56,13 +41,6 @@ public static class Colliders{
       if(everyColliders.get(i).layer == everyColliders.get(j).layer)
         continue;
     }
-
-     
-     
-     /*
-     if(everyColliders.get(i).layer != everyColliders.get(j).layer)
-       continue;
-     */
      
          //if they touch
         if(everyColliders.get(i).intersect(everyColliders.get(j))){

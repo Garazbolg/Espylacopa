@@ -5,8 +5,6 @@
 */
 
 
-/*
-*/
 public static class GUI{
   
   private static processing.core.PApplet env;

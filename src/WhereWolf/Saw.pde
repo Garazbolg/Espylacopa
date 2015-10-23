@@ -24,19 +24,10 @@ public class Saw extends Component {
   
   public void init(){
     
-    /*
-    if(sawsManagedByNetwork){
-      gameObject.addComponent(new NetworkView());
-      networkId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
-    }
-    */
-    
     gameObject.addComponent(new DamageCollider(new Circle(0, 0, 12), 1));
-    //gameObject.addComponent(new DamageCollider(new Rect(0, 0, 12, 12), 1));
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layer = CollisionLayer.CharacterBody;
     ((DamageCollider)gameObject.getComponent(DamageCollider.class)).layerManagement = LayerManagement.OnlyMyLayer;
     
-    //((DamageCollider)gameObject.getComponent(DamageCollider.class)).forceDebugDraw = true;
     
     nextSawTrail = ((SawTrail)currentSawTrail.getComponent(SawTrail.class)).getNextSawTrail();
     if(nextSawTrail ==  null) nextSawTrail = ((SawTrail)currentSawTrail.getComponent(SawTrail.class)).getPreviousSawTrail();

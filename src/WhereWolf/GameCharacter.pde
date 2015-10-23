@@ -5,8 +5,6 @@
 */
 
 
-/*
-*/
 public abstract class GameCharacter extends Component{
   
   AnimatorController animator;
@@ -60,7 +58,6 @@ public abstract class GameCharacter extends Component{
   private float openChestImmobileDelay = 1000;
   
   private float movementSpeed = 70.0f;
-  //private float movementSpeed = 170.0f;
   
   private boolean airJumpForDebug = false;
   
@@ -421,11 +418,7 @@ public abstract class GameCharacter extends Component{
     isAlive = false;
     animator.setCurrentState(dead);
     characterCollider.setArea(new Rect(0, 0, deadSpriteSheet.getSpriteWidth(), deadSpriteSheet.getSpriteHeight()));
-    //characterCollider.layer = CollisionLayer.Environment;
     rigid.setVelocity(new PVector(0, rigid.getVelocity().y));
-    
-    //characterCollider.isTrigger = true;
-    //characterCollider.forceDebugDraw = true;
     
     
     staticGrave = false;
@@ -459,7 +452,7 @@ public abstract class GameCharacter extends Component{
     
     if(!myCharacter) return;
     
-    // TODO : too much checks in this if condition, not really optimized but more safe, check rigid.velocity inizialited is essential for sure
+    // TODO : too much checks in this if condition, not really optimized but more safe, check rigid.velocity initialized is essential for sure
     if(rigid == null || rigid.velocity == null || characterCollider == null || other == null || gameObject == null) return; // if condition to avoid error at launch when initialization is not finish
     if(other.passablePlatform && !characterCollider.getOverlookColliders().contains(other)){
       
@@ -518,7 +511,6 @@ public abstract class GameCharacter extends Component{
   public void initPlayer(){
     
     player = this.gameObject;
-    //playerCharacterComponent = (GameCharacter)(player.getComponent(Villager.class));
     playerCharacterComponent = this;
     spawnPosition = new PVector(player.position.x, player.position.y);
     
@@ -526,18 +518,13 @@ public abstract class GameCharacter extends Component{
   
     cameraPosition = new PVector(player.getPosition().x-(pixelResolutionStripSize/2)+1.5*playerColliderHalfDimensions.x, player.getPosition().y-64+playerColliderHalfDimensions.y);
   
-    
-    Updatables.start();
-  
-    //scene = SceneState.Game;    
+    Updatables.start(); 
     
     playerInitialized = true; 
     playerId = ((NetworkView)(gameObject.getComponent(NetworkView.class))).getId();
     
     gameObject.setActive(true);
     rigid.isKinematic = false;
-    
-    characterCollider.forceDebugDraw = true;
     
     myCharacter = true;
     

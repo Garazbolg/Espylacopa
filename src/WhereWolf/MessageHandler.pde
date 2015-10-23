@@ -15,8 +15,6 @@ public class MessageHandler{
   // RPC target(RCPMode) ip networkViewId methodName methodArguments
   // Instantiate className position.x poisition.y id
   
-  
-  
   MessageHandler(WhereWolf newEnv){
     env = newEnv;
   }
@@ -217,16 +215,7 @@ public class MessageHandler{
             }
          }
        }
-
-         
-       //}
-
        
-       
-       
-       
-       
-     //}
    }
   
 }

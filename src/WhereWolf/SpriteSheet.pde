@@ -5,9 +5,6 @@
 */
 
 
-/*
-  
-*/
 public class SpriteSheet{
   
   

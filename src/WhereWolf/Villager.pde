@@ -69,7 +69,6 @@ public class Villager extends GameCharacter {
     leftShotAttack.addComponent(new Collider(new Rect(-29, 0, 82, 10)));
     leftShotAttackCollider = (Collider)leftShotAttack.getComponent(Collider.class);
     leftShotAttackCollider.isTrigger = true;
-    leftShotAttackCollider.forceDebugDraw = true;
     
     
     rightShotAttack = new GameObject("LeftHumanAttack", new PVector(-10,2), gameObject);
@@ -81,7 +80,6 @@ public class Villager extends GameCharacter {
   
   public void update(){
     
-    //if(Network.isServer && gameObject.name == "clientPlayer")
     super.update();
     
     if(isAlive){
@@ -94,7 +92,6 @@ public class Villager extends GameCharacter {
         else{
           if(millis() - fireShotChrono > fireShotDelay){
             barrelGun.setActive(false);
-            //canMove = false;
           }
         }
       }
@@ -185,7 +182,6 @@ public class Villager extends GameCharacter {
     
     
     if(!showWeapon) showWeapon();
-    // Waiting for raycast implementation
     isFiring = true;
     canMove = false;
     animator.getCurrentState().startState(); // To have a fixed height for the weapon
@@ -241,9 +237,7 @@ public class Villager extends GameCharacter {
     idleLeft.animation.source = walkAndIdle;
     
     fireShotSprite = new Sprite(spritesPath + "fireShot.png");
-    //fireShotSprite = new Sprite(characterSpriteSheetPath + "VillageoisSpriteSheet.png");
      
-    //GameObject thisGameObject = (GameObject) this;
     barrelGun = new GameObject("BarrelGun", new PVector(-10,2), gameObject);
     barrelGun.addComponent(fireShotSprite);
     
@@ -267,16 +261,6 @@ public class Villager extends GameCharacter {
     if(barrelIsFacingRight) barrelGun.position = new PVector(10,2);
     else barrelGun.position = new PVector(-10,2);
   }
-  
-  /*
-  public void onTriggerEnter(Collider other){
-    if(availableTrapsNumber < maxTrapsNumber){
-      Trap trapComponent = (Trap)other.getComponent(Trap.class);
-      if(trapComponent != null){
-         
-      }
-    }
-  }
-  */
+
   
 }

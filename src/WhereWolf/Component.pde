@@ -5,8 +5,6 @@
 */
 
 
-/*
-*/
 public abstract class Component extends Updatable{
  public GameObject gameObject;
   
@@ -21,7 +19,7 @@ public abstract class Component extends Updatable{
  
  /*
    Use to declare a RPC Function to be called remotely
-   Exemple :
+   Example :
    
 void start(){
   super.start();

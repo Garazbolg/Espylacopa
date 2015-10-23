@@ -19,28 +19,10 @@ public class Trap extends Component {
   private boolean applyDamage = false;
   
   Trap(){
-    
     super();
     
     creationTime = millis();
-    
     blockLocation = map.getCurrentBlock();
-    /*
-    gameObject = go;
-    Parameters trapParams = new Parameters();
-    trapParams.setBool("Close", false);
-    
-    State trapIdle = new State(new Animation(trapSpriteSheet,0,false),0);
-    State trapClose =  new State(new Animation(trapSpriteSheet,0,false),9);
-    
-    Transition t = new Transition(trapIdle,trapClose,"Close",ConditionType.Equal,true);
-    
-    animatorController = new AnimatorController(trapIdle,trapParams);
-    gameObject.addComponent(animatorController);
-    
-    gameObject.addComponent(new Collider(new Rect(0,0,15,15)));
-    ((Collider)gameObject.getComponent(Collider.class)).isTrigger = true;
-    */
   }
 
   public void init(){
@@ -91,18 +73,6 @@ public class Trap extends Component {
        }
      }
   }
-  
-  /*
-  public void onTriggerEnter(Collider other){
-    if(millis() - creationTime > delayBeforePossibleActivation){
-      if(other.gameObject.getComponent(Trap.class) == null){
-      activate = true;
-      animatorController.parameters.setBool("Close",true);
-      activationChrono = millis();
-      }
-    }
-  }
-  */
   
   public boolean canBeActivated(){
     return(millis() - creationTime > delayBeforePossibleActivation);
